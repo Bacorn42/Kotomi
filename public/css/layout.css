@@ -1,0 +1,20 @@
+.kotomi-header {
+    width: 100%;
+    max-width: 1100px;
+    padding: 35px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.kotomi-header a {
+    color: var(--muted);
+    text-decoration: none;
+}
+
+.kotomi-container {
+    width: 100%;
+    max-width: 1100px;
+    padding: 20px;
+    margin: auto;
+}

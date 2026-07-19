@@ -1,0 +1,58 @@
+.kotomi-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border: 1px solid var(--border);
+    backdrop-filter: blur(14px);
+    border-radius: 22px;
+    padding: 35px;
+    box-shadow: var(--shadow);
+}
+
+.kotomi-button {
+    padding: 14px 32px;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #2a1b0e;
+    background: linear-gradient(135deg, var(--accent), #c98245);
+}
+
+.kotomi-input {
+    width: 100%;
+    padding: 18px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+}
+
+.kotomi-progress {
+    width: 100%;
+    height: 14px;
+    margin-top: 15px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #1b1714;
+}
+
+.kotomi-progress::-webkit-progress-bar {
+    background: #1b1714;
+    border-radius: 10px;
+}
+
+.kotomi-progress::-webkit-progress-value {
+    background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+    border-radius: 10px;
+}
+
+.kotomi-progress::-moz-progress-bar {
+    background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+    border-radius: 10px;
+}
+
+.kotomi-status {
+    margin-top: 20px;
+    color: var(--muted);
+    min-height: 24px;
+    font-size: 15px;
+}

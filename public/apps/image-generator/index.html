@@ -3,22 +3,33 @@
 <html>
     <head>
         <title>Kotomi - Image Generator</title>
+
+        <link rel="stylesheet" href="/css/theme.css" />
+        <link rel="stylesheet" href="/css/base.css" />
+        <link rel="stylesheet" href="/css/layout.css" />
+        <link rel="stylesheet" href="/css/components.css" />
+
         <link rel="stylesheet" href="style.css" />
     </head>
 
     <body>
-        <header>
-            <h1>Kotomi Image Generator</h1>
+        <header class="kotomi-header">
+            <h1>Kotomi</h1>
+            <span> Image Generator </span>
             <a href="/"> ← Back to Kotomi </a>
         </header>
 
-        <main>
-            <section class="generator">
+        <main class="kotomi-container">
+            <section class="kotomi-card generator">
                 <h2>Create an Image</h2>
-                <textarea id="prompt" placeholder="Describe what you want to create..."></textarea>
-                <button id="generate">✨ Generate Image</button>
-                <div id="status">Ready</div>
-                <progress id="progress" value="0" max="100"></progress>
+                <textarea
+                    id="prompt"
+                    class="kotomi-input"
+                    placeholder="Describe what you want to create..."
+                ></textarea>
+                <button id="generate" class="kotomi-button">✨ Generate Image</button>
+                <div id="status" class="kotomi-status">Ready</div>
+                <progress id="progress" class="kotomi-progress" value="0" max="100"></progress>
                 <img id="result" style="display: none" />
             </section>
         </main>
