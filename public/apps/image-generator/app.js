@@ -18,7 +18,11 @@ button.onclick = async () => {
 
     const data = await response.json();
 
+    const img = document.getElementById("result");
+    img.src = `/api/image/view?filename=${data.image.filename}`;
+    img.style.display = "block";
+
     console.log(data);
 
-    status.innerText = "Prompt received: " + data.enhanced;
+    status.innerText = "Image generated";
 };

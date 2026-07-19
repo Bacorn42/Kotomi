@@ -11,6 +11,7 @@ app.use(express.json());
 
 // Serve website files
 app.use(express.static("public"));
+app.use("/generated", express.static("data/images"));
 
 // Serve website routes
 app.use("/api/image", imageRoute);
