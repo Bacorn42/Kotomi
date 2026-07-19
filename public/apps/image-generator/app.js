@@ -20,5 +20,5 @@ button.onclick = async () => {
 
     console.log(data);
 
-    status.innerText = data.message;
+    status.innerText = "Prompt received: " + data.enhanced;
 };
