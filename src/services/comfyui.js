@@ -1,6 +1,10 @@
 const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
+const WebSocket = require("ws");
+const crypto = require("crypto");
+
+const socket = require("./socket");
 
 const COMFY_URL = "http://127.0.0.1:8188";
 
@@ -15,14 +19,19 @@ function loadWorkflow() {
 
 async function queueWorkflow(prompt) {
     const workflow = loadWorkflow();
+    const clientID = crypto.randomUUID();
 
     workflow["2"].inputs.text = prompt;
 
     const response = await axios.post(`${COMFY_URL}/prompt`, {
         prompt: workflow,
+        client_id: clientID,
     });
 
-    return response.data.prompt_id;
+    return {
+        promptID: response.data.prompt_id,
+        clientID: clientID,
+    };
 }
 
 async function waitForCompletion(promptID) {
@@ -57,8 +66,47 @@ function extractImage(history) {
     return null;
 }
 
+function listenForProgress(promptID, clientID) {
+    return new Promise((resolve, reject) => {
+        const ws = new WebSocket(`ws://127.0.0.1:8188/ws?clientId=${clientID}`);
+
+        ws.on("open", () => {
+            console.log("Connected to ComfyUI websocket");
+        });
+
+        ws.on("message", (data) => {
+            let message;
+            try {
+                message = JSON.parse(data.toString());
+            } catch (error) {
+                return;
+            }
+
+            if (message.type === "progress") {
+                const value = message.data.value;
+                const max = message.data.max;
+                const percent = Math.round((value / max) * 100);
+
+                console.log(`ComfyUI: ${percent}%`);
+                socket.sendProgress(percent);
+            }
+
+            if (message.type === "executing") {
+                if (message.data.node === null && message.data.prompt_id === promptID) {
+                    console.log("ComfyUI finished");
+                    ws.close();
+                    resolve();
+                }
+            }
+        });
+
+        ws.on("error", reject);
+    });
+}
+
 module.exports = {
     queueWorkflow,
     waitForCompletion,
     extractImage,
+    listenForProgress,
 };

@@ -1,8 +1,23 @@
+const socket = io();
+
+const status = document.getElementById("status");
+const progress = document.getElementById("progress");
+
+socket.on("status", (message) => {
+    status.innerText = message;
+});
+
+socket.on("progress", (percent) => {
+    status.innerText = `Generating image: ${percent}%`;
+    progress.value = percent;
+});
+
 const button = document.getElementById("generate");
 
 button.onclick = async () => {
+    socket.emit("status", "Starting generation...");
+
     const prompt = document.getElementById("prompt").value;
-    const status = document.getElementById("status");
 
     status.innerText = "Generating...";
 
@@ -17,12 +32,11 @@ button.onclick = async () => {
     });
 
     const data = await response.json();
+    console.log(data);
 
     const img = document.getElementById("result");
-    img.src = `/api/image/view?filename=${data.image.filename}`;
+    img.src = `/api/image/view?filename=${data.filename}`;
     img.style.display = "block";
-
-    console.log(data);
 
     status.innerText = "Image generated";
 };

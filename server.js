@@ -1,8 +1,14 @@
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 
 const imageRoute = require("./src/routes/image");
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+require("./src/services/socket").init(io);
 
 const PORT = 3000;
 
@@ -23,7 +29,16 @@ app.get("/api/test", (req, res) => {
     });
 });
 
+// Sockets
+io.on("connection", (socket) => {
+    console.log("Kotomi client connected");
+
+    socket.on("disconnect", () => {
+        console.log("Client disconnected");
+    });
+});
+
 // Start server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Kotomi running at http://localhost:${PORT}`);
 });
