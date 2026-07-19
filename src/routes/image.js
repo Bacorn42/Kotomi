@@ -1,31 +1,14 @@
 const express = require("express");
 const axios = require("axios");
-const ollama = require("../services/ollama");
-const comfy = require("../services/comfyui");
+const generator = require("../../modules/image-generation/generator");
 
 const router = express.Router();
 
 router.post("/generate", async (req, res) => {
     try {
-        const userPrompt = req.body.prompt;
+        const result = await generator.generate(req.body.prompt);
 
-        console.log("Received prompt:");
-        console.log(userPrompt);
-
-        const enhancedPrompt = await ollama.generateImagePrompt(userPrompt);
-
-        console.log("Gemma prompt:");
-        console.log(enhancedPrompt);
-
-        const promptID = await comfy.queueWorkflow(enhancedPrompt);
-        const history = await comfy.waitForCompletion(promptID);
-        const image = comfy.extractImage(history);
-
-        res.json({
-            success: true,
-            enhanced: enhancedPrompt,
-            image: image,
-        });
+        res.json(result);
     } catch (error) {
         console.error(error);
 
