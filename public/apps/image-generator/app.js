@@ -6,11 +6,19 @@ button.onclick = async () => {
 
     status.innerText = "Generating...";
 
-    /*
-       This will eventually call:
-       POST /api/image/generate
-       with the prompt.
-    */
+    const response = await fetch("/api/image/generate", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            prompt: prompt,
+        }),
+    });
 
-    console.log(prompt);
+    const data = await response.json();
+
+    console.log(data);
+
+    status.innerText = data.message;
 };

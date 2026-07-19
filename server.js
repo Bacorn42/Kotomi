@@ -1,5 +1,7 @@
 const express = require("express");
 
+const imageRoute = require("./src/routes/image");
+
 const app = express();
 
 const PORT = 3000;
@@ -9,6 +11,9 @@ app.use(express.json());
 
 // Serve website files
 app.use(express.static("public"));
+
+// Serve website routes
+app.use("/api/image", imageRoute);
 
 // Test route
 app.get("/api/test", (req, res) => {
