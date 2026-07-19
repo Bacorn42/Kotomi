@@ -15,6 +15,9 @@ socket.on("progress", (percent) => {
 const button = document.getElementById("generate");
 
 button.onclick = async () => {
+    button.disabled = true;
+    button.innerText = "Generating...";
+
     socket.emit("status", "Starting generation...");
 
     const prompt = document.getElementById("prompt").value;
@@ -39,4 +42,7 @@ button.onclick = async () => {
     img.style.display = "block";
 
     status.innerText = "Image generated";
+
+    button.disabled = false;
+    button.innerText = "✨ Generate Image";
 };
