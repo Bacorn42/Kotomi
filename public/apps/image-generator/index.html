@@ -1,0 +1,31 @@
+<!doctype html>
+
+<html>
+    <head>
+        <title>Kotomi - Image Generator</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+
+    <body>
+        <header>
+            <h1>Kotomi Image Generator</h1>
+            <a href="/"> ← Back to Kotomi </a>
+        </header>
+
+        <main>
+            <section class="generator">
+                <h2>Create an Image</h2>
+
+                <textarea id="prompt" placeholder="Describe what you want to create..."></textarea>
+
+                <button id="generate">Generate</button>
+
+                <div id="status"></div>
+
+                <img id="result" style="display: none" />
+            </section>
+        </main>
+
+        <script src="app.js"></script>
+    </body>
+</html>
