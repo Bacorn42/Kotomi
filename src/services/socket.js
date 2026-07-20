@@ -20,9 +20,14 @@ function sendPrompt(prompt) {
     io.emit("prompt", prompt);
 }
 
+function sendGenerationStarted() {
+    io.emit("generation-started", "");
+}
+
 module.exports = {
     init,
     sendStatus,
     sendProgress,
     sendPrompt,
+    sendGenerationStarted,
 };

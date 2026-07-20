@@ -129,10 +129,15 @@ async function getImage(filename) {
     });
 }
 
+async function interrupt() {
+    await axios.post(`${COMFY_URL}/interrupt`);
+}
+
 module.exports = {
     queueWorkflow,
     waitForCompletion,
     extractImage,
     listenForProgress,
     getImage,
+    interrupt,
 };

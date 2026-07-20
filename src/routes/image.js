@@ -45,4 +45,18 @@ router.get("/view", async (req, res) => {
     }
 });
 
+router.post("/cancel", async (req, res) => {
+    try {
+        await comfyui.interrupt();
+        res.json({
+            success: true,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: error.message,
+        });
+    }
+});
+
 module.exports = router;

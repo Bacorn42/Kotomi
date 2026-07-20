@@ -2,6 +2,7 @@ const socket = io();
 
 const ui = {
     button: document.getElementById("generate"),
+    cancel: document.getElementById("cancel"),
     prompt: document.getElementById("prompt"),
     model: document.getElementById("modelSelect"),
     status: document.getElementById("status"),
@@ -30,7 +31,12 @@ socket.on("prompt", (prompt) => {
     ui.promptOutput.innerText = prompt;
 });
 
+socket.on("generation-started", () => {
+    ui.cancel.classList.remove("hide");
+});
+
 ui.button.onclick = generateImage;
+ui.cancel.onclick = cancelImageGeneration;
 
 ui.enhancePrompt.addEventListener("change", () => {
     ui.model.disabled = !ui.enhancePrompt.checked;
@@ -54,6 +60,10 @@ async function generateImage() {
         }
 
         const data = await response.json();
+        if (data === null) {
+            setGenerating(false);
+            return;
+        }
         displayImage(data.filename);
 
         ui.status.innerText = "Image generated";
@@ -83,6 +93,7 @@ function buildGenerationRequest() {
 function displayImage(filename) {
     ui.result.src = `/api/image/view?filename=${filename}`;
     ui.result.style.display = "block";
+    ui.cancel.classList.add("hide");
 }
 
 function setGenerating(isGenerating) {
@@ -109,6 +120,15 @@ function populateModelList(models) {
         option.textContent = model.name;
         ui.model.appendChild(option);
     }
+}
+
+async function cancelImageGeneration() {
+    await fetch(`/api/image/cancel`, {
+        method: "POST",
+    });
+    ui.status.innerHTML = "Generation cancelled";
+    ui.cancel.classList.add("hide");
+    setGenerating(false);
 }
 
 initialize();

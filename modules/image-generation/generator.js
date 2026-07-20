@@ -13,6 +13,7 @@ async function generate(userPrompt, model, enhancePrompt, settings) {
     }
     socket.sendPrompt(finalPrompt);
     const { promptID, clientID } = await comfyui.queueWorkflow(finalPrompt, settings);
+    socket.sendGenerationStarted();
     await comfyui.listenForProgress(promptID, clientID);
     const history = await comfyui.waitForCompletion(promptID);
     const image = comfyui.extractImage(history);
