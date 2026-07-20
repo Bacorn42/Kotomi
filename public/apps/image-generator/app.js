@@ -7,6 +7,8 @@ const ui = {
     generateButton: document.getElementById("generateButton"),
     status: document.getElementById("status"),
     progress: document.getElementById("progress"),
+    resolution: document.getElementById("resolutionSelect"),
+    steps: document.getElementById("stepsInput"),
 };
 
 async function initialize() {
@@ -30,6 +32,12 @@ ui.button.onclick = async () => {
 
     const prompt = ui.prompt.value;
     const model = ui.model.value;
+    const resolution = Number(ui.resolution.value);
+    const settings = {
+        width: resolution,
+        height: resolution,
+        steps: Number(ui.steps.value),
+    };
 
     status.innerText = "Generating...";
 
@@ -41,6 +49,7 @@ ui.button.onclick = async () => {
         body: JSON.stringify({
             prompt,
             model,
+            settings,
         }),
     });
 

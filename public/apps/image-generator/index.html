@@ -31,6 +31,28 @@
                 </div>
 
                 <div class="kotomi-field">
+                    <label for="resolutionSelect" class="kotomi-label"> Resolution </label>
+                    <select id="resolutionSelect" class="kotomi-control">
+                        <option value="256">256 × 256</option>
+                        <option value="512" selected>512 × 512</option>
+                        <option value="768">768 × 768</option>
+                        <option value="1024">1024 × 1024</option>
+                    </select>
+                </div>
+
+                <div class="kotomi-field">
+                    <label for="stepsInput" class="kotomi-label"> Steps </label>
+                    <input
+                        id="stepsInput"
+                        class="kotomi-control"
+                        type="number"
+                        min="1"
+                        max="50"
+                        value="8"
+                    />
+                </div>
+
+                <div class="kotomi-field">
                     <label for="prompt" class="kotomi-label">Prompt</label>
                     <textarea
                         id="prompt"

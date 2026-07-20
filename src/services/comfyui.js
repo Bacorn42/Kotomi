@@ -17,11 +17,20 @@ function loadWorkflow() {
     return JSON.parse(fs.readFileSync(workflowPath, "utf8"));
 }
 
-async function queueWorkflow(prompt) {
+async function queueWorkflow(prompt, settings) {
     const workflow = loadWorkflow();
     const clientID = crypto.randomUUID();
 
     workflow["2"].inputs.text = prompt;
+
+    workflow["4"].inputs.width = settings.width;
+    workflow["4"].inputs.height = settings.height;
+
+    workflow["10"].inputs.width = settings.width;
+    workflow["10"].inputs.height = settings.height;
+
+    workflow["5"].inputs.steps = settings.steps;
+    workflow["5"].inputs.seed = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 
     const response = await axios.post(`${COMFY_URL}/prompt`, {
         prompt: workflow,

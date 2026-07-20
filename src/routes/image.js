@@ -6,7 +6,8 @@ const router = express.Router();
 
 router.post("/generate", async (req, res) => {
     try {
-        const result = await generator.generate(req.body.prompt, req.body.model);
+        const { prompt, model, settings } = req.body;
+        const result = await generator.generate(prompt, model, settings);
 
         res.json(result);
     } catch (error) {
