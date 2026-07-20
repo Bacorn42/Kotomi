@@ -20,7 +20,7 @@ Current pipeline:
 User Prompt
 |
 v
-Gemma 2B (Ollama)
+Local Language Model (Ollama)
 |
 v
 Enhanced Image Prompt
@@ -39,6 +39,11 @@ Features:
 - ComfyUI workflow integration
 - Real-time generation progress
 - Image preview in browser
+- Dynamic local model selection through Ollama
+- Configurable generation settings:
+    - Resolution
+    - Generation steps
+- Preview of the final image prompt
 
 ---
 
@@ -58,6 +63,7 @@ Kotomi
 ├── AI Services
 │ ├── Ollama
 │ └── ComfyUI
+│ └── Socket.IO
 │
 └── Shared UI System
 ├── Theme
@@ -96,6 +102,7 @@ The goal is to feel less like an enterprise dashboard and more like a place wher
 - Node.js
 - Express
 - Socket.IO
+- Axios
 
 ### Frontend
 
@@ -106,7 +113,7 @@ The goal is to feel less like an enterprise dashboard and more like a place wher
 ### AI
 
 - Ollama
-- Gemma 2B
+- Local language model
 - ComfyUI
 - Z-Image Turbo
 
@@ -217,7 +224,3 @@ The interesting thing is:
 > "A personal digital environment where all my tools live together."
 
 That's the project identity.
-
----
-
-One small GitHub recommendation: when you eventually make the repo public, add a screenshot/GIF near the top. A project like this is very visual. The warm UI + generated images will communicate the idea faster than any paragraph can. 🙂
