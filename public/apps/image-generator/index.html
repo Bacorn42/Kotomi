@@ -22,11 +22,21 @@
         <main class="kotomi-container">
             <section class="kotomi-card generator">
                 <h2>Create an Image</h2>
-                <textarea
-                    id="prompt"
-                    class="kotomi-input"
-                    placeholder="Describe what you want to create..."
-                ></textarea>
+
+                <div class="kotomi-field">
+                    <label for="modelSelect" class="kotomi-label">Language Model</label>
+                    <select id="modelSelect" class="kotomi-control"></select>
+                </div>
+
+                <div class="kotomi-field">
+                    <label for="prompt" class="kotomi-label">Prompt</label>
+                    <textarea
+                        id="prompt"
+                        class="kotomi-control"
+                        placeholder="Describe what you want to create..."
+                    ></textarea>
+                </div>
+
                 <button id="generate" class="kotomi-button">✨ Generate Image</button>
                 <div id="status" class="kotomi-status">Ready</div>
                 <progress id="progress" class="kotomi-progress" value="0" max="100"></progress>

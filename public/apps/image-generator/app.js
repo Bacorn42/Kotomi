@@ -1,26 +1,35 @@
 const socket = io();
 
-const status = document.getElementById("status");
-const progress = document.getElementById("progress");
+const ui = {
+    button: document.getElementById("generate"),
+    prompt: document.getElementById("prompt"),
+    model: document.getElementById("modelSelect"),
+    generateButton: document.getElementById("generateButton"),
+    status: document.getElementById("status"),
+    progress: document.getElementById("progress"),
+};
+
+async function initialize() {
+    await loadModels();
+}
 
 socket.on("status", (message) => {
-    status.innerText = message;
+    ui.status.innerText = message;
 });
 
 socket.on("progress", (percent) => {
-    status.innerText = `Generating image: ${percent}%`;
-    progress.value = percent;
+    ui.status.innerText = `Generating image: ${percent}%`;
+    ui.progress.value = percent;
 });
 
-const button = document.getElementById("generate");
-
-button.onclick = async () => {
-    button.disabled = true;
-    button.innerText = "Generating...";
+ui.button.onclick = async () => {
+    ui.button.disabled = true;
+    ui.button.innerText = "Generating...";
 
     socket.emit("status", "Starting generation...");
 
-    const prompt = document.getElementById("prompt").value;
+    const prompt = ui.prompt.value;
+    const model = ui.model.value;
 
     status.innerText = "Generating...";
 
@@ -30,7 +39,8 @@ button.onclick = async () => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            prompt: prompt,
+            prompt,
+            model,
         }),
     });
 
@@ -41,8 +51,31 @@ button.onclick = async () => {
     img.src = `/api/image/view?filename=${data.filename}`;
     img.style.display = "block";
 
-    status.innerText = "Image generated";
+    ui.status.innerText = "Image generated";
 
-    button.disabled = false;
-    button.innerText = "✨ Generate Image";
+    ui.button.disabled = false;
+    ui.button.innerText = "✨ Generate Image";
 };
+
+async function loadModels() {
+    const response = await fetch("/api/ai/models");
+    if (!response.ok) {
+        throw new Error("Unable to retrieve models.");
+    }
+
+    const models = await response.json();
+    populateModelList(models);
+}
+
+function populateModelList(models) {
+    ui.model.innerHTML = "";
+
+    for (const model of models) {
+        const option = document.createElement("option");
+        option.value = model.name;
+        option.textContent = model.name;
+        ui.model.appendChild(option);
+    }
+}
+
+initialize();

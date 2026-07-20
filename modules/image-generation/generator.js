@@ -2,9 +2,9 @@ const ollama = require("../../src/services/ollama");
 const comfy = require("../../src/services/comfyui");
 const socket = require("../../src/services/socket");
 
-async function generate(userPrompt) {
+async function generate(userPrompt, model) {
     socket.sendStatus("Creating enhanced prompt...");
-    const enhanced = await ollama.generateImagePrompt(userPrompt);
+    const enhanced = await ollama.generateImagePrompt(userPrompt, model);
     socket.sendStatus("Prompt created. Starting image generation...");
     const { promptID, clientID } = await comfy.queueWorkflow(enhanced);
     await comfy.listenForProgress(promptID, clientID);

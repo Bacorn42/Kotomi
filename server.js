@@ -2,7 +2,8 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 
-const imageRoute = require("./src/routes/image");
+const imageRoutes = require("./src/routes/image");
+const aiRoutes = require("./src/routes/ai");
 
 const app = express();
 const server = http.createServer(app);
@@ -20,7 +21,8 @@ app.use(express.static("public"));
 app.use("/generated", express.static("data/images"));
 
 // Serve website routes
-app.use("/api/image", imageRoute);
+app.use("/api/image", imageRoutes);
+app.use("/api/ai", aiRoutes);
 
 // Test route
 app.get("/api/test", (req, res) => {

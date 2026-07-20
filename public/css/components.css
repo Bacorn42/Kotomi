@@ -17,12 +17,46 @@
     background: linear-gradient(135deg, var(--accent), #c98245);
 }
 
-.kotomi-input {
+.kotomi-control {
     width: 100%;
     padding: 18px;
     border-radius: 14px;
     border: 1px solid var(--border);
     background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    font: inherit;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+textarea.kotomi-control {
+    resize: vertical;
+}
+
+.kotomi-control:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(227, 163, 92, 0.2);
+}
+
+select.kotomi-control {
+    appearance: none;
+    cursor: pointer;
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+    background-position:
+        calc(100% - 22px) calc(50% - 2px),
+        calc(100% - 16px) calc(50% - 2px);
+    background-size: 6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 48px;
+}
+
+.kotomi-control option {
+    background: var(--surface);
     color: var(--text);
 }
 
@@ -55,4 +89,16 @@
     color: var(--muted);
     min-height: 24px;
     font-size: 15px;
+}
+
+.kotomi-field {
+    margin-bottom: 20px;
+}
+
+.kotomi-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 600;
 }
