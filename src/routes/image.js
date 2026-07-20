@@ -1,12 +1,21 @@
 const express = require("express");
 const axios = require("axios");
 const generator = require("../../modules/image-generation/generator");
+const comfyui = require("../../src/services/comfyui");
 
 const router = express.Router();
 
 router.post("/generate", async (req, res) => {
     try {
         const { prompt, model, enhancePrompt, settings } = req.body;
+
+        if (!prompt) {
+            return res.status(400).json({
+                success: false,
+                error: "Prompt is required.",
+            });
+        }
+
         const result = await generator.generate(prompt, model, enhancePrompt, settings);
 
         res.json(result);
@@ -24,14 +33,7 @@ router.get("/view", async (req, res) => {
     try {
         const filename = req.query.filename;
 
-        const response = await axios.get("http://127.0.0.1:8188/view", {
-            params: {
-                filename: filename,
-                type: "output",
-            },
-
-            responseType: "stream",
-        });
+        const response = await comfyui.getImage(filename);
 
         res.setHeader("Content-Type", response.headers["content-type"]);
 

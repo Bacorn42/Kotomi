@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const socket = require("./socket");
 
 const COMFY_URL = "http://127.0.0.1:8188";
+const COMFY_WS = COMFY_URL.replace("http", "ws");
 
 function loadWorkflow() {
     const workflowPath = path.join(
@@ -21,16 +22,7 @@ async function queueWorkflow(prompt, settings) {
     const workflow = loadWorkflow();
     const clientID = crypto.randomUUID();
 
-    workflow["2"].inputs.text = prompt;
-
-    workflow["4"].inputs.width = settings.width;
-    workflow["4"].inputs.height = settings.height;
-
-    workflow["10"].inputs.width = settings.width;
-    workflow["10"].inputs.height = settings.height;
-
-    workflow["5"].inputs.steps = settings.steps;
-    workflow["5"].inputs.seed = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+    applySettings(workflow, prompt, settings);
 
     const response = await axios.post(`${COMFY_URL}/prompt`, {
         prompt: workflow,
@@ -41,6 +33,19 @@ async function queueWorkflow(prompt, settings) {
         promptID: response.data.prompt_id,
         clientID: clientID,
     };
+}
+
+function applySettings(workflow, prompt, settings) {
+    workflow["2"].inputs.text = prompt;
+
+    workflow["4"].inputs.width = settings.width;
+    workflow["4"].inputs.height = settings.height;
+
+    workflow["10"].inputs.width = settings.width;
+    workflow["10"].inputs.height = settings.height;
+
+    workflow["5"].inputs.steps = settings.steps;
+    workflow["5"].inputs.seed = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 }
 
 async function waitForCompletion(promptID) {
@@ -77,7 +82,7 @@ function extractImage(history) {
 
 function listenForProgress(promptID, clientID) {
     return new Promise((resolve, reject) => {
-        const ws = new WebSocket(`ws://127.0.0.1:8188/ws?clientId=${clientID}`);
+        const ws = new WebSocket(`${COMFY_WS}/ws?clientId=${clientID}`);
 
         ws.on("open", () => {
             console.log("Connected to ComfyUI websocket");
@@ -113,9 +118,21 @@ function listenForProgress(promptID, clientID) {
     });
 }
 
+async function getImage(filename) {
+    return await axios.get(`${COMFY_URL}/view`, {
+        params: {
+            filename,
+            type: "output",
+        },
+
+        responseType: "stream",
+    });
+}
+
 module.exports = {
     queueWorkflow,
     waitForCompletion,
     extractImage,
     listenForProgress,
+    getImage,
 };

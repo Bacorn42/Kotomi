@@ -13,13 +13,9 @@ async function getModels() {
         return cachedModels;
     }
 
-    const response = await fetch(`${OLLAMA_URL}/api/tags`);
-    if (!response.ok) {
-        throw new Error("Failed to retrieve Ollama models.");
-    }
+    const response = await axios.get(`${OLLAMA_URL}/api/tags`);
 
-    const data = await response.json();
-    cachedModels = data.models.map((model) => ({
+    cachedModels = response.data.models.map((model) => ({
         name: model.name,
     }));
     lastRefresh = Date.now();
@@ -28,13 +24,17 @@ async function getModels() {
 }
 
 async function generateImagePrompt(userPrompt, model) {
-    const response = await axios.post(`${OLLAMA_URL}/api/generate`, {
-        model: model,
-        prompt: prompts.createImagePrompt(userPrompt),
-        stream: false,
-    });
-
-    return response.data.response.trim();
+    try {
+        const response = await axios.post(`${OLLAMA_URL}/api/generate`, {
+            model: model,
+            prompt: prompts.createImagePrompt(userPrompt),
+            stream: false,
+        });
+        return response.data.response.trim();
+    } catch (error) {
+        console.error(error.message);
+        throw new Error("Could not generate enhanced prompt.");
+    }
 }
 
 module.exports = {

@@ -4,9 +4,9 @@ const ui = {
     button: document.getElementById("generate"),
     prompt: document.getElementById("prompt"),
     model: document.getElementById("modelSelect"),
-    generateButton: document.getElementById("generateButton"),
     status: document.getElementById("status"),
     progress: document.getElementById("progress"),
+    result: document.getElementById("result"),
     resolution: document.getElementById("resolutionSelect"),
     steps: document.getElementById("stepsInput"),
     enhancePrompt: document.getElementById("enhancePrompt"),
@@ -25,53 +25,65 @@ socket.on("progress", (percent) => {
     ui.progress.value = percent;
 });
 
-ui.button.onclick = async () => {
-    ui.button.disabled = true;
-    ui.button.innerText = "Generating...";
-
-    socket.emit("status", "Starting generation...");
-
-    const prompt = ui.prompt.value;
-    const model = ui.model.value;
-    const resolution = Number(ui.resolution.value);
-    const settings = {
-        width: resolution,
-        height: resolution,
-        steps: Number(ui.steps.value),
-    };
-    const enhancePrompt = ui.enhancePrompt.checked;
-
-    status.innerText = "Generating...";
-
-    const response = await fetch("/api/image/generate", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            prompt,
-            model,
-            enhancePrompt,
-            settings,
-        }),
-    });
-
-    const data = await response.json();
-    console.log(data);
-
-    const img = document.getElementById("result");
-    img.src = `/api/image/view?filename=${data.filename}`;
-    img.style.display = "block";
-
-    ui.status.innerText = "Image generated";
-
-    ui.button.disabled = false;
-    ui.button.innerText = "✨ Generate Image";
-};
+ui.button.onclick = generateImage;
 
 ui.enhancePrompt.addEventListener("change", () => {
     ui.model.disabled = !ui.enhancePrompt.checked;
 });
+
+async function generateImage() {
+    setGenerating(true);
+
+    try {
+        const request = buildGenerationRequest();
+        const response = await fetch("/api/image/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(request),
+        });
+
+        if (!response.ok) {
+            throw new Error("Image generation failed.");
+        }
+
+        const data = await response.json();
+        displayImage(data.filename);
+
+        ui.status.innerText = "Image generated";
+    } catch (error) {
+        console.error(error);
+        ui.status.innerText = "Generation failed.";
+    } finally {
+        setGenerating(false);
+    }
+}
+
+function buildGenerationRequest() {
+    const resolution = Number(ui.resolution.value);
+
+    return {
+        prompt: ui.prompt.value,
+        model: ui.model.value,
+        enhancePrompt: ui.enhancePrompt.checked,
+        settings: {
+            width: resolution,
+            height: resolution,
+            steps: Number(ui.steps.value),
+        },
+    };
+}
+
+function displayImage(filename) {
+    ui.result.src = `/api/image/view?filename=${filename}`;
+    ui.result.style.display = "block";
+}
+
+function setGenerating(isGenerating) {
+    ui.button.disabled = isGenerating;
+    ui.button.innerText = isGenerating ? "Generating..." : "✨ Generate Image";
+}
 
 async function loadModels() {
     const response = await fetch("/api/ai/models");
