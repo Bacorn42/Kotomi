@@ -10,6 +10,7 @@ const ui = {
     resolution: document.getElementById("resolutionSelect"),
     steps: document.getElementById("stepsInput"),
     enhancePrompt: document.getElementById("enhancePrompt"),
+    promptOutput: document.getElementById("promptOutput"),
 };
 
 async function initialize() {
@@ -23,6 +24,10 @@ socket.on("status", (message) => {
 socket.on("progress", (percent) => {
     ui.status.innerText = `Generating image: ${percent}%`;
     ui.progress.value = percent;
+});
+
+socket.on("prompt", (prompt) => {
+    ui.promptOutput.innerText = prompt;
 });
 
 ui.button.onclick = generateImage;

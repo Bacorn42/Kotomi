@@ -29,6 +29,9 @@ async function generateImagePrompt(userPrompt, model) {
             model: model,
             prompt: prompts.createImagePrompt(userPrompt),
             stream: false,
+            options: {
+                temperature: 0.42,
+            },
         });
         return response.data.response.trim();
     } catch (error) {

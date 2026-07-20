@@ -9,3 +9,14 @@
     height: auto;
     border-radius: 18px;
 }
+
+.prompt {
+    padding: 18px;
+    min-height: 80px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    line-height: 1.5;
+    white-space: pre-wrap;
+}

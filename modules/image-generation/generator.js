@@ -11,6 +11,7 @@ async function generate(userPrompt, model, enhancePrompt, settings) {
     } else {
         socket.sendStatus("Starting image generation...");
     }
+    socket.sendPrompt(finalPrompt);
     const { promptID, clientID } = await comfyui.queueWorkflow(finalPrompt, settings);
     await comfyui.listenForProgress(promptID, clientID);
     const history = await comfyui.waitForCompletion(promptID);

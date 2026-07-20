@@ -71,6 +71,12 @@
                 <button id="generate" class="kotomi-button">✨ Generate Image</button>
                 <div id="status" class="kotomi-status">Ready</div>
                 <progress id="progress" class="kotomi-progress" value="0" max="100"></progress>
+                <div class="kotomi-field">
+                    <label class="kotomi-label" for="promptOutput">
+                        Prompt Sent to Image Model
+                    </label>
+                    <div id="promptOutput" class="prompt"></div>
+                </div>
                 <img id="result" style="display: none" />
             </section>
         </main>

@@ -16,8 +16,13 @@ function sendProgress(percent) {
     }
 }
 
+function sendPrompt(prompt) {
+    io.emit("prompt", prompt);
+}
+
 module.exports = {
     init,
     sendStatus,
     sendProgress,
+    sendPrompt,
 };
