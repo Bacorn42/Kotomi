@@ -41,6 +41,11 @@ textarea.kotomi-control {
     box-shadow: 0 0 0 3px rgba(227, 163, 92, 0.2);
 }
 
+.kotomi-control:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 select.kotomi-control {
     appearance: none;
     cursor: pointer;
@@ -101,4 +106,20 @@ select.kotomi-control {
     color: var(--muted);
     font-size: 0.9rem;
     font-weight: 600;
+}
+
+.kotomi-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+}
+
+.kotomi-checkbox input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
 }

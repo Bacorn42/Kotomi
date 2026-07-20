@@ -9,6 +9,7 @@ const ui = {
     progress: document.getElementById("progress"),
     resolution: document.getElementById("resolutionSelect"),
     steps: document.getElementById("stepsInput"),
+    enhancePrompt: document.getElementById("enhancePrompt"),
 };
 
 async function initialize() {
@@ -38,6 +39,7 @@ ui.button.onclick = async () => {
         height: resolution,
         steps: Number(ui.steps.value),
     };
+    const enhancePrompt = ui.enhancePrompt.checked;
 
     status.innerText = "Generating...";
 
@@ -49,6 +51,7 @@ ui.button.onclick = async () => {
         body: JSON.stringify({
             prompt,
             model,
+            enhancePrompt,
             settings,
         }),
     });
@@ -65,6 +68,10 @@ ui.button.onclick = async () => {
     ui.button.disabled = false;
     ui.button.innerText = "✨ Generate Image";
 };
+
+ui.enhancePrompt.addEventListener("change", () => {
+    ui.model.disabled = !ui.enhancePrompt.checked;
+});
 
 async function loadModels() {
     const response = await fetch("/api/ai/models");
