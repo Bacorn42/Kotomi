@@ -88,6 +88,19 @@
             </section>
         </main>
 
+        <div id="imageModal" class="kotomi-modal hide">
+            <div class="kotomi-modal-content">
+                <button id="closeModal" class="modal-close">✕</button>
+                <img id="modalImage" class="kotomi-modal-image" />
+                <h2 id="modalPrompt" class="kotomi-modal-title"></h2>
+                <div id="modalDetails" class="kotomi-modal-details"></div>
+                <div class="kotomi-modal-actions">
+                    <button id="downloadImage" class="kotomi-button">Download</button>
+                    <button id="deleteImage" class="kotomi-button">Delete</button>
+                </div>
+            </div>
+        </div>
+
         <script src="/socket.io/socket.io.js"></script>
         <script src="app.js"></script>
     </body>

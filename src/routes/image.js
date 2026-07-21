@@ -72,4 +72,45 @@ router.get("/history", (req, res) => {
     }
 });
 
+router.get("/:id", (req, res) => {
+    try {
+        const image = imageRepository.getById(req.params.id);
+
+        if (!image) {
+            return res.status(404).json({
+                error: "Image not found.",
+            });
+        }
+
+        res.json(image);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: "Unable to retrieve image.",
+        });
+    }
+});
+
+router.delete("/:id", (req, res) => {
+    try {
+        const result = imageRepository.deleteById(req.params.id);
+
+        if (result.changes === 0) {
+            return res.status(404).json({
+                error: "Image not found.",
+            });
+        }
+
+        res.json({
+            success: true,
+        });
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            error: "Unable to delete image.",
+        });
+    }
+});
+
 module.exports = router;

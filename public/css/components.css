@@ -123,3 +123,66 @@ select.kotomi-control {
     height: 18px;
     accent-color: var(--accent);
 }
+
+.kotomi-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 1000;
+}
+
+.kotomi-modal.hide {
+    display: none;
+}
+
+.kotomi-modal-content {
+    position: relative;
+    width: min(600px, 90vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 30px;
+    box-shadow: var(--shadow);
+}
+
+.kotomi-modal-image {
+    width: 100%;
+    max-height: 60vh;
+    object-fit: contain;
+    border-radius: 18px;
+}
+
+.kotomi-modal-title {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.kotomi-modal-details {
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.kotomi-modal-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.kotomi-modal .modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--text);
+    font-size: 18px;
+}

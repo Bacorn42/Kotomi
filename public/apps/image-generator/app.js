@@ -13,11 +13,22 @@ const ui = {
     enhancePrompt: document.getElementById("enhancePrompt"),
     promptOutput: document.getElementById("promptOutput"),
     history: document.getElementById("historyGrid"),
+
+    modal: document.getElementById("imageModal"),
+    modalImage: document.getElementById("modalImage"),
+    modalPrompt: document.getElementById("modalPrompt"),
+    modalDetails: document.getElementById("modalDetails"),
+    closeModal: document.getElementById("closeModal"),
+
+    downloadImage: document.getElementById("downloadImage"),
+    deleteImage: document.getElementById("deleteImage"),
 };
 
 let displayedProgress = 0;
 let targetProgress = 0;
 let progressTimer = null;
+
+let selectedImage = null;
 
 async function initialize() {
     await loadModels();
@@ -48,6 +59,23 @@ ui.enhancePrompt.addEventListener("change", () => {
     ui.model.disabled = !ui.enhancePrompt.checked;
 });
 
+ui.closeModal.onclick = hideModal;
+
+ui.modal.onclick = (event) => {
+    if (event.target === ui.modal) {
+        hideModal();
+    }
+};
+
+ui.downloadImage.onclick = downloadImageFile;
+ui.deleteImage.onclick = deleteSelectedImage;
+
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+        hideModal();
+    }
+});
+
 async function generateImage() {
     setGenerating(true);
     resetProgress();
@@ -74,6 +102,7 @@ async function generateImage() {
         displayImage(data.filename);
 
         ui.status.innerText = "Image generated";
+        await loadHistory();
     } catch (error) {
         console.error(error);
         ui.status.innerText = "Generation failed.";
@@ -137,6 +166,7 @@ function renderHistory(images) {
         const card = document.createElement("div");
 
         card.className = "history-card";
+        card.onclick = () => showImageDetails(image.ImageID);
 
         card.innerHTML = `
             <img src="/api/image/view?filename=${image.Filename}">
@@ -154,6 +184,54 @@ function renderHistory(images) {
 
         ui.history.appendChild(card);
     }
+}
+
+async function showImageDetails(id) {
+    const response = await fetch(`/api/image/${id}`);
+
+    if (!response.ok) {
+        console.error("Unable to load image details.");
+        return;
+    }
+
+    const image = await response.json();
+    selectedImage = image;
+
+    ui.modalImage.src = `/api/image/view?filename=${image.Filename}`;
+    ui.modalPrompt.innerText = image.Prompt;
+    ui.modalDetails.innerHTML = `
+        <p>
+            <strong>Resolution:</strong>
+            ${image.Width} × ${image.Height}
+        </p>
+
+        <p>
+            <strong>Steps:</strong>
+            ${image.Steps}
+        </p>
+
+        <p>
+            <strong>Seed:</strong>
+            ${image.Seed}
+        </p>
+
+        <p>
+            <strong>Model:</strong>
+            ${image.Model}
+        </p>
+
+        <p>
+            <strong>Created:</strong>
+            ${new Date(image.CreatedDate).toLocaleString()}
+        </p>
+
+        <p>
+            <strong>Enhanced Prompt:</strong><br>
+            ${image.EnhancedPrompt}
+        </p>
+    `;
+
+    ui.modal.classList.remove("hide");
 }
 
 function populateModelList(models) {
@@ -196,11 +274,54 @@ function animateProgress() {
     }, 60);
 }
 
+function downloadImageFile() {
+    if (!selectedImage) {
+        return;
+    }
+
+    const filename = selectedImage.Filename;
+    const link = document.createElement("a");
+
+    link.href = `/api/image/view?filename=${filename}`;
+    link.download = filename;
+
+    link.click();
+}
+
+async function deleteSelectedImage() {
+    if (!selectedImage) {
+        return;
+    }
+
+    const confirmed = confirm("Are you sure you want to delete this image?");
+
+    if (!confirmed) {
+        return;
+    }
+
+    const response = await fetch(`/api/image/${selectedImage.ImageID}`, {
+        method: "DELETE",
+    });
+
+    if (!response.ok) {
+        console.error("Unable to delete image.");
+        return;
+    }
+
+    await loadHistory();
+    hideModal();
+    selectedImage = null;
+}
+
 function resetProgress() {
     displayedProgress = 0;
     targetProgress = 0;
     progressTimer = null;
     ui.progress.value = 0;
+}
+
+function hideModal() {
+    ui.modal.classList.add("hide");
 }
 
 initialize();
