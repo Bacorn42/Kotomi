@@ -24,3 +24,49 @@
 .hide {
     display: none;
 }
+
+#history {
+    margin-top: 35px;
+}
+
+#historyGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 25px;
+    margin-top: 25px;
+}
+
+.history-card {
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.history-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+}
+
+.history-card img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+}
+
+.history-card-content {
+    padding: 15px;
+}
+
+.history-card p {
+    margin: 0 0 10px;
+    line-height: 1.4;
+}
+
+.history-card small {
+    color: var(--muted);
+}

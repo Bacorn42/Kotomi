@@ -12,6 +12,7 @@ const ui = {
     steps: document.getElementById("stepsInput"),
     enhancePrompt: document.getElementById("enhancePrompt"),
     promptOutput: document.getElementById("promptOutput"),
+    history: document.getElementById("historyGrid"),
 };
 
 let displayedProgress = 0;
@@ -20,6 +21,7 @@ let progressTimer = null;
 
 async function initialize() {
     await loadModels();
+    await loadHistory();
 }
 
 socket.on("status", (message) => {
@@ -114,6 +116,44 @@ async function loadModels() {
 
     const models = await response.json();
     populateModelList(models);
+}
+
+async function loadHistory() {
+    const response = await fetch("/api/image/history");
+
+    if (!response.ok) {
+        throw new Error("Unable to load history.");
+    }
+
+    const images = await response.json();
+
+    renderHistory(images);
+}
+
+function renderHistory(images) {
+    ui.history.innerHTML = "";
+
+    for (const image of images) {
+        const card = document.createElement("div");
+
+        card.className = "history-card";
+
+        card.innerHTML = `
+            <img src="/api/image/view?filename=${image.Filename}">
+
+            <div class="history-card-content">
+                <p>${image.Prompt}</p>
+
+                <small>
+                    ${image.Width}×${image.Height}
+                    ·
+                    ${image.Steps} steps
+                </small>
+            </div>
+        `;
+
+        ui.history.appendChild(card);
+    }
 }
 
 function populateModelList(models) {
