@@ -15,8 +15,26 @@ const insertImage = db.prepare(`
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
 
+const getImageById = db.prepare(`
+   SELECT *
+   FROM Images
+   WHERE ImageID = ? 
+`);
+
+const getRecentImages = db.prepare(`
+    SELECT *
+    FROM Images
+    ORDER BY CreatedDate DESC
+    LIMIT ?
+`);
+
+const deleteImage = db.prepare(`
+    DELETE FROM Images
+    WHERE ImageID = ?
+`);
+
 function save(image) {
-    insertImage.run(
+    const result = insertImage.run(
         image.filename,
         image.prompt,
         image.enhancedPrompt,
@@ -27,8 +45,24 @@ function save(image) {
         image.model,
         image.createdDate,
     );
+    return result.lastInsertRowid;
+}
+
+function getById(id) {
+    return getImageById.get(id);
+}
+
+function getRecent(limit = 50) {
+    return getRecentImages.all(limit);
+}
+
+function deleteById(id) {
+    return deleteImage.run(id);
 }
 
 module.exports = {
     save,
+    getById,
+    getRecent,
+    deleteById,
 };

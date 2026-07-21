@@ -2,6 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const generator = require("../../modules/image-generation/generator");
 const comfyui = require("../../src/services/comfyui");
+const imageRepository = require("../repositories/imageRepository");
 
 const router = express.Router();
 
@@ -55,6 +56,18 @@ router.post("/cancel", async (req, res) => {
         console.error(error);
         res.status(500).json({
             error: error.message,
+        });
+    }
+});
+
+router.get("/history", (req, res) => {
+    try {
+        const images = imageRepository.getRecent();
+        res.json(images);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: "Unable to retrieve image history.",
         });
     }
 });
