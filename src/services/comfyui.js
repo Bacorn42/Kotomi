@@ -22,7 +22,7 @@ async function queueWorkflow(prompt, settings) {
     const workflow = loadWorkflow();
     const clientID = crypto.randomUUID();
 
-    applySettings(workflow, prompt, settings);
+    const seed = applySettings(workflow, prompt, settings);
 
     const response = await axios.post(`${COMFY_URL}/prompt`, {
         prompt: workflow,
@@ -32,6 +32,7 @@ async function queueWorkflow(prompt, settings) {
     return {
         promptID: response.data.prompt_id,
         clientID: clientID,
+        seed,
     };
 }
 
@@ -44,8 +45,11 @@ function applySettings(workflow, prompt, settings) {
     workflow["10"].inputs.width = settings.width;
     workflow["10"].inputs.height = settings.height;
 
+    const seed = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
     workflow["5"].inputs.steps = settings.steps;
-    workflow["5"].inputs.seed = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+    workflow["5"].inputs.seed = seed;
+
+    return seed;
 }
 
 async function waitForCompletion(promptID) {
