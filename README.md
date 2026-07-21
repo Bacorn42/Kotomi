@@ -2,7 +2,7 @@
 
 > A personal project hub for AI tools, utilities, dashboards, experiments, and creative projects.
 
-Kotomi is a self-hosted personal workspace designed to bring together my various projects into one unified interface.
+Kotomi is a self-hosted personal workspace designed to bring together my various projects into one unified interface, with shared services, persistent storage, and a consistent user experience.
 
 The goal is to create a cozy, extensible environment where tools, experiments, and applications can live together under one consistent experience.
 
@@ -30,6 +30,9 @@ ComfyUI + Z-Image Turbo
 |
 v
 Generated Image
+|
+v
+SQLite History Storage
 ```
 
 Features:
@@ -44,6 +47,13 @@ Features:
     - Resolution
     - Generation steps
 - Preview of the final image prompt
+- Persistent image generation history
+- Image metadata storage
+- History gallery
+- Image detail viewer
+- Download generated images
+- Delete generated images
+- Regenerate images from previous generations
 
 ---
 
@@ -64,6 +74,9 @@ Kotomi
 │ ├── Ollama
 │ └── ComfyUI
 │ └── Socket.IO
+|
+├── Persistence
+| └── SQLite Database
 │
 └── Shared UI System
 ├── Theme
@@ -103,6 +116,12 @@ The goal is to feel less like an enterprise dashboard and more like a place wher
 - Express
 - Socket.IO
 - Axios
+- SQLite (better-sqlite3)
+
+### Database
+
+- SQLite
+- Local application storage
 
 ### Frontend
 
@@ -129,6 +148,7 @@ You will need:
 - npm
 - Ollama
 - ComfyUI
+- SQLite support (included through the application)
 
 ---
 
@@ -180,13 +200,19 @@ These can be customized as the project develops.
 
 Planned:
 
+- Image thumbnails
+- Image organization
+    - Tags
+    - Favorites
+    - Search
+- Image-to-image workflows
 - Kotomi application launcher
 - App registry system
-- Generation history
 - User settings
 - Additional utilities
 - Dashboard applications
 - More AI-powered tools
+- Games
 
 ## 📜 License
 

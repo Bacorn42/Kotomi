@@ -6,6 +6,56 @@ Current development:
 
 - Future improvements and experiments
 
+## 2026-07-21
+
+### Added
+
+Backend:
+
+- SQLite database integration
+- Database initialization and schema system
+- Image repository layer for database operations
+- Image generation history API
+- Persistent storage of generated image metadata
+- Image deletion endpoint
+
+Frontend:
+
+- Image history gallery
+- Image details modal
+- Generated image download support
+- Regenerate image from previous generation
+- Improved image generation progress display
+
+Database:
+
+- Added Images table for generated image records
+- Stored:
+    - Prompt
+    - Enhanced prompt
+    - Resolution
+    - Steps
+    - Seed
+    - Model
+    - Creation date
+
+### Improved
+
+Image Generator:
+
+- Generation history is now persisted between sessions
+- Improved image management workflow
+- Improved progress bar smoothness during generation
+
+### Refactored
+
+Backend:
+
+- Added repository layer for database access
+- Separated image persistence logic from generation logic
+
+---
+
 ## 2026-07-19
 
 ### Added
@@ -41,6 +91,8 @@ Backend:
 
 - Improved Ollama service organization
 - Separated reusable image generation logic into modules
+
+---
 
 ## 2026-07-18
 

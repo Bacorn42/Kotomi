@@ -29,6 +29,13 @@ Backend:
 - Express
 - Socket.IO
 - Axios
+- SQLite (better-sqlite3)
+
+Database:
+
+- SQLite
+- Local application database
+- Stores image generation history and metadata
 
 AI:
 
@@ -50,20 +57,28 @@ kotomi/
 ├── server.js
 
 ├── src/
+│
 │ ├── routes/
 │ │ └── image.js
 │ │
-│ └── services/
-│ ├── ollama.js
-│ ├── comfyui.js
-│ └── socket.js
-
+│ ├── services/
+│ │ ├── ollama.js
+│ │ ├── comfyui.js
+│ │ └── socket.js
+│ │
+│ ├── database/
+│ │ ├── db.js
+│ │ └── schema.sql
+│ │
+│ └── repositories/
+│ └── imageRepository.js
+│
 ├── modules/
 │ └── image-generation/
 │ ├── generator.js
 │ ├── prompts.js
 │ └── img_gen_z-image_turbo.json
-
+│
 ├── public/
 │
 │ ├── css/
@@ -79,6 +94,58 @@ kotomi/
 │ ├── index.html
 │ ├── app.js
 │ └── style.css
+
+Database files:
+
+- SQLite database file is generated locally
+- Database contents are excluded from git
+- Schema is stored separately in schema.sql
+
+---
+
+# Database
+
+Kotomi uses SQLite for local persistence.
+
+Purpose:
+
+- Store generated image history
+- Preserve generation metadata
+- Enable future features such as:
+    - search
+    - favorites
+    - tags
+    - analytics
+
+Current schema:
+
+## Images
+
+Stores one row per generated image.
+
+Fields:
+
+- ImageID
+- Filename
+- Prompt
+- EnhancedPrompt
+- Width
+- Height
+- Steps
+- Seed
+- Model
+- CreatedDate
+
+Repository:
+
+src/repositories/imageRepository.js
+
+Current operations:
+
+- save()
+- getById()
+- getRecent()
+- deleteById()
 
 ---
 
@@ -110,6 +177,10 @@ ComfyUI generates image
 
 Image returned to browser
 
+↓
+
+Metadata saved to SQLite
+
 Current working:
 
 - Prompt enhancement
@@ -123,6 +194,13 @@ Current working:
 - Image retrieval
 - WebSocket progress updates
 - Display of final prompt sent to image model
+- Image generation history
+- SQLite storage of generation metadata
+- History gallery
+- Image details modal
+- Download generated images
+- Delete images from history
+- Regenerate images from previous generations
 
 ---
 
@@ -195,6 +273,7 @@ components.css
 - buttons
 - inputs
 - progress bars
+- modal components
 
 ---
 
@@ -209,7 +288,10 @@ Working:
 ✅ ComfyUI integration  
 ✅ Socket.IO progress updates  
 ✅ Prompt preview  
-✅ Shared UI theme
+✅ Shared UI theme  
+✅ SQLite database integration  
+✅ Image history persistence  
+✅ Image management UI
 
 ---
 
@@ -231,12 +313,15 @@ Future applications should be added as modules that use shared:
 
 ## Image Generator
 
-- Add image download button
-- Add generation history
-- Save generated image metadata
+- Add image thumbnails
 - Add image generation presets
 - Add image-to-image support
-- Add ComfyUI cancellation button
+- Add ComfyUI cancellation support
+- Improve image organization:
+    - Tags
+    - Favorites
+    - Search
+- Store workflow configurations
 
 ## Kotomi Platform
 
@@ -292,6 +377,28 @@ Explored:
 
 - ComfyUI cancellation support
 - Future job management architecture
+
+---
+
+## 2026-07-21
+
+Implemented:
+
+- Added SQLite database support
+- Created database initialization and schema system
+- Added image repository layer
+- Stored generated image metadata
+- Added image history API
+- Added history gallery UI
+- Added image detail modal
+- Added image download support
+- Added image deletion
+- Added image regeneration from history
+
+Improved:
+
+- Smoothed generation progress display
+- Added persistent image generation workflow
 
 ---
 
