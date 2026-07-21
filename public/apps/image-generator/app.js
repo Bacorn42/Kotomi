@@ -14,6 +14,10 @@ const ui = {
     promptOutput: document.getElementById("promptOutput"),
 };
 
+let displayedProgress = 0;
+let targetProgress = 0;
+let progressTimer = null;
+
 async function initialize() {
     await loadModels();
 }
@@ -23,8 +27,8 @@ socket.on("status", (message) => {
 });
 
 socket.on("progress", (percent) => {
-    ui.status.innerText = `Generating image: ${percent}%`;
-    ui.progress.value = percent;
+    targetProgress = percent;
+    animateProgress();
 });
 
 socket.on("prompt", (prompt) => {
@@ -44,6 +48,7 @@ ui.enhancePrompt.addEventListener("change", () => {
 
 async function generateImage() {
     setGenerating(true);
+    resetProgress();
 
     try {
         const request = buildGenerationRequest();
@@ -127,8 +132,35 @@ async function cancelImageGeneration() {
         method: "POST",
     });
     ui.status.innerHTML = "Generation cancelled";
+    resetProgress();
     ui.cancel.classList.add("hide");
     setGenerating(false);
+}
+
+function animateProgress() {
+    if (progressTimer) {
+        return;
+    }
+
+    progressTimer = setInterval(() => {
+        if (displayedProgress >= targetProgress) {
+            clearInterval(progressTimer);
+            progressTimer = null;
+            return;
+        }
+
+        displayedProgress += 1;
+
+        ui.progress.value = displayedProgress;
+        ui.status.innerText = `Generating image: ${displayedProgress}%`;
+    }, 60);
+}
+
+function resetProgress() {
+    displayedProgress = 0;
+    targetProgress = 0;
+    progressTimer = null;
+    ui.progress.value = 0;
 }
 
 initialize();
