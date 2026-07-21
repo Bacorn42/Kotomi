@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS Images
+(
+    ImageID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Filename TEXT NOT NULL,
+    Prompt TEXT NOT NULL,
+    EnhancedPrompt TEXT,
+    Width INTEGER NOT NULL,
+    Height INTEGER NOT NULL,
+    Steps INTEGER NOT NULL,
+    Seed INTEGER,
+    Model TEXT,
+    CreatedDate TEXT NOT NULL
+);

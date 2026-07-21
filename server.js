@@ -9,6 +9,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+require("./src/database/db");
 require("./src/services/socket").init(io);
 
 const PORT = 3000;
