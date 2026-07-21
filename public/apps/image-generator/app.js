@@ -32,8 +32,13 @@ let progressTimer = null;
 let selectedImage = null;
 
 async function initialize() {
-    await loadModels();
-    await loadHistory();
+    try {
+        await loadModels();
+        await loadHistory();
+    } catch (error) {
+        console.error(error);
+        ui.status.innerText = "Unable to initialize application.";
+    }
 }
 
 socket.on("status", (message) => {
@@ -73,8 +78,14 @@ ui.deleteImage.onclick = deleteSelectedImage;
 ui.regenerateImage.onclick = regenerateSelectedImage;
 
 document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
+    if (event.key === "Escape" && !ui.modal.classList.contains("hide")) {
         hideModal();
+    }
+});
+
+ui.prompt.addEventListener("keydown", (event) => {
+    if (event.ctrlKey && event.key === "Enter") {
+        generateImage();
     }
 });
 
@@ -140,16 +151,24 @@ function setGenerating(isGenerating) {
 }
 
 async function loadModels() {
-    const response = await fetch("/api/ai/models");
-    if (!response.ok) {
-        throw new Error("Unable to retrieve models.");
-    }
+    ui.button.disabled = true;
 
-    const models = await response.json();
-    populateModelList(models);
+    try {
+        const response = await fetch("/api/ai/models");
+        if (!response.ok) {
+            throw new Error("Unable to retrieve models.");
+        }
+
+        const models = await response.json();
+        populateModelList(models);
+    } finally {
+        ui.button.disabled = false;
+    }
 }
 
 async function loadHistory() {
+    ui.history.innerHTML = "Loading...";
+
     const response = await fetch("/api/image/history");
 
     if (!response.ok) {
@@ -282,12 +301,14 @@ function downloadImageFile() {
     }
 
     const filename = selectedImage.Filename;
-    const link = document.createElement("a");
+    const date = new Date(selectedImage.CreatedDate).toISOString().split("T")[0];
 
+    const link = document.createElement("a");
     link.href = `/api/image/view?filename=${filename}`;
-    link.download = filename;
+    link.download = `kotomi-image-${selectedImage.ImageID}-${date}.png`;
 
     link.click();
+    ui.status.innerText = "Image downloaded";
 }
 
 async function deleteSelectedImage() {
@@ -313,6 +334,7 @@ async function deleteSelectedImage() {
     await loadHistory();
     hideModal();
     selectedImage = null;
+    ui.status.innerText = "Image deleted";
 }
 
 async function regenerateSelectedImage() {
@@ -331,9 +353,13 @@ async function regenerateSelectedImage() {
 }
 
 function resetProgress() {
+    if (progressTimer) {
+        clearInterval(progressTimer);
+        progressTimer = null;
+    }
+
     displayedProgress = 0;
     targetProgress = 0;
-    progressTimer = null;
     ui.progress.value = 0;
 }
 
