@@ -21,6 +21,7 @@ const ui = {
     closeModal: document.getElementById("closeModal"),
 
     downloadImage: document.getElementById("downloadImage"),
+    regenerateImage: document.getElementById("regenerateImage"),
     deleteImage: document.getElementById("deleteImage"),
 };
 
@@ -69,6 +70,7 @@ ui.modal.onclick = (event) => {
 
 ui.downloadImage.onclick = downloadImageFile;
 ui.deleteImage.onclick = deleteSelectedImage;
+ui.regenerateImage.onclick = regenerateSelectedImage;
 
 document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
@@ -311,6 +313,21 @@ async function deleteSelectedImage() {
     await loadHistory();
     hideModal();
     selectedImage = null;
+}
+
+async function regenerateSelectedImage() {
+    if (!selectedImage) {
+        return;
+    }
+
+    hideModal();
+
+    ui.prompt.value = selectedImage.Prompt;
+    ui.model.value = selectedImage.Model;
+    ui.resolution.value = selectedImage.Width;
+    ui.steps.value = selectedImage.Steps;
+
+    await generateImage();
 }
 
 function resetProgress() {
