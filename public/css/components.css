@@ -22,6 +22,17 @@
     cursor: pointer;
 }
 
+.kotomi-button-secondary {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+}
+
+.kotomi-button-secondary:hover {
+    background: var(--accent);
+    color: var(--background);
+}
+
 .kotomi-control {
     width: 100%;
     padding: 18px;
@@ -202,4 +213,10 @@ select.kotomi-control {
 .kotomi-link:hover {
     color: #ffd08a;
     text-decoration: underline;
+}
+
+.kotomi-account {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }

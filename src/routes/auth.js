@@ -54,9 +54,27 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/me", (req, res) => {
+    const sessionId = req.cookies.kotomi_session;
+
+    if (!sessionId) {
+        return res.json({
+            success: true,
+            user: null,
+        });
+    }
+
+    const user = authService.getSession(sessionId);
+
+    if (!user) {
+        return res.json({
+            success: true,
+            user: null,
+        });
+    }
+
     res.json({
-        success: false,
-        user: null,
+        success: true,
+        user,
     });
 });
 
