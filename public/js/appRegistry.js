@@ -4,7 +4,7 @@ const AppRegistry = [
         name: "Image Generator",
         icon: "✨",
         category: "AI",
-        description: "Generate images using Z-Image Turbo and Gemma.",
+        description: "Generate images with local AI models.",
         url: "/apps/image-generator/",
     },
 ];
