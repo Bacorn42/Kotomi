@@ -9,17 +9,13 @@
         <link rel="stylesheet" href="/css/layout.css" />
         <link rel="stylesheet" href="/css/components.css" />
 
+        <link rel="stylesheet" href="/css/app-shell.css" />
+
         <link rel="stylesheet" href="style.css" />
     </head>
 
     <body>
-        <header class="kotomi-header">
-            <a href="/" class="kotomi-logo"> Kotomi </a>
-            <div class="kotomi-title">
-                <h1>Image Generator</h1>
-                <p>Generate images with local AI models</p>
-            </div>
-        </header>
+        <div id="app-header"></div>
 
         <main class="kotomi-container">
             <section class="kotomi-card generator">
@@ -103,6 +99,7 @@
         </div>
 
         <script src="/socket.io/socket.io.js"></script>
+        <script src="/js/appShell.js"></script>
         <script src="app.js"></script>
     </body>
 </html>

@@ -1,5 +1,10 @@
 const socket = io();
 
+renderAppHeader({
+    title: "✨ Image Generator",
+    description: "Generate images with local AI models",
+});
+
 const ui = {
     button: document.getElementById("generate"),
     cancel: document.getElementById("cancel"),

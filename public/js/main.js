@@ -1,3 +1,8 @@
+renderAppHeader({
+    title: "Kotomi",
+    description: "My personal project hub",
+});
+
 function createAppCard(app) {
     return `
         <article class="kotomi-card app-card">
