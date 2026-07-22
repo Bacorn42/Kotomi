@@ -1,6 +1,8 @@
 const argon2 = require("argon2");
+const crypto = require("crypto");
 
 const userRepository = require("../repositories/userRepository");
+const sessionRepository = require("../repositories/sessionRepository");
 
 async function register(username, password) {
     username = normalizeUsername(username);
@@ -49,7 +51,9 @@ function createSession(userId) {
     const sessionId = crypto.randomBytes(32).toString("hex");
     const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
 
-    return sessionRepository.createSession(sessionId, userId, expires.toISOString());
+    sessionRepository.createSession(sessionId, userId, expires.toISOString());
+
+    return sessionId;
 }
 
 function validateUsername(username) {

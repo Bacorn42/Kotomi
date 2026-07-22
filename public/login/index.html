@@ -1,0 +1,38 @@
+<!doctype html>
+
+<html>
+    <head>
+        <title>Kotomi - Login</title>
+
+        <link rel="stylesheet" href="/css/kotomi.css" />
+    </head>
+
+    <body>
+        <div id="app-header"></div>
+
+        <main class="kotomi-container">
+            <section class="kotomi-card">
+                <h2>Login</h2>
+                <div class="kotomi-field">
+                    <label class="kotomi-label">Username</label>
+                    <input id="username" class="kotomi-control" type="text" />
+                </div>
+
+                <div class="kotomi-field">
+                    <label class="kotomi-label">Password</label>
+                    <input id="password" class="kotomi-control" type="password" />
+                </div>
+
+                <button id="login" class="kotomi-button">Login</button>
+                <p id="message"></p>
+
+                <p>
+                    Don't have an account?
+                    <a class="kotomi-link" href="/register/"> Register </a>
+                </p>
+            </section>
+        </main>
+
+        <script type="module" src="app.js"></script>
+    </body>
+</html>

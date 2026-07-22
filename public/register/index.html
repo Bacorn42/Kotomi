@@ -1,0 +1,43 @@
+<!doctype html>
+
+<html>
+    <head>
+        <title>Kotomi - Register</title>
+
+        <link rel="stylesheet" href="/css/kotomi.css" />
+    </head>
+
+    <body>
+        <div id="app-header"></div>
+
+        <main class="kotomi-container">
+            <section class="kotomi-card">
+                <h2>Create Account</h2>
+                <div class="kotomi-field">
+                    <label class="kotomi-label"> Username </label>
+                    <input id="username" class="kotomi-control" />
+                </div>
+
+                <div class="kotomi-field">
+                    <label class="kotomi-label"> Password </label>
+                    <input id="password" class="kotomi-control" type="password" />
+                </div>
+
+                <div class="kotomi-field">
+                    <label class="kotomi-label"> Confirm Password </label>
+                    <input id="confirmPassword" class="kotomi-control" type="password" />
+                </div>
+
+                <button id="register" class="kotomi-button">Create Account</button>
+
+                <p id="message"></p>
+                <p>
+                    Already have an account?
+                    <a class="kotomi-link" href="/login/"> Login </a>
+                </p>
+            </section>
+        </main>
+
+        <script type="module" src="app.js"></script>
+    </body>
+</html>

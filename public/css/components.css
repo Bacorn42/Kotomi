@@ -15,6 +15,11 @@
     font-weight: 600;
     color: #2a1b0e;
     background: linear-gradient(135deg, var(--accent), #c98245);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
 .kotomi-control {
@@ -185,4 +190,16 @@ select.kotomi-control {
     background: rgba(0, 0, 0, 0.25);
     color: var(--text);
     font-size: 18px;
+}
+
+.kotomi-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.kotomi-link:hover {
+    color: #ffd08a;
+    text-decoration: underline;
 }

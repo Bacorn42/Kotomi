@@ -15,4 +15,11 @@ function initializeKotomiApp(appId) {
     });
 }
 
-export { AppRegistry, renderAppHeader, initializeKotomiApp };
+function renderPlatformHeader(title, description) {
+    renderAppHeader({
+        title,
+        description,
+    });
+}
+
+export { AppRegistry, renderAppHeader, initializeKotomiApp, renderPlatformHeader };
