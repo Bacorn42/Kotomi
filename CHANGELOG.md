@@ -4,7 +4,79 @@
 
 Current development:
 
+- Building additional Kotomi applications
+- Expanding shared platform features
 - Future improvements and experiments
+
+---
+
+## 2026-07-22
+
+### Added
+
+Authentication System:
+
+Backend:
+
+- Added user account system
+- Added Users database table
+- Added Sessions database table
+- Added password hashing and salting
+- Added registration endpoint
+- Added login endpoint
+- Added logout endpoint
+- Added current user endpoint
+- Added authentication middleware
+- Added session-based authentication
+
+Frontend:
+
+- Added registration page
+- Added login page
+- Added authentication-aware application shell
+- Added logged-in user display
+- Added logout controls
+- Added login/register navigation
+
+Image Generator:
+
+- Added user ownership for generated images
+- Restricted image history to authenticated users
+- Updated image operations to use UserID
+
+---
+
+### Improved
+
+Kotomi Platform:
+
+- Added shared application shell
+- Improved consistent Kotomi branding across applications
+- Added centralized frontend utilities
+- Converted frontend JavaScript to ES modules
+- Improved shared CSS organization
+
+Image Generator:
+
+- Added authentication-aware initialization
+- Improved handling of logged-out users
+
+---
+
+### Refactored
+
+Frontend:
+
+- Consolidated shared Kotomi JavaScript functionality
+- Reduced repeated application setup code
+- Standardized application loading process
+
+Backend:
+
+- Integrated user identity into application workflows
+- Connected image data with user accounts
+
+---
 
 ## 2026-07-21
 
@@ -25,7 +97,6 @@ Frontend:
 - Image details modal
 - Generated image download support
 - Regenerate image from previous generation
-- Improved image generation progress display
 
 Database:
 
@@ -64,9 +135,10 @@ Backend:
 
 - Ollama model discovery endpoint
 - Dynamic Ollama model selection
-- Configurable image generation settings
+- Configurable image generation settings:
     - Image resolution
     - Generation steps
+
 - Prompt generation temperature configuration
 - Real-time prompt events through Socket.IO
 

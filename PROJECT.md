@@ -17,6 +17,14 @@ Kotomi is intended to be both:
 - a personal tool server that runs on the user's machine
 - a portfolio project demonstrating modern software development practices
 
+Applications are built as modules that share:
+
+- authentication
+- UI components
+- themes
+- navigation
+- common services
+
 The first application is an AI image generator.
 
 ---
@@ -35,7 +43,17 @@ Database:
 
 - SQLite
 - Local application database
-- Stores image generation history and metadata
+- Stores:
+    - user accounts
+    - sessions
+    - application data
+    - image generation history
+
+Authentication:
+
+- Username/password accounts
+- Password hashing with salts
+- Cookie-based sessions
 
 AI:
 
@@ -46,7 +64,9 @@ AI:
 Frontend:
 
 - HTML/CSS/JavaScript
+- ES modules
 - Shared Kotomi theme system
+- Shared application shell
 
 ---
 
@@ -59,19 +79,26 @@ kotomi/
 ├── src/
 │
 │ ├── routes/
-│ │ └── image.js
+│ │ ├── image.js
+│ │ └── auth.js
 │ │
 │ ├── services/
 │ │ ├── ollama.js
 │ │ ├── comfyui.js
-│ │ └── socket.js
+│ │ ├── socket.js
+│ │ └── auth.js
+│ │
+│ ├── middleware/
+│ │ └── auth.js
 │ │
 │ ├── database/
 │ │ ├── db.js
 │ │ └── schema.sql
 │ │
 │ └── repositories/
-│ └── imageRepository.js
+│ ├── imageRepository.js
+│ ├── userRepository.js
+│ └── sessionRepository.js
 │
 ├── modules/
 │ └── image-generation/
@@ -85,9 +112,24 @@ kotomi/
 │ │ ├── theme.css
 │ │ ├── base.css
 │ │ ├── layout.css
-│ │ └── components.css
+│ │ ├── components.css
+│ │ ├── app-shell.css
+│ │ └── kotomi.css
+│
+│ ├── js/
+│ │ ├── kotomi.js
+│ │ ├── appShell.js
+│ │ └── appRegistry.js
 │
 │ ├── index.html
+│
+│ ├── login/
+│ │ ├── index.html
+│ │ └── app.js
+│
+│ ├── register/
+│ │ ├── index.html
+│ │ └── app.js
 │
 │ └── apps/
 │ └── image-generator/
@@ -111,13 +153,49 @@ Purpose:
 
 - Store generated image history
 - Preserve generation metadata
+- Store user accounts
+- Store login sessions
 - Enable future features such as:
     - search
     - favorites
     - tags
     - analytics
+    - user statistics
 
 Current schema:
+
+## Users
+
+Stores application accounts.
+
+Fields:
+
+- UserID
+- Username
+- PasswordHash
+- PasswordSalt
+- CreatedDate
+
+Users authenticate using username/password.
+
+Passwords are never stored directly.
+
+---
+
+## Sessions
+
+Stores active login sessions.
+
+Fields:
+
+- SessionID
+- UserID
+- CreatedDate
+- ExpiresDate
+
+Sessions are stored server-side and linked through cookies.
+
+---
 
 ## Images
 
@@ -126,6 +204,7 @@ Stores one row per generated image.
 Fields:
 
 - ImageID
+- UserID
 - Filename
 - Prompt
 - EnhancedPrompt
@@ -135,6 +214,8 @@ Fields:
 - Seed
 - Model
 - CreatedDate
+
+Images belong to users.
 
 Repository:
 
@@ -146,6 +227,76 @@ Current operations:
 - getById()
 - getRecent()
 - deleteById()
+
+Operations require UserID so users only access their own images.
+
+---
+
+# Authentication System
+
+Kotomi currently supports:
+
+## Registration
+
+Users provide:
+
+- username
+- password
+- password confirmation
+
+Requirements:
+
+- Username must be unique
+- Password length: 8-64 characters
+
+---
+
+## Login
+
+Users authenticate with:
+
+- username
+- password
+
+Successful login creates a session cookie.
+
+---
+
+## Current authentication flow
+
+Browser:
+
+```
+Login page
+    |
+    v
+POST /api/auth/login
+    |
+    v
+Validate password
+    |
+    v
+Create session
+    |
+    v
+Set cookie
+```
+
+Application pages:
+
+```
+Page loads
+
+    |
+    v
+
+GET /api/auth/me
+
+    |
+    v
+
+Current user available
+```
 
 ---
 
@@ -189,6 +340,7 @@ Current working:
 - Configurable generation settings:
     - Resolution
     - Steps
+
 - Random seed generation
 - ComfyUI workflow execution
 - Image retrieval
@@ -196,11 +348,13 @@ Current working:
 - Display of final prompt sent to image model
 - Image generation history
 - SQLite storage of generation metadata
+- User-specific image history
 - History gallery
 - Image details modal
 - Download generated images
 - Delete images from history
 - Regenerate images from previous generations
+- Authentication requirement
 
 ---
 
@@ -244,30 +398,39 @@ Design goal:
 Colors:
 
 Background:
+
+```
 #211c18
+```
 
 Surface:
+
+```
 #302923
+```
 
 Accent:
+
+```
 #e3a35c
+```
 
 Shared CSS:
 
-theme.css
+## theme.css
 
 - colors
 
-base.css
+## base.css
 
 - global styles
 
-layout.css
+## layout.css
 
 - headers
 - containers
 
-components.css
+## components.css
 
 - cards
 - buttons
@@ -275,22 +438,52 @@ components.css
 - progress bars
 - modal components
 
+## app-shell.css
+
+- shared application layout
+
+---
+
+# Shared Application Shell
+
+All Kotomi applications use:
+
+- shared header
+- Kotomi branding
+- authentication awareness
+- common styling
+- shared JavaScript utilities
+
+The shell provides:
+
+- Kotomi logo
+- application title/subtitle
+- login/register links when logged out
+- username display when logged in
+- logout action
+
 ---
 
 # Current State
 
 Working:
 
-✅ Express server  
-✅ Image generation pipeline  
-✅ Ollama integration  
-✅ Dynamic model selection  
-✅ ComfyUI integration  
-✅ Socket.IO progress updates  
-✅ Prompt preview  
-✅ Shared UI theme  
-✅ SQLite database integration  
-✅ Image history persistence  
+✅ Express server
+✅ Image generation pipeline
+✅ Ollama integration
+✅ Dynamic model selection
+✅ ComfyUI integration
+✅ Socket.IO progress updates
+✅ Prompt preview
+✅ Shared UI theme
+✅ Shared application shell
+✅ SQLite database integration
+✅ User accounts
+✅ Password hashing
+✅ Sessions
+✅ Login/logout
+✅ User-specific image ownership
+✅ Image history persistence
 ✅ Image management UI
 
 ---
@@ -305,7 +498,10 @@ Future applications should be added as modules that use shared:
 - UI components
 - themes
 - navigation
+- authentication
 - job/status handling
+
+Applications should avoid rebuilding platform functionality.
 
 ---
 
@@ -313,27 +509,51 @@ Future applications should be added as modules that use shared:
 
 ## Image Generator
 
-- Add image thumbnails
-- Add image generation presets
-- Add image-to-image support
-- Add ComfyUI cancellation support
 - Improve image organization:
     - Tags
     - Favorites
     - Search
-- Store workflow configurations
+
+- Add image thumbnails
+- Add image generation presets
+- Add image-to-image support
+- Add reference image upload
+- Add denoise control
+- Add seed control
+- Add batch generation support
+- Support multiple ComfyUI workflows
+- Improve generation queue handling
+
+---
+
+## Authentication
+
+Future improvements:
+
+- Session cleanup
+- Password change
+- Account deletion
+- Database migrations
+- Improved security for public deployment
+
+---
 
 ## Kotomi Platform
 
-- Create homepage app launcher
-- Create app registry
+- Improve launcher
+- Expand app registry
 - Add application categories
-- Add shared navigation
+- Add shared settings system
+- Add notifications/status system
+- Add reusable application layouts
+
+---
 
 ## Future Applications
 
 Ideas:
 
+- Dice Game
 - Dashboard
 - Utility tools
 - Automation tools
@@ -344,19 +564,62 @@ Ideas:
 
 # Development Status
 
-Current milestone:
+Completed milestones:
 
-Milestone 1:
+## Milestone 1:
+
 AI Image Generator
 
 Status:
 
-Core functionality complete.
+Complete.
+
+---
+
+## Milestone 2:
+
+Kotomi Launcher / Platform
+
+Status:
+
+Complete.
+
+Includes:
+
+- homepage launcher
+- app registry foundation
+- shared shell
+- shared theme system
+
+---
+
+## Milestone 3:
+
+Authentication and User System
+
+Status:
+
+Complete.
+
+Includes:
+
+- user accounts
+- sessions
+- login/register pages
+- authentication-aware UI
+- user-owned application data
+
+---
 
 Next milestone:
 
-Milestone 2:
-Kotomi launcher/dashboard
+## Milestone 4:
+
+Additional Kotomi Applications
+
+Candidate:
+
+Dice Game
 
 ---
 
@@ -402,20 +665,71 @@ Improved:
 
 ---
 
+## 2026-07-22
+
+Implemented:
+
+### Kotomi Platform
+
+- Added homepage launcher
+- Added shared application shell
+- Added shared header rendering
+- Added centralized CSS loading
+- Converted frontend JavaScript to ES modules
+- Added shared Kotomi frontend utilities
+
+### Authentication
+
+- Added Users table
+- Added Sessions table
+- Added password hashing and salting
+- Added registration endpoint
+- Added login endpoint
+- Added session creation
+- Added logout support
+- Added current user endpoint
+- Added login/register pages
+- Added authentication-aware header UI
+
+### Image Generator
+
+- Added UserID ownership to images
+- Restricted image history to logged-in users
+- Added authentication checks
+- Updated frontend initialization for login state
+
+Improved:
+
+- Kotomi branding consistency
+- Header account controls
+- Shared component styling
+
+---
+
 # Running Kotomi
 
 Start server:
 
+```
 npm start
+```
 
 Required services:
 
 Ollama:
+
+```
 http://127.0.0.1:11434
+```
 
 ComfyUI:
+
+```
 http://127.0.0.1:8188
+```
 
 Development:
 
+```
 npm run dev
+```

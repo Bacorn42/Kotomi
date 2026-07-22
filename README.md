@@ -2,9 +2,9 @@
 
 > A personal project hub for AI tools, utilities, dashboards, experiments, and creative projects.
 
-Kotomi is a self-hosted personal workspace designed to bring together my various projects into one unified interface, with shared services, persistent storage, and a consistent user experience.
+Kotomi is a self-hosted personal workspace designed to bring together various projects into one unified interface, with shared services, persistent storage, authentication, and a consistent user experience.
 
-The goal is to create a cozy, extensible environment where tools, experiments, and applications can live together under one consistent experience.
+The goal is to create a cozy, extensible environment where tools, experiments, and applications can live together under one consistent platform.
 
 ---
 
@@ -46,14 +46,32 @@ Features:
 - Configurable generation settings:
     - Resolution
     - Generation steps
+
 - Preview of the final image prompt
 - Persistent image generation history
+- User-specific image history
 - Image metadata storage
 - History gallery
 - Image detail viewer
 - Download generated images
 - Delete generated images
 - Regenerate images from previous generations
+
+---
+
+### 👤 User Accounts
+
+Kotomi includes a local account system for personal and multi-user deployments.
+
+Features:
+
+- Username/password accounts
+- Password hashing with salts
+- Cookie-based sessions
+- User-specific application data
+- Authentication-aware applications
+
+The system is designed for personal hosting and can be expanded for public deployments in the future.
 
 ---
 
@@ -70,18 +88,23 @@ Kotomi
 ├── Applications
 │ └── Image Generator
 │
+├── Authentication
+│ ├── Users
+│ └── Sessions
+│
 ├── AI Services
 │ ├── Ollama
-│ └── ComfyUI
+│ ├── ComfyUI
 │ └── Socket.IO
-|
-├── Persistence
-| └── SQLite Database
 │
-└── Shared UI System
-├── Theme
-├── Components
-└── Layout
+├── Persistence
+│ └── SQLite Database
+│
+└── Shared Platform
+    ├── Theme
+    ├── Components
+    ├── Layout
+    └── Application Shell
 ```
 
 The long-term goal is to support additional applications such as:
@@ -123,16 +146,24 @@ The goal is to feel less like an enterprise dashboard and more like a place wher
 - SQLite
 - Local application storage
 
+Stores:
+
+- User accounts
+- Sessions
+- Application data
+- Image generation history
+
 ### Frontend
 
 - HTML
 - CSS
 - JavaScript
+- ES Modules
 
 ### AI
 
 - Ollama
-- Local language model
+- Local language models
 - ComfyUI
 - Z-Image Turbo
 
@@ -172,13 +203,15 @@ npm install
 npm start
 ```
 
-The server will start at
+The server will start at:
 
 ```
 http://localhost:3000
 ```
 
-### ⚙️ Configuration
+---
+
+## ⚙️ Configuration
 
 Kotomi currently assumes local services:
 
@@ -196,57 +229,57 @@ http://127.0.0.1:8188
 
 These can be customized as the project develops.
 
+---
+
 ## 📌 Roadmap
 
 Planned:
 
+### Image Generator
+
 - Image thumbnails
-- Image organization
+- Image organization:
     - Tags
     - Favorites
     - Search
+
 - Image-to-image workflows
-- Kotomi application launcher
-- App registry system
-- User settings
-- Additional utilities
+- Multiple ComfyUI workflows
+- Generation queue improvements
+
+### Platform
+
+- Application categories
+- Application metadata
+- Shared settings system
+- Notifications/status system
+- Additional reusable components
+
+### Applications
+
+- Dice Game
 - Dashboard applications
+- Utility tools
+- Automation tools
 - More AI-powered tools
-- Games
+
+---
 
 ## 📜 License
 
 MIT License
 
+---
+
 ## 💡 About
 
 Kotomi is a personal software environment built to explore AI, automation, and creative tools while creating a unified home for future projects.
 
----
+The goal is not just to build individual tools, but to create a place where tools can grow together:
 
-A few reasons I like this style:
+- shared identity
+- shared design
+- shared services
+- shared data systems
 
-### It doesn't oversell
-
-You're not pretending this is a polished commercial product. It clearly says "personal workspace."
-
-### It leaves room to grow
-
-If six months from now Kotomi has:
-
-- a weather app
-- a game launcher
-- a finance dashboard
-- a local AI assistant
-
-the README still fits.
-
-### It communicates the _idea_
-
-The interesting thing about Kotomi isn't actually "it runs Z-Image Turbo." Lots of things can do that.
-
-The interesting thing is:
-
-> "A personal digital environment where all my tools live together."
-
-That's the project identity.
+Kotomi is a personal digital workspace where projects can live.
