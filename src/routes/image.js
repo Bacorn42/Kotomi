@@ -3,10 +3,11 @@ const axios = require("axios");
 const generator = require("../../modules/image-generation/generator");
 const comfyui = require("../../src/services/comfyui");
 const imageRepository = require("../repositories/imageRepository");
+const { requireLogin } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.post("/generate", async (req, res) => {
+router.post("/generate", requireLogin, async (req, res) => {
     try {
         const { prompt, model, enhancePrompt, settings } = req.body;
 
@@ -17,7 +18,13 @@ router.post("/generate", async (req, res) => {
             });
         }
 
-        const result = await generator.generate(prompt, model, enhancePrompt, settings);
+        const result = await generator.generate(
+            req.user.UserID,
+            prompt,
+            model,
+            enhancePrompt,
+            settings,
+        );
 
         res.json(result);
     } catch (error) {
@@ -60,9 +67,9 @@ router.post("/cancel", async (req, res) => {
     }
 });
 
-router.get("/history", (req, res) => {
+router.get("/history", requireLogin, (req, res) => {
     try {
-        const images = imageRepository.getRecent();
+        const images = imageRepository.getRecent(req.user.UserID);
         res.json(images);
     } catch (error) {
         console.error(error);

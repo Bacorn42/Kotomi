@@ -3,7 +3,7 @@ const comfyui = require("../../src/services/comfyui");
 const socket = require("../../src/services/socket");
 const imageRepository = require("../../src/repositories/imageRepository");
 
-async function generate(userPrompt, model, enhancePrompt, settings) {
+async function generate(userId, userPrompt, model, enhancePrompt, settings) {
     let finalPrompt = userPrompt;
     if (enhancePrompt) {
         socket.sendStatus("Creating enhanced prompt...");
@@ -23,7 +23,7 @@ async function generate(userPrompt, model, enhancePrompt, settings) {
         return null;
     }
 
-    imageRepository.save({
+    imageRepository.save(userId, {
         filename: image.filename,
         prompt: userPrompt,
         enhancedPrompt: finalPrompt,

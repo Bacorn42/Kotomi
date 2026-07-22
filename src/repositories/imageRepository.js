@@ -2,6 +2,7 @@ const db = require("../database/db");
 
 const insertImage = db.prepare(`
     INSERT INTO Images (
+        UserID,
         Filename,
         Prompt,
         EnhancedPrompt,
@@ -12,7 +13,7 @@ const insertImage = db.prepare(`
         Model,
         CreatedDate
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
 
 const getImageById = db.prepare(`
@@ -24,6 +25,7 @@ const getImageById = db.prepare(`
 const getRecentImages = db.prepare(`
     SELECT *
     FROM Images
+    WHERE UserID = ?
     ORDER BY CreatedDate DESC
     LIMIT ?
 `);
@@ -33,8 +35,9 @@ const deleteImage = db.prepare(`
     WHERE ImageID = ?
 `);
 
-function save(image) {
+function save(userId, image) {
     const result = insertImage.run(
+        userId,
         image.filename,
         image.prompt,
         image.enhancedPrompt,
@@ -52,8 +55,8 @@ function getById(id) {
     return getImageById.get(id);
 }
 
-function getRecent(limit = 50) {
-    return getRecentImages.all(limit);
+function getRecent(userId, limit = 50) {
+    return getRecentImages.all(userId, limit);
 }
 
 function deleteById(id) {

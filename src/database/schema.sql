@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS Images
 (
     ImageID INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserID INTEGER NOT NULL,
     Filename TEXT NOT NULL,
     Prompt TEXT NOT NULL,
     EnhancedPrompt TEXT,
@@ -9,7 +10,11 @@ CREATE TABLE IF NOT EXISTS Images
     Steps INTEGER NOT NULL,
     Seed INTEGER,
     Model TEXT,
-    CreatedDate TEXT NOT NULL
+    CreatedDate TEXT NOT NULL,
+
+    FOREIGN KEY(UserID)
+        REFERENCES Users(UserID)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Users (
@@ -24,6 +29,7 @@ CREATE TABLE IF NOT EXISTS Sessions (
     UserID INTEGER NOT NULL,
     CreatedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     ExpiresDate TEXT NOT NULL,
+    
     FOREIGN KEY(UserID)
         REFERENCES Users(UserID)
         ON DELETE CASCADE

@@ -1,4 +1,4 @@
-import { initializeKotomiApp } from "/js/kotomi.js";
+import { initializeKotomiApp, getCurrentUser } from "/js/kotomi.js";
 
 initializeKotomiApp("image-generator");
 
@@ -16,7 +16,8 @@ const ui = {
     steps: document.getElementById("stepsInput"),
     enhancePrompt: document.getElementById("enhancePrompt"),
     promptOutput: document.getElementById("promptOutput"),
-    history: document.getElementById("historyGrid"),
+    history: document.getElementById("history"),
+    historyGrid: document.getElementById("historyGrid"),
 
     modal: document.getElementById("imageModal"),
     modalImage: document.getElementById("modalImage"),
@@ -34,11 +35,21 @@ let targetProgress = 0;
 let progressTimer = null;
 
 let selectedImage = null;
+let currentUser = null;
 
 async function initialize() {
     try {
+        currentUser = await getCurrentUser();
         await loadModels();
+
+        if (!currentUser) {
+            ui.status.innerText = "Please login to generate and view images.";
+            ui.button.disabled = true;
+            return;
+        }
+
         await loadHistory();
+        ui.history.classList.remove("hide");
     } catch (error) {
         console.error(error);
         ui.status.innerText = "Unable to initialize application.";
@@ -94,6 +105,11 @@ ui.prompt.addEventListener("keydown", (event) => {
 });
 
 async function generateImage() {
+    if (!currentUser) {
+        ui.status.innerText = "Please login before generating images.";
+        return;
+    }
+
     setGenerating(true);
     resetProgress();
 
@@ -171,7 +187,7 @@ async function loadModels() {
 }
 
 async function loadHistory() {
-    ui.history.innerHTML = "Loading...";
+    ui.historyGrid.innerHTML = "Loading...";
 
     const response = await fetch("/api/image/history");
 
@@ -185,7 +201,7 @@ async function loadHistory() {
 }
 
 function renderHistory(images) {
-    ui.history.innerHTML = "";
+    ui.historyGrid.innerHTML = "";
 
     for (const image of images) {
         const card = document.createElement("div");
@@ -207,7 +223,7 @@ function renderHistory(images) {
             </div>
         `;
 
-        ui.history.appendChild(card);
+        ui.historyGrid.appendChild(card);
     }
 }
 
