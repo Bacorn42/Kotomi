@@ -1,17 +1,16 @@
 const db = require("../database/db");
 
-function createUser(username, passwordHash, passwordSalt) {
+function createUser(username, passwordHash) {
     const statement = db.prepare(`
         INSERT INTO Users
         (
             Username,
-            PasswordHash,
-            PasswordSalt
+            PasswordHash
         )
-        VALUES (?, ?, ?)
+        VALUES (?, ?)
     `);
 
-    const result = statement.run(username, passwordHash, passwordSalt);
+    const result = statement.run(username, passwordHash);
 
     return getById(result.lastInsertRowid);
 }
