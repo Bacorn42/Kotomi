@@ -26,3 +26,11 @@
     display: inline-block;
     width: fit-content;
 }
+
+.app-category {
+    margin-bottom: 50px;
+}
+
+.app-category h2 {
+    margin-bottom: 20px;
+}
