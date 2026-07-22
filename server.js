@@ -4,6 +4,7 @@ const { Server } = require("socket.io");
 
 const imageRoutes = require("./src/routes/image");
 const aiRoutes = require("./src/routes/ai");
+const authRoutes = require("./src/routes/auth");
 
 const app = express();
 const server = http.createServer(app);
@@ -24,6 +25,7 @@ app.use("/generated", express.static("data/images"));
 // Serve website routes
 app.use("/api/image", imageRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/auth", authRoutes);
 
 // Test route
 app.get("/api/test", (req, res) => {

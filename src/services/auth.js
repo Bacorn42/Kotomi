@@ -3,6 +3,7 @@ const argon2 = require("argon2");
 const userRepository = require("../repositories/userRepository");
 
 async function register(username, password) {
+    username = username.toLowerCase();
     if (!validateUsername(username)) {
         throw new Error(
             "Username must be 3-32 characters and contain only letters, numbers, and underscores",
@@ -26,6 +27,7 @@ async function register(username, password) {
 }
 
 async function login(username, password) {
+    username = username.toLowerCase();
     const user = userRepository.getByUsername(username);
 
     if (!user) {
