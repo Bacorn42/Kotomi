@@ -1,4 +1,4 @@
-function renderAppHeader(options) {
+export function renderAppHeader(options) {
     const target = document.getElementById("app-header");
 
     target.innerHTML = `
@@ -11,5 +11,3 @@ function renderAppHeader(options) {
         </header>
     `;
 }
-
-window.renderAppHeader = renderAppHeader;

@@ -1,3 +1,5 @@
+import { AppRegistry, renderAppHeader } from "/js/kotomi.js";
+
 renderAppHeader({
     title: "Kotomi",
     description: "My personal project hub",

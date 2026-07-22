@@ -1,6 +1,8 @@
-const socket = io();
+import { initializeKotomiApp } from "/js/kotomi.js";
 
 initializeKotomiApp("image-generator");
+
+const socket = io();
 
 const ui = {
     button: document.getElementById("generate"),

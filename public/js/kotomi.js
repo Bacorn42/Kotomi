@@ -1,3 +1,6 @@
+import { AppRegistry } from "./appRegistry.js";
+import { renderAppHeader } from "./appShell.js";
+
 function initializeKotomiApp(appId) {
     const app = AppRegistry.find((x) => x.id === appId);
 
@@ -12,4 +15,4 @@ function initializeKotomiApp(appId) {
     });
 }
 
-window.initializeKotomiApp = initializeKotomiApp;
+export { AppRegistry, renderAppHeader, initializeKotomiApp };

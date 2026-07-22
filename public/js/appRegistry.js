@@ -1,4 +1,4 @@
-const AppRegistry = [
+export const AppRegistry = [
     {
         id: "image-generator",
         name: "Image Generator",
@@ -8,5 +8,3 @@ const AppRegistry = [
         url: "/apps/image-generator/",
     },
 ];
-
-window.AppRegistry = AppRegistry;
