@@ -3,7 +3,7 @@ const argon2 = require("argon2");
 const userRepository = require("../repositories/userRepository");
 
 async function register(username, password) {
-    username = username.toLowerCase();
+    username = normalizeUsername(username);
     if (!validateUsername(username)) {
         throw new Error(
             "Username must be 3-32 characters and contain only letters, numbers, and underscores",
@@ -21,13 +21,12 @@ async function register(username, password) {
     }
 
     const passwordHash = await argon2.hash(password);
-    const user = userRepository.createUser(username, passwordHash);
 
-    return user;
+    return userRepository.createUser(username, passwordHash);
 }
 
 async function login(username, password) {
-    username = username.toLowerCase();
+    username = normalizeUsername(username);
     const user = userRepository.getByUsername(username);
 
     if (!user) {
@@ -46,15 +45,37 @@ async function login(username, password) {
     };
 }
 
+function createSession(userId) {
+    const sessionId = crypto.randomBytes(32).toString("hex");
+    const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
+
+    return sessionRepository.createSession(sessionId, userId, expires.toISOString());
+}
+
 function validateUsername(username) {
     return /^[a-zA-Z0-9_]{3,32}$/.test(username);
+}
+
+function normalizeUsername(username) {
+    return username.toLowerCase();
 }
 
 function validatePassword(password) {
     return password.length >= 8 && password.length <= 64;
 }
 
+function getSession(sessionId) {
+    return sessionRepository.getSession(sessionId);
+}
+
+function deleteSession(sessionId) {
+    sessionRepository.deleteSession(sessionId);
+}
+
 module.exports = {
     register,
     login,
+    createSession,
+    getSession,
+    deleteSession,
 };

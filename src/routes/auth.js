@@ -33,6 +33,14 @@ router.post("/login", async (req, res) => {
             });
         }
 
+        const sessionId = authService.createSession(user.UserID);
+
+        res.cookie("kotomi_session", sessionId, {
+            httpOnly: true,
+            sameSite: "lax",
+            maxAge: 1000 * 60 * 60 * 24 * 30,
+        });
+
         res.json({
             success: true,
             user,
@@ -53,6 +61,14 @@ router.get("/me", (req, res) => {
 });
 
 router.post("/logout", (req, res) => {
+    const sessionId = req.cookies.kotomi_session;
+
+    if (sessionId) {
+        authService.deleteSession(sessionId);
+    }
+
+    res.clearCookie("kotomi_session");
+
     res.json({
         success: true,
     });

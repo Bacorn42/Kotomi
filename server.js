@@ -1,6 +1,7 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
+const cookieParser = require("cookie-parser");
 
 const imageRoutes = require("./src/routes/image");
 const aiRoutes = require("./src/routes/ai");
@@ -17,6 +18,7 @@ const PORT = 3000;
 
 // Allow JSON requests
 app.use(express.json());
+app.use(cookieParser());
 
 // Serve website files
 app.use(express.static("public"));
