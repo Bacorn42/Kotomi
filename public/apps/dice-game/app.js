@@ -1,4 +1,5 @@
 import { initializeKotomiApp } from "/js/kotomi.js";
+import { renderDice } from "./components/diceRenderer.js";
 
 initializeKotomiApp("dice-game");
 
@@ -28,28 +29,9 @@ function displayHistory(rolls) {
         const item = document.createElement("div");
         item.className = "history-roll";
 
-        const dice = sortDice(roll.dice);
-
         const diceContainer = document.createElement("div");
         diceContainer.className = "history-dice";
-
-        let previousValue = null;
-
-        for (const value of dice) {
-            if (previousValue !== null && previousValue !== value) {
-                const gap = document.createElement("div");
-                gap.className = "dice-group-gap history-gap";
-                diceContainer.appendChild(gap);
-            }
-
-            const image = document.createElement("img");
-            image.src = getDieImage(value);
-            image.alt = `Die ${value}`;
-
-            diceContainer.appendChild(image);
-
-            previousValue = value;
-        }
+        renderDice(diceContainer, roll.dice);
 
         const score = document.createElement("div");
         score.className = "history-score";
@@ -108,21 +90,7 @@ function displayRoll(result) {
 
     const diceContainer = document.createElement("div");
     diceContainer.className = "dice-values";
-
-    const sortedDice = sortDice(result.dice);
-    let previousValue = null;
-
-    for (const value of sortedDice) {
-        if (previousValue !== null && previousValue !== value) {
-            const gap = document.createElement("div");
-            gap.className = "dice-group-gap";
-            diceContainer.appendChild(gap);
-        }
-
-        diceContainer.appendChild(createDie(value));
-
-        previousValue = value;
-    }
+    renderDice(diceContainer, result.dice);
 
     const score = document.createElement("h3");
     score.textContent = `Score: ${result.score}`;

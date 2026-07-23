@@ -1,4 +1,5 @@
 import { initializeKotomiApp } from "/js/kotomi.js";
+import { renderDice } from "./components/diceRenderer.js";
 
 initializeKotomiApp("dice-game");
 
@@ -49,27 +50,7 @@ function displayTopRolls(rolls) {
 
         const diceContainer = document.createElement("div");
         diceContainer.className = "history-dice";
-
-        const sortedDice = [...roll.dice].sort((a, b) => a - b);
-
-        let previousValue = null;
-
-        for (const value of sortedDice) {
-            if (previousValue !== null && previousValue !== value) {
-                const gap = document.createElement("div");
-                gap.className = "dice-group-gap history-gap";
-
-                diceContainer.appendChild(gap);
-            }
-
-            const image = document.createElement("img");
-            image.src = getDieImage(value);
-            image.alt = `Die ${value}`;
-
-            diceContainer.appendChild(image);
-
-            previousValue = value;
-        }
+        renderDice(diceContainer, roll.dice);
 
         const score = document.createElement("div");
         score.className = "roll-score";
