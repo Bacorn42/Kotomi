@@ -8,6 +8,60 @@ function getDieImage(value) {
     return `/apps/dice-game/assets/dice/classic/die-classic-${value}.png`;
 }
 
+async function loadHistory() {
+    const response = await fetch("/api/dice/recent");
+
+    if (!response.ok) {
+        return;
+    }
+
+    const rolls = await response.json();
+
+    displayHistory(rolls);
+}
+
+function displayHistory(rolls) {
+    const history = document.getElementById("history");
+    history.innerHTML = "";
+
+    for (const roll of rolls) {
+        const item = document.createElement("div");
+        item.className = "history-roll";
+
+        const dice = sortDice(roll.dice);
+
+        const diceContainer = document.createElement("div");
+        diceContainer.className = "history-dice";
+
+        let previousValue = null;
+
+        for (const value of dice) {
+            if (previousValue !== null && previousValue !== value) {
+                const gap = document.createElement("div");
+                gap.className = "dice-group-gap history-gap";
+                diceContainer.appendChild(gap);
+            }
+
+            const image = document.createElement("img");
+            image.src = getDieImage(value);
+            image.alt = `Die ${value}`;
+
+            diceContainer.appendChild(image);
+
+            previousValue = value;
+        }
+
+        const score = document.createElement("div");
+        score.className = "history-score";
+        score.innerHTML = `Score: <strong>${roll.score}</strong>`;
+
+        item.appendChild(diceContainer);
+        item.appendChild(score);
+
+        history.appendChild(item);
+    }
+}
+
 async function rollDice() {
     const response = await fetch("/api/dice/roll", {
         method: "POST",
@@ -115,6 +169,7 @@ async function initialize() {
         try {
             const result = await rollDice();
             displayRoll(result);
+            await loadHistory();
         } catch (error) {
             console.error(error);
             document.getElementById("result").textContent = "Something went wrong.";
@@ -130,6 +185,8 @@ async function initialize() {
 
         rolling = false;
     });
+
+    await loadHistory();
 }
 
 function sortDice(dice) {

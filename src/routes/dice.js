@@ -32,10 +32,17 @@ router.post("/roll", requireLogin, (req, res) => {
     });
 });
 
-router.get("/recent", (req, res) => {
-    const rolls = getRecentRolls(req.user.UserID);
+router.get("/recent", requireLogin, (req, res) => {
+    const rolls = diceRepository.getRecentRolls(req.user.UserID, 10);
 
-    res.json(rolls);
+    const formattedRolls = rolls.map((roll) => ({
+        rollId: roll.RollID,
+        dice: JSON.parse(roll.DiceValues),
+        score: roll.Score,
+        createdDate: roll.CreatedDate,
+    }));
+
+    res.json(formattedRolls);
 });
 
 module.exports = router;
