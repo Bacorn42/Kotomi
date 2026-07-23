@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const imageRoutes = require("./src/routes/image");
 const aiRoutes = require("./src/routes/ai");
 const authRoutes = require("./src/routes/auth");
+const diceRoutes = require("./src/routes/dice");
 
 const app = express();
 const server = http.createServer(app);
@@ -28,6 +29,7 @@ app.use("/generated", express.static("data/images"));
 app.use("/api/image", imageRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/dice", diceRoutes);
 
 // Test route
 app.get("/api/test", (req, res) => {
