@@ -1,5 +1,28 @@
 #result {
     margin-top: 1.5rem;
-    font-size: 1.1rem;
-    color: var(--color-accent);
+}
+
+.dice-result {
+    text-align: center;
+}
+
+.dice-values {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+}
+
+.die {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-accent);
+    font-size: 1.3rem;
+    font-weight: bold;
 }
