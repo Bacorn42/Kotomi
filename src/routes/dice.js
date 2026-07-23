@@ -47,7 +47,7 @@ router.get("/recent", requireLogin, (req, res) => {
 });
 
 router.get("/profile", requireLogin, (req, res) => {
-    const stats = playerRepository.getPlayerStats(req.user.UserID);
+    const stats = playerRepository.getPlayerProfile(req.user.UserID);
 
     res.json(stats);
 });

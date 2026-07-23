@@ -1,6 +1,6 @@
 const db = require("../database/db.js");
 
-function getPlayerStats(userId) {
+function getPlayerProfile(userId) {
     const stats = db
         .prepare(
             `
@@ -46,5 +46,5 @@ function getPlayerStats(userId) {
 }
 
 module.exports = {
-    getPlayerStats,
+    getPlayerProfile,
 };
