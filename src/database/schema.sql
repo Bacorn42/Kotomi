@@ -34,3 +34,16 @@ CREATE TABLE IF NOT EXISTS Sessions (
         REFERENCES Users(UserID)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS Rolls (
+    RollID INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserID INTEGER NOT NULL,
+    DiceValues TEXT NOT NULL,
+    DiceCount INTEGER NOT NULL,
+    Weights TEXT NOT NULL,
+    Score INTEGER NOT NULL,
+    CreatedDate TEXT NOT NULL,
+
+    FOREIGN KEY (UserID)
+        REFERENCES Users(UserID)
+);
