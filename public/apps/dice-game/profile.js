@@ -1,4 +1,4 @@
-import { initializeKotomiApp } from "/js/kotomi.js";
+import { initializeKotomiApp, formatUsername } from "/js/kotomi.js";
 import { renderDice } from "./components/diceRenderer.js";
 
 initializeKotomiApp("dice-game");
@@ -11,8 +11,23 @@ async function loadProfile() {
     const response = await fetch("/api/dice/profile");
     const profile = await response.json();
 
+    displayPlayerInfo(profile);
     displayStats(profile);
+    displayDiceSetup(profile);
     displayTopRolls(profile.topRolls);
+}
+
+function displayPlayerInfo(profile) {
+    document.getElementById("player-info").innerHTML = `
+        <div class="stat-row">
+            <span>Username</span>
+            <strong>${formatUsername(profile.username)}</strong>
+        </div>
+        <div class="stat-row">
+            <span>Member Since</span>
+            <strong>${new Date(profile.createdDate).toLocaleDateString()}</strong>
+        </div>
+    `;
 }
 
 function displayStats(profile) {
@@ -33,6 +48,35 @@ function displayStats(profile) {
             <span>Highest Roll</span>
             <strong>${profile.highestScore}</strong>
         </div>
+    `;
+}
+
+function displayDiceSetup(profile) {
+    document.getElementById("dice-setup").innerHTML = `
+        <div class="stat-row">
+            <span>Dice</span>
+            <strong>${profile.diceCount}</strong>
+        </div>
+
+        <h3>
+            Weights
+        </h3>
+
+
+        <table class="weights-table">
+            <thead>
+                <tr>
+                    <th>Value</th>
+                    ${profile.weights.map((_, index) => `<th>${index + 1}</th>`).join("")}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Weight</th>
+                    ${profile.weights.map((weight) => `<td>${weight}</td>`).join("")}
+                </tr>
+            </tbody>
+        </table>
     `;
 }
 

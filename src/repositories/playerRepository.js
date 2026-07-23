@@ -1,6 +1,18 @@
 const db = require("../database/db.js");
 
 function getPlayerProfile(userId) {
+    const user = db
+        .prepare(
+            `
+            SELECT
+                Username,
+                CreatedDate
+            FROM Users
+            WHERE UserID = ?
+        `,
+        )
+        .get(userId);
+
     const stats = db
         .prepare(
             `
@@ -32,10 +44,16 @@ function getPlayerProfile(userId) {
         .all(userId);
 
     return {
+        username: user.Username,
+        createdDate: user.CreatedDate,
+
         totalRolls: stats.totalRolls,
         totalScore: stats.totalScore,
         averageScore: Number(stats.averageScore.toFixed(2)),
         highestScore: stats.highestScore,
+
+        diceCount: 10,
+        weights: [60, 50, 40, 30, 20, 10],
         topRolls: topRolls.map((roll) => ({
             rollId: roll.RollID,
             dice: JSON.parse(roll.DiceValues),

@@ -81,6 +81,14 @@
     margin-top: 2rem;
 }
 
+.profile-info section {
+    margin-bottom: 1rem;
+}
+
+.profile-info section:last-child {
+    margin-bottom: 0;
+}
+
 .stat-row {
     display: flex;
     justify-content: space-between;
@@ -115,6 +123,27 @@
     margin-left: auto;
     font-weight: bold;
     font-size: 1.1rem;
+}
+
+.weights-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.weights-table th,
+.weights-table td {
+    text-align: center;
+    padding: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.weights-table th {
+    font-weight: bold;
+}
+
+.weights-table tr:last-child td {
+    border-bottom: none;
 }
 
 @media (max-width: 900px) {
