@@ -4,14 +4,9 @@ initializeKotomiApp("dice-game");
 
 let rolling = false;
 
-const dieFaces = {
-    1: "⚀",
-    2: "⚁",
-    3: "⚂",
-    4: "⚃",
-    5: "⚄",
-    6: "⚅",
-};
+function getDieImage(value) {
+    return `/apps/dice-game/assets/dice/classic/die-classic-${value}.png`;
+}
 
 async function rollDice() {
     const response = await fetch("/api/dice/roll", {
@@ -29,11 +24,23 @@ function createDie(value, animate = false) {
     const die = document.createElement("div");
     die.className = "die";
 
+    const image = document.createElement("img");
+    image.src = getDieImage(value);
+    image.alt = `Die showing ${value}`;
+
+    die.appendChild(image);
+
     if (animate) {
         die.classList.add("rolling");
-    }
 
-    die.textContent = dieFaces[value];
+        const duration = (Math.random() * 0.25 + 0.25).toFixed(2);
+        const delay = (Math.random() * 0.4).toFixed(2);
+        const rotation = Math.floor(Math.random() * 90) - 45;
+
+        die.style.setProperty("--shake-duration", `${duration}s`);
+        die.style.setProperty("--shake-delay", `${delay}s`);
+        die.style.setProperty("--initial-rotation", `${rotation}deg`);
+    }
 
     return die;
 }
@@ -48,8 +55,19 @@ function displayRoll(result) {
     const diceContainer = document.createElement("div");
     diceContainer.className = "dice-values";
 
-    for (const value of result.dice) {
+    const sortedDice = sortDice(result.dice);
+    let previousValue = null;
+
+    for (const value of sortedDice) {
+        if (previousValue !== null && previousValue !== value) {
+            const gap = document.createElement("div");
+            gap.className = "dice-group-gap";
+            diceContainer.appendChild(gap);
+        }
+
         diceContainer.appendChild(createDie(value));
+
+        previousValue = value;
     }
 
     const score = document.createElement("h3");
@@ -92,7 +110,7 @@ async function initialize() {
         button.disabled = true;
         showRollingAnimation();
         button.textContent = "Rolling...";
-        await sleep(1200);
+        await sleep(1000);
 
         try {
             const result = await rollDice();
@@ -102,13 +120,20 @@ async function initialize() {
             document.getElementById("result").textContent = "Something went wrong.";
         }
 
-        button.textContent = "Wait...";
-        await sleep(5000);
+        for (let seconds = 4; seconds > 0; seconds--) {
+            button.textContent = `Wait ${seconds}s`;
+            await sleep(1000);
+        }
+
         button.textContent = "Throw Dice";
         button.disabled = false;
 
         rolling = false;
     });
+}
+
+function sortDice(dice) {
+    return [...dice].sort((a, b) => a - b);
 }
 
 initialize();

@@ -16,15 +16,11 @@
 }
 
 .die {
-    width: 55px;
-    height: 55px;
+    width: 64px;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
-    background: var(--color-surface);
-    border: 2px solid var(--color-accent);
-    font-size: 2.2rem;
     transition: transform 0.2s ease;
 }
 
@@ -33,19 +29,38 @@
 }
 
 .die.rolling {
-    animation: shake 0.15s infinite;
+    animation: shake var(--shake-duration) ease-in-out infinite;
+    animation-delay: var(--shake-delay);
+}
+
+.die img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.dice-group-gap {
+    width: 1rem;
 }
 
 @keyframes shake {
     0% {
-        transform: rotate(-10deg);
+        transform: rotate(var(--initial-rotation)) translate(0, 0) scale(1);
+    }
+
+    25% {
+        transform: rotate(calc(var(--initial-rotation) + 25deg)) translate(6px, -4px) scale(1.05);
     }
 
     50% {
-        transform: rotate(10deg);
+        transform: rotate(calc(var(--initial-rotation) - 30deg)) translate(-5px, 5px) scale(0.98);
+    }
+
+    75% {
+        transform: rotate(calc(var(--initial-rotation) + 15deg)) translate(4px, 3px) scale(1.03);
     }
 
     100% {
-        transform: rotate(-10deg);
+        transform: rotate(var(--initial-rotation)) translate(0, 0) scale(1);
     }
 }
