@@ -2,6 +2,7 @@ const express = require("express");
 const { rollDice } = require("../../modules/dice-game/roller");
 const { calculateScore } = require("../../modules/dice-game/scoring");
 const diceRepository = require("../repositories/rollRepository");
+const playerRepository = require("../repositories/playerRepository");
 const { requireLogin } = require("../middleware/auth");
 
 const router = express.Router();
@@ -43,6 +44,12 @@ router.get("/recent", requireLogin, (req, res) => {
     }));
 
     res.json(formattedRolls);
+});
+
+router.get("/profile", requireLogin, (req, res) => {
+    const stats = playerRepository.getPlayerStats(req.user.UserID);
+
+    res.json(stats);
 });
 
 module.exports = router;
