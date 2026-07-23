@@ -1,9 +1,6 @@
-import { AppRegistry, renderAppHeader } from "/js/kotomi.js";
+import { AppRegistry, renderPlatformHeader } from "/js/kotomi.js";
 
-renderAppHeader({
-    title: "Kotomi",
-    description: "My personal project hub",
-});
+renderPlatformHeader("Kotomi", "My personal project hub");
 
 function createAppCard(app) {
     return `

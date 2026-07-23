@@ -7,4 +7,12 @@ export const AppRegistry = [
         description: "Generate images with local AI models.",
         url: "/apps/image-generator/",
     },
+    {
+        id: "dice-game",
+        name: "Dice Game",
+        icon: "🎲",
+        category: "Games",
+        description: "Roll weighted dice, collect upgrades, and chase high scores.",
+        url: "/apps/dice-game/",
+    },
 ];
