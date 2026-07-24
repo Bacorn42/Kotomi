@@ -13,7 +13,10 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 require("./src/database/db");
+const { seedAchievements } = require("./src/database/seedAchievements.js");
 require("./src/services/socket").init(io);
+
+seedAchievements();
 
 const PORT = 3000;
 

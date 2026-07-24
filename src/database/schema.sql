@@ -47,3 +47,32 @@ CREATE TABLE IF NOT EXISTS Rolls (
     FOREIGN KEY (UserID)
         REFERENCES Users(UserID)
 );
+
+CREATE TABLE IF NOT EXISTS Achievements (
+    AchievementID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT NOT NULL,
+    Description TEXT NOT NULL,
+    Icon TEXT NOT NULL,
+    RequirementType TEXT NOT NULL,
+    RequirementValue INTEGER NOT NULL
+);
+
+
+CREATE TABLE IF NOT EXISTS UserAchievements (
+    UserID INTEGER NOT NULL,
+    AchievementID INTEGER NOT NULL,
+    UnlockedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (
+        UserID,
+        AchievementID
+    ),
+
+    FOREIGN KEY(UserID)
+        REFERENCES Users(UserID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY(AchievementID)
+        REFERENCES Achievements(AchievementID)
+        ON DELETE CASCADE
+);
