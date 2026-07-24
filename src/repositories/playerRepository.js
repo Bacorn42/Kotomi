@@ -128,10 +128,23 @@ function getPlayer(userId) {
         .get(userId);
 }
 
+function updateLastRollTime(userId) {
+    db.prepare(
+        `
+        UPDATE Players
+        SET
+            LastRollTime = CURRENT_TIMESTAMP,
+            UpdatedDate = CURRENT_TIMESTAMP
+        WHERE UserID = ?
+        `,
+    ).run(userId);
+}
+
 module.exports = {
     getPlayerProfile,
     getTotalRolls,
     createPlayer,
     ensurePlayer,
     getPlayer,
+    updateLastRollTime,
 };

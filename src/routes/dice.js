@@ -7,6 +7,8 @@ const { requireLogin } = require("../middleware/auth");
 const { checkAchievements } = require("../services/achievement.js");
 const { getPlayer } = require("../repositories/playerRepository.js");
 const { getDiceConfiguration } = require("../services/diceConfiguration.js");
+const { updateLastRollTime } = require("../repositories/playerRepository.js");
+const { canRoll, getRemainingCooldown } = require("../services/diceCooldown.js");
 
 const router = express.Router();
 
@@ -15,6 +17,13 @@ router.post("/roll", requireLogin, (req, res) => {
 
     const player = getPlayer(userId);
     const configuration = getDiceConfiguration(player);
+
+    if (!canRoll(player, configuration.cooldownMs)) {
+        return res.status(429).json({
+            error: "Roll cooldown active",
+            remainingMs: getRemainingCooldown(player, configuration.cooldownMs),
+        });
+    }
 
     const dice = rollDice(configuration);
     const score = calculateScore(dice);
@@ -25,6 +34,7 @@ router.post("/roll", requireLogin, (req, res) => {
         weights: configuration.weights,
         score,
     });
+    updateLastRollTime(userId);
 
     const unlocked = checkAchievements(userId, {
         score,

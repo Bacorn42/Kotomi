@@ -132,10 +132,10 @@ async function initialize() {
         button.disabled = true;
         showRollingAnimation();
         button.textContent = "Rolling...";
-        await sleep(1000);
 
         try {
             const result = await rollDice();
+            await sleep(1000);
             displayRoll(result);
             await loadHistory();
 
