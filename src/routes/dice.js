@@ -4,6 +4,7 @@ const { calculateScore } = require("../../modules/dice-game/scoring");
 const diceRepository = require("../repositories/rollRepository");
 const playerRepository = require("../repositories/playerRepository");
 const { requireLogin } = require("../middleware/auth");
+const { checkAchievements } = require("../services/achievement.js");
 
 const router = express.Router();
 
@@ -25,10 +26,17 @@ router.post("/roll", requireLogin, (req, res) => {
         score,
     });
 
+    const unlocked = checkAchievements(userId, {
+        score,
+        dice,
+        totalRolls: playerRepository.getTotalRolls(userId),
+    });
+
     res.json({
         rollId,
         dice,
         score,
+        unlockedAchievements: unlocked,
         configuration,
     });
 });

@@ -63,6 +63,21 @@ function getPlayerProfile(userId) {
     };
 }
 
+function getTotalRolls(userId) {
+    const result = db
+        .prepare(
+            `
+            SELECT COUNT(*) AS totalRolls
+            FROM Rolls
+            WHERE UserID = ?
+            `,
+        )
+        .get(userId);
+
+    return result.totalRolls;
+}
+
 module.exports = {
     getPlayerProfile,
+    getTotalRolls,
 };
