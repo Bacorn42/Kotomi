@@ -116,8 +116,6 @@ function getPlayer(userId) {
         SELECT
             UserID,
             Money,
-            BaseDiceCount,
-            BaseCooldownMs,
             DiceSkin,
             MaxActiveItems,
             LastRollTime,

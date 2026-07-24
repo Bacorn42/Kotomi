@@ -5,16 +5,16 @@ const diceRepository = require("../repositories/rollRepository");
 const playerRepository = require("../repositories/playerRepository");
 const { requireLogin } = require("../middleware/auth");
 const { checkAchievements } = require("../services/achievement.js");
+const { getPlayer } = require("../repositories/playerRepository.js");
+const { getDiceConfiguration } = require("../services/diceConfiguration.js");
 
 const router = express.Router();
 
 router.post("/roll", requireLogin, (req, res) => {
     const userId = req.user.UserID;
 
-    const configuration = {
-        diceCount: 10,
-        weights: [60, 50, 40, 30, 20, 10],
-    };
+    const player = getPlayer(userId);
+    const configuration = getDiceConfiguration(player);
 
     const dice = rollDice(configuration);
     const score = calculateScore(dice);
