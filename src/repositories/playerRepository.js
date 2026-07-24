@@ -1,4 +1,5 @@
 const db = require("../database/db.js");
+const { getDiceConfiguration } = require("../services/diceConfiguration.js");
 
 function getPlayerProfile(userId) {
     const user = db
@@ -43,17 +44,21 @@ function getPlayerProfile(userId) {
         )
         .all(userId);
 
+    const player = getPlayer(userId);
+    const configuration = getDiceConfiguration(player);
+
     return {
         username: user.Username,
         createdDate: user.CreatedDate,
 
         totalRolls: stats.totalRolls,
         totalScore: stats.totalScore,
+        moneyCents: player.MoneyCents,
         averageScore: Number(stats.averageScore.toFixed(2)),
         highestScore: stats.highestScore,
 
-        diceCount: 10,
-        weights: [60, 50, 40, 30, 20, 10],
+        diceCount: configuration.diceCount,
+        weights: configuration.weights,
         topRolls: topRolls.map((roll) => ({
             rollId: roll.RollID,
             dice: JSON.parse(roll.DiceValues),
@@ -115,7 +120,7 @@ function getPlayer(userId) {
             `
         SELECT
             UserID,
-            Money,
+            MoneyCents,
             DiceSkin,
             MaxActiveItems,
             LastRollTime,
@@ -140,6 +145,18 @@ function updateLastRollTime(userId) {
     ).run(userId);
 }
 
+function addMoneyCents(userId, amount) {
+    db.prepare(
+        `
+        UPDATE Players
+        SET
+            MoneyCents = MoneyCents + ?,
+            UpdatedDate = CURRENT_TIMESTAMP
+        WHERE UserID = ?
+        `,
+    ).run(amount, userId);
+}
+
 module.exports = {
     getPlayerProfile,
     getTotalRolls,
@@ -147,4 +164,5 @@ module.exports = {
     ensurePlayer,
     getPlayer,
     updateLastRollTime,
+    addMoneyCents,
 };

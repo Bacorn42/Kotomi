@@ -41,6 +41,10 @@ function displayStats(profile) {
             <strong>${profile.totalScore}</strong>
         </div>
         <div class="stat-row">
+            <span>Money</span>
+            <strong>$${(profile.moneyCents / 100).toFixed(2)}</strong>
+        </div>
+        <div class="stat-row">
             <span>Average Roll</span>
             <strong>${profile.averageScore}</strong>
         </div>

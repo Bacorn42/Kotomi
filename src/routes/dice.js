@@ -7,8 +7,9 @@ const { requireLogin } = require("../middleware/auth");
 const { checkAchievements } = require("../services/achievement.js");
 const { getPlayer } = require("../repositories/playerRepository.js");
 const { getDiceConfiguration } = require("../services/diceConfiguration.js");
-const { updateLastRollTime } = require("../repositories/playerRepository.js");
+const { updateLastRollTime, addMoneyCents } = require("../repositories/playerRepository.js");
 const { canRoll, getRemainingCooldown } = require("../services/diceCooldown.js");
+const { calculateMoney } = require("../services/rewards.js");
 
 const router = express.Router();
 
@@ -27,6 +28,10 @@ router.post("/roll", requireLogin, (req, res) => {
 
     const dice = rollDice(configuration);
     const score = calculateScore(dice);
+    const moneyCents = calculateMoney(score);
+    if (moneyCents > 0) {
+        addMoneyCents(userId, moneyCents);
+    }
 
     const rollId = diceRepository.saveRoll({
         userId,
@@ -46,6 +51,7 @@ router.post("/roll", requireLogin, (req, res) => {
         rollId,
         dice,
         score,
+        moneyCents,
         unlockedAchievements: unlocked,
         configuration,
     });
