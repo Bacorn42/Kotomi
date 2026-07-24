@@ -204,6 +204,43 @@
     display: block;
 }
 
+#achievement-notifications {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    z-index: 1000;
+}
+
+.achievement-notification {
+    width: 280px;
+    padding: 1rem;
+    background: #302923;
+    border: 1px solid #e3a35c;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: achievement-slide-in 0.3s ease-out;
+}
+
+.achievement-notification img {
+    width: 48px;
+    height: 48px;
+}
+
+.achievement-notification strong {
+    display: block;
+}
+
+.achievement-notification p {
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+}
+
 @media (max-width: 900px) {
     .profile-grid {
         grid-template-columns: 1fr;
@@ -229,5 +266,17 @@
 
     100% {
         transform: rotate(var(--initial-rotation)) translate(0, 0) scale(1);
+    }
+}
+
+@keyframes achievement-slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }

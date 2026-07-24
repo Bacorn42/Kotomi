@@ -138,6 +138,10 @@ async function initialize() {
             const result = await rollDice();
             displayRoll(result);
             await loadHistory();
+
+            if (result.unlockedAchievements && result.unlockedAchievements.length > 0) {
+                showAchievementNotifications(result.unlockedAchievements);
+            }
         } catch (error) {
             console.error(error);
             document.getElementById("result").textContent = "Something went wrong.";
@@ -159,6 +163,29 @@ async function initialize() {
 
 function sortDice(dice) {
     return [...dice].sort((a, b) => a - b);
+}
+
+function showAchievementNotifications(achievements) {
+    const container = document.getElementById("achievement-notifications");
+
+    for (const achievement of achievements) {
+        const notification = document.createElement("div");
+        notification.className = "achievement-notification";
+        notification.innerHTML = `
+            <img src="/apps/dice-game/assets/achievements/${achievement.Icon}">
+            <div>
+                <strong>Achievement Unlocked!</strong>
+                <div>${achievement.Name}</div>
+                <p>${achievement.Description}</p>
+            </div>
+        `;
+
+        container.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
 }
 
 initialize();
