@@ -77,7 +77,63 @@ function getTotalRolls(userId) {
     return result.totalRolls;
 }
 
+function createPlayer(userId) {
+    db.prepare(
+        `
+        INSERT INTO Players
+        (
+            UserID
+        )
+        VALUES
+        (?)
+        `,
+    ).run(userId);
+}
+
+function ensurePlayer(userId) {
+    const existing = db
+        .prepare(
+            `
+            SELECT
+                UserID
+            FROM Players
+            WHERE UserID = ?
+            `,
+        )
+        .get(userId);
+
+    if (!existing) {
+        createPlayer(userId);
+    }
+}
+
+function getPlayer(userId) {
+    ensurePlayer(userId);
+
+    return db
+        .prepare(
+            `
+        SELECT
+            UserID,
+            Money,
+            BaseDiceCount,
+            BaseCooldownMs,
+            DiceSkin,
+            MaxActiveItems,
+            LastRollTime,
+            CreatedDate,
+            UpdatedDate
+        FROM Players
+        WHERE UserID = ?
+        `,
+        )
+        .get(userId);
+}
+
 module.exports = {
     getPlayerProfile,
     getTotalRolls,
+    createPlayer,
+    ensurePlayer,
+    getPlayer,
 };

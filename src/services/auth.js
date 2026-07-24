@@ -3,6 +3,7 @@ const crypto = require("crypto");
 
 const userRepository = require("../repositories/userRepository");
 const sessionRepository = require("../repositories/sessionRepository");
+const { createPlayer, ensurePlayer } = require("../repositories/playerRepository.js");
 
 async function register(username, password) {
     username = normalizeUsername(username);
@@ -24,7 +25,10 @@ async function register(username, password) {
 
     const passwordHash = await argon2.hash(password);
 
-    return userRepository.createUser(username, passwordHash);
+    const user = userRepository.createUser(username, passwordHash);
+    createPlayer(user.UserID);
+
+    return user;
 }
 
 async function login(username, password) {

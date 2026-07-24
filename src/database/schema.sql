@@ -76,3 +76,18 @@ CREATE TABLE IF NOT EXISTS UserAchievements (
         REFERENCES Achievements(AchievementID)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS Players
+(
+    UserID INTEGER PRIMARY KEY,
+    Money INTEGER NOT NULL DEFAULT 0,
+    DiceSkin TEXT NOT NULL DEFAULT 'classic',
+    MaxActiveItems INTEGER NOT NULL DEFAULT 2,
+    LastRollTime TEXT,
+    CreatedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UpdatedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY(UserID)
+        REFERENCES Users(UserID)
+        ON DELETE CASCADE
+);
