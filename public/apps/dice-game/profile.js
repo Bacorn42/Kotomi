@@ -108,4 +108,37 @@ function displayTopRolls(rolls) {
     });
 }
 
+async function loadAchievements() {
+    const response = await fetch("/api/achievements");
+    const achievements = await response.json();
+    displayAchievements(achievements);
+}
+
+function displayAchievements(achievements) {
+    const container = document.getElementById("achievements");
+
+    container.innerHTML = "";
+
+    for (const achievement of achievements) {
+        const item = document.createElement("div");
+        item.className = "achievement";
+
+        if (!achievement.unlocked) {
+            item.classList.add("locked");
+        }
+
+        item.innerHTML = `
+            <img src="/apps/dice-game/assets/achievements/${achievement.icon}" alt="${achievement.name}">
+            <div class="achievement-name">${achievement.name}</div>
+            <div class="achievement-tooltip">
+                <strong>${achievement.name}</strong>
+                <p>${achievement.description}</p>
+            </div>
+        `;
+
+        container.appendChild(item);
+    }
+}
+
 await loadProfile();
+await loadAchievements();
