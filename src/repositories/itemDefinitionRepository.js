@@ -12,6 +12,19 @@ function getAll() {
         .all();
 }
 
+function getAllShopItems() {
+    return db
+        .prepare(
+            `
+        SELECT *
+        FROM ItemDefinitions
+        WHERE CanGenerate = 0
+        ORDER BY CostCents
+    `,
+        )
+        .all();
+}
+
 function getById(definitionId) {
     return db
         .prepare(
@@ -94,10 +107,26 @@ function createDefinition(definition) {
     }
 }
 
+function getRandomGeneratedDefinition() {
+    return db
+        .prepare(
+            `
+        SELECT *
+        FROM ItemDefinitions
+        WHERE CanGenerate = 1
+        ORDER BY RANDOM()
+        LIMIT 1
+    `,
+        )
+        .get();
+}
+
 module.exports = {
     getAll,
+    getAllShopItems,
     getById,
     getEffects,
     exists,
     createDefinition,
+    getRandomGeneratedDefinition,
 };

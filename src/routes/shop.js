@@ -8,7 +8,7 @@ const upgradeRepository = require("../repositories/upgradeRepository.js");
 const router = express.Router();
 
 router.get("/", requireLogin, (req, res) => {
-    const definitions = itemDefinitionRepository.getAll();
+    const definitions = itemDefinitionRepository.getAllShopItems();
     const inventory = playerItemRepository.getInventory(req.user.UserID);
     const owned = new Set(inventory.map((item) => item.DefinitionID));
 

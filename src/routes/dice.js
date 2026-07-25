@@ -11,6 +11,7 @@ const { updateLastRollTime, addMoneyCents } = require("../repositories/playerRep
 const { canRoll, getRemainingCooldown } = require("../services/diceCooldown.js");
 const { calculateMoney } = require("../services/rewards.js");
 const { getPlayerConfiguration } = require("../services/playerConfiguration.js");
+const itemGeneration = require("../services/itemGeneration.js");
 
 const router = express.Router();
 
@@ -34,6 +35,11 @@ router.post("/roll", requireLogin, (req, res) => {
         addMoneyCents(userId, moneyCents);
     }
 
+    let droppedItem = null;
+    if (Math.random() < 0.01) {
+        droppedItem = itemGeneration.generateItem(userId);
+    }
+
     const rollId = diceRepository.saveRoll({
         userId,
         dice,
@@ -53,6 +59,7 @@ router.post("/roll", requireLogin, (req, res) => {
         dice,
         score,
         moneyCents,
+        droppedItem,
         unlockedAchievements: unlocked,
         configuration,
     });

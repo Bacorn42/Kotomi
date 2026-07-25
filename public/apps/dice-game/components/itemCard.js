@@ -6,9 +6,9 @@ export function createItemCard(item, options = {}) {
     const effects = item.effects.map((effect) => `<li>${formatEffect(effect)}</li>`).join("");
 
     return `
-        <div class="item-card">
+        <div class="item-card ${item.rarity}">
             <img src="/apps/dice-game/assets/items/${item.icon}" class="item-icon">
-            <h3>${item.name}</h3>
+            <h3>${item.rarity ? item.rarity + " " : ""}${item.name}</h3>
             <p>${item.description}</p>
             <div class="item-effects">
                 <strong>Effects</strong>

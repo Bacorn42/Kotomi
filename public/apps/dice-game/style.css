@@ -368,6 +368,26 @@
     image-rendering: pixelated;
 }
 
+.item-card.Common {
+    border-color: #aaa;
+}
+
+.item-card.Uncommon {
+    border-color: #55aa55;
+}
+
+.item-card.Rare {
+    border-color: #4488ff;
+}
+
+.item-card.Epic {
+    border-color: #aa55ff;
+}
+
+.item-card.Legendary {
+    border-color: #ffcc33;
+}
+
 @media (max-width: 900px) {
     .profile-grid {
         grid-template-columns: 1fr;

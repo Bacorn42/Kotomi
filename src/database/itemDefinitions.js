@@ -163,4 +163,28 @@ module.exports = [
             },
         ],
     },
+
+    {
+        name: "Ring of Fives",
+        description: "A mysterious ring that favors the number five.",
+        icon: "ring-of-fives.png",
+        costCents: 0,
+        canGenerate: true,
+        effects: [
+            {
+                type: "weight",
+                data: {
+                    value: 5,
+                    amount: 5,
+                },
+            },
+            {
+                type: "weight",
+                data: {
+                    value: 6,
+                    amount: -2,
+                },
+            },
+        ],
+    },
 ];
