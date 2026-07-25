@@ -144,3 +144,30 @@ CREATE TABLE IF NOT EXISTS PlayerItemEffects
         REFERENCES PlayerItems(PlayerItemID)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS UpgradeDefinitions
+(
+    UpgradeID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT NOT NULL,
+    Description TEXT NOT NULL,
+    CostCents INTEGER NOT NULL,
+    UpgradeType TEXT NOT NULL,
+    UpgradeData TEXT NOT NULL
+);
+
+
+CREATE TABLE IF NOT EXISTS PlayerUpgrades
+(
+    PlayerUpgradeID INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserID INTEGER NOT NULL,
+    UpgradeID INTEGER NOT NULL,
+    PurchasedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY(UserID)
+        REFERENCES Users(UserID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY(UpgradeID)
+        REFERENCES UpgradeDefinitions(UpgradeID)
+        ON DELETE CASCADE
+);
