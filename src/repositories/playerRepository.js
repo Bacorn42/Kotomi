@@ -146,6 +146,18 @@ function updateLastRollTime(userId) {
     ).run(userId);
 }
 
+function getMoneyCents(userId) {
+    return db
+        .prepare(
+            `
+        SELECT MoneyCents
+        FROM Players
+        WHERE UserID = ?
+    `,
+        )
+        .get(userId).MoneyCents;
+}
+
 function addMoneyCents(userId, amount) {
     db.prepare(
         `
@@ -179,6 +191,7 @@ module.exports = {
     ensurePlayer,
     getPlayer,
     updateLastRollTime,
+    getMoneyCents,
     addMoneyCents,
     getPlayerSettings,
 };

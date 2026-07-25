@@ -2,6 +2,7 @@ const express = require("express");
 const { requireLogin } = require("../middleware/auth.js");
 const itemDefinitionRepository = require("../repositories/itemDefinitionRepository.js");
 const playerItemRepository = require("../repositories/playerItemRepository.js");
+const shopService = require("../services/shop.js");
 
 const router = express.Router();
 
@@ -20,6 +21,12 @@ router.get("/", requireLogin, (req, res) => {
             owned: owned.has(item.DefinitionID),
         })),
     );
+});
+
+router.post("/:id/buy", requireLogin, (req, res) => {
+    const result = shopService.buyItem(req.user.UserID, Number(req.params.id));
+
+    res.json(result);
 });
 
 module.exports = router;
