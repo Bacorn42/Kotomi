@@ -74,6 +74,11 @@ router.get("/recent", requireLogin, (req, res) => {
 router.get("/profile", requireLogin, (req, res) => {
     const stats = playerRepository.getPlayerProfile(req.user.UserID);
 
+    const player = getPlayer(req.user.UserID);
+    const configuration = getPlayerConfiguration(getDiceConfiguration(player), req.user.UserID);
+
+    stats.cooldownMs = configuration.cooldownMs;
+
     res.json(stats);
 });
 

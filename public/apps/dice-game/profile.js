@@ -62,6 +62,10 @@ function displayDiceSetup(profile) {
             <span>Dice</span>
             <strong>${profile.diceCount}</strong>
         </div>
+        <div class="stat-row">
+            <span>Cooldown</span>
+            <strong>${(profile.cooldownMs / 1000).toFixed(1)}s</strong>
+        </div>
         <h3>Weights</h3>
         <table class="weights-table">
             <thead>
@@ -200,9 +204,30 @@ async function loadItems() {
 
 function displayItems(items, maxActiveItems) {
     const container = document.getElementById("items");
+    const equipped = items.filter((item) => item.equipped);
+    const unequipped = items.filter((item) => !item.equipped);
 
     container.innerHTML = `
-        <p>Equipped: ${items.filter((item) => item.equipped).length}/${maxActiveItems}</p>
+        <div class="equipped-items">
+            <h3>Active Items (${equipped.length}/${maxActiveItems})</h3>
+            <div class="active-item-list">
+                ${
+                    equipped.length
+                        ? equipped
+                              .map(
+                                  (item) => `
+                            <div class="active-item">
+                                <img src="/apps/dice-game/assets/items/${item.icon}">
+                                <span>${item.name}</span>
+                            </div>
+                        `,
+                              )
+                              .join("")
+                        : "<p>No active items</p>"
+                }
+            </div>
+        </div>
+        <h3>Inventory</h3>
         <div class="item-grid">
             ${items
                 .map((item) =>
