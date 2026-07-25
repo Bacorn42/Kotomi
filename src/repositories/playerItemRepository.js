@@ -14,7 +14,7 @@ function getInventory(userId) {
 }
 
 function addItem(userId, definitionId, generatedName = null, rarity = null) {
-    return db
+    const result = db
         .prepare(
             `
         INSERT INTO PlayerItems
@@ -28,6 +28,52 @@ function addItem(userId, definitionId, generatedName = null, rarity = null) {
     `,
         )
         .run(userId, definitionId, generatedName, rarity);
+
+    return result.lastInsertRowid;
+}
+
+function addEffect(playerItemId, effectType, effectData) {
+    db.prepare(
+        `
+        INSERT INTO PlayerItemEffects
+        (
+            PlayerItemID,
+            EffectType,
+            EffectData
+        )
+        VALUES (?, ?, ?)
+    `,
+    ).run(playerItemId, effectType, JSON.stringify(effectData));
+}
+
+function getEquipped(userId) {
+    return db
+        .prepare(
+            `
+        SELECT
+            PlayerItems.*
+        FROM PlayerItems
+        WHERE UserID = ?
+          AND IsEquipped = 1
+    `,
+        )
+        .all(userId);
+}
+
+function getEffects(playerItemId) {
+    return db
+        .prepare(
+            `
+        SELECT *
+        FROM PlayerItemEffects
+        WHERE PlayerItemID = ?
+    `,
+        )
+        .all(playerItemId)
+        .map((effect) => ({
+            effectType: effect.EffectType,
+            effectData: JSON.parse(effect.EffectData),
+        }));
 }
 
 function equip(playerItemId) {
@@ -50,23 +96,12 @@ function unequip(playerItemId) {
     ).run(playerItemId);
 }
 
-function getEquipped(userId) {
-    return db
-        .prepare(
-            `
-        SELECT *
-        FROM PlayerItems
-        WHERE UserID = ?
-          AND IsEquipped = 1
-    `,
-        )
-        .all(userId);
-}
-
 module.exports = {
     getInventory,
     addItem,
+    addEffect,
+    getEquipped,
+    getEffects,
     equip,
     unequip,
-    getEquipped,
 };

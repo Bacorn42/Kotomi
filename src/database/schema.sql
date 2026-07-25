@@ -132,3 +132,15 @@ CREATE TABLE IF NOT EXISTS PlayerItems
         REFERENCES ItemDefinitions(DefinitionID)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS PlayerItemEffects
+(
+    EffectID INTEGER PRIMARY KEY AUTOINCREMENT,
+    PlayerItemID INTEGER NOT NULL,
+    EffectType TEXT NOT NULL,
+    EffectData TEXT NOT NULL,
+
+    FOREIGN KEY (PlayerItemID)
+        REFERENCES PlayerItems(PlayerItemID)
+        ON DELETE CASCADE
+);
