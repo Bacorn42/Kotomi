@@ -10,6 +10,7 @@ const { getDiceConfiguration } = require("../services/diceConfiguration.js");
 const { updateLastRollTime, addMoneyCents } = require("../repositories/playerRepository.js");
 const { canRoll, getRemainingCooldown } = require("../services/diceCooldown.js");
 const { calculateMoney } = require("../services/rewards.js");
+const { getPlayerConfiguration } = require("../services/playerConfiguration.js");
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ router.post("/roll", requireLogin, (req, res) => {
     const userId = req.user.UserID;
 
     const player = getPlayer(userId);
-    const configuration = getDiceConfiguration(player);
+    const configuration = getPlayerConfiguration(getDiceConfiguration(player), userId);
 
     if (!canRoll(player, configuration.cooldownMs)) {
         return res.status(429).json({

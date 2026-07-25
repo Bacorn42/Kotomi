@@ -7,6 +7,8 @@ function getDiceConfiguration(player) {
         cooldownMs: diceConfig.defaultCooldownMs,
         skin: player.DiceSkin,
         maxActiveItems: player.MaxActiveItems,
+        scoreMultiplier: diceConfig.scoreMultiplier,
+        moneyMultiplier: diceConfig.moneyMultiplier,
     };
 }
 
