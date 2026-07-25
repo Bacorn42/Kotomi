@@ -60,6 +60,19 @@ function getEquipped(userId) {
         .all(userId);
 }
 
+function getEquippedCount(userId) {
+    return db
+        .prepare(
+            `
+        SELECT COUNT(*) AS Count
+        FROM PlayerItems
+        WHERE UserID = ?
+          AND IsEquipped = 1
+    `,
+        )
+        .get(userId).Count;
+}
+
 function getEffects(playerItemId) {
     return db
         .prepare(
@@ -101,6 +114,7 @@ module.exports = {
     addItem,
     addEffect,
     getEquipped,
+    getEquippedCount,
     getEffects,
     equip,
     unequip,

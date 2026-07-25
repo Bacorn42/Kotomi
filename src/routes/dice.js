@@ -77,4 +77,16 @@ router.get("/profile", requireLogin, (req, res) => {
     res.json(stats);
 });
 
+router.post("/items/:id/equip", requireLogin, (req, res) => {
+    const result = itemService.equipItem(req.user.UserID, Number(req.params.id));
+
+    res.json(result);
+});
+
+router.post("/items/:id/unequip", requireLogin, (req, res) => {
+    const result = itemService.unequipItem(req.user.UserID, Number(req.params.id));
+
+    res.json(result);
+});
+
 module.exports = router;

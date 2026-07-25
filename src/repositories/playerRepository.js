@@ -157,6 +157,20 @@ function addMoneyCents(userId, amount) {
     ).run(amount, userId);
 }
 
+function getPlayerSettings(userId) {
+    return db
+        .prepare(
+            `
+        SELECT
+            MaxActiveItems,
+            DiceSkin
+        FROM Players
+        WHERE UserID = ?
+    `,
+        )
+        .get(userId);
+}
+
 module.exports = {
     getPlayerProfile,
     getTotalRolls,
@@ -165,4 +179,5 @@ module.exports = {
     getPlayer,
     updateLastRollTime,
     addMoneyCents,
+    getPlayerSettings,
 };
