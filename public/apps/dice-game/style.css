@@ -316,6 +316,16 @@
     margin-bottom: 0.25rem;
 }
 
+.item-shop-info {
+    margin-top: 1rem;
+}
+
+.item-price {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
 @media (max-width: 900px) {
     .profile-grid {
         grid-template-columns: 1fr;

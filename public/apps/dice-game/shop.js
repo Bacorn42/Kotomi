@@ -1,5 +1,5 @@
 import { initializeKotomiApp } from "/js/kotomi.js";
-import { formatEffect } from "./components/itemFormatter.js";
+import { createItemCard } from "./components/itemCard.js";
 
 initializeKotomiApp("dice-game");
 
@@ -30,33 +30,18 @@ function displayMoney(moneyCents) {
 
 function displayShop(items) {
     const container = document.getElementById("shop-items");
-    container.innerHTML = items.map(createItemCard).join("");
+
+    container.innerHTML = items
+        .map((item) =>
+            createItemCard(item, {
+                showBuy: true,
+            }),
+        )
+        .join("");
 
     document.querySelectorAll(".buy-button").forEach((button) => {
         button.addEventListener("click", () => buyItem(button.dataset.id));
     });
-}
-
-function createItemCard(item) {
-    const effects = item.effects.map((effect) => `<li>${formatEffect(effect)}</li>`).join("");
-
-    return `
-        <div class="item-card">
-            <img src="/apps/dice-game/assets/items/${item.icon}" class="item-icon">
-            <h3>${item.name}</h3>
-            <p>${item.description}</p>
-            <div class="item-effects">
-                <strong>Effects</strong>
-                <ul>${effects}</ul>
-            </div>
-            <div class="item-price">$${(item.costCents / 100).toFixed(2)}</div>
-            ${
-                item.owned
-                    ? `<button class="kotomi-button-secondary" disabled>Owned</button>`
-                    : `<button class="kotomi-button buy-button" data-id="${item.definitionId}">Buy</button>`
-            }
-        </div>
-    `;
 }
 
 async function buyItem(definitionId) {

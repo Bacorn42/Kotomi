@@ -1,5 +1,6 @@
 import { initializeKotomiApp, formatUsername } from "/js/kotomi.js";
 import { renderDice } from "./components/diceRenderer.js";
+import { createItemCard } from "./components/itemCard.js";
 
 initializeKotomiApp("dice-game");
 
@@ -204,23 +205,10 @@ function displayItems(items, maxActiveItems) {
         <p>Equipped: ${items.filter((item) => item.equipped).length}/${maxActiveItems}</p>
         <div class="item-grid">
             ${items
-                .map(
-                    (item) => `
-                <div class="item-card">
-                    <img src="/apps/dice-game/assets/items/${item.icon}">
-                    <h3>${item.name}</h3>
-                    <p>${item.description}</p>
-                    <div>${item.effects.map((effect) => `<div>${formatEffect(effect)}</div>`).join("")}</div>
-
-                    <button
-                        class="kotomi-button item-toggle"
-                        data-id="${item.playerItemId}"
-                        data-equipped="${item.equipped}"
-                    >
-                        ${item.equipped ? "Unequip" : "Equip"}
-                    </button>
-                </div>
-                `,
+                .map((item) =>
+                    createItemCard(item, {
+                        showEquip: true,
+                    }),
                 )
                 .join("")}
         </div>
