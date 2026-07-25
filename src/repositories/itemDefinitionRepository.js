@@ -37,8 +37,8 @@ function getEffects(definitionId) {
         .all(definitionId)
         .map((effect) => ({
             effectId: effect.EffectID,
-            type: effect.EffectType,
-            data: JSON.parse(effect.EffectData),
+            effectData: JSON.parse(effect.EffectData),
+            effectType: effect.EffectType,
         }));
 }
 
