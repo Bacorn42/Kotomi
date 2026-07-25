@@ -91,3 +91,44 @@ CREATE TABLE IF NOT EXISTS Players
         REFERENCES Users(UserID)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS ItemDefinitions
+(
+    DefinitionID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT NOT NULL,
+    Description TEXT NOT NULL,
+    Icon TEXT NOT NULL,
+    CostCents INTEGER NOT NULL,
+    CanGenerate INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS ItemDefinitionEffects
+(
+    EffectID INTEGER PRIMARY KEY AUTOINCREMENT,
+    DefinitionID INTEGER NOT NULL,
+    EffectType TEXT NOT NULL,
+    EffectData TEXT NOT NULL,
+
+    FOREIGN KEY (DefinitionID)
+        REFERENCES ItemDefinitions(DefinitionID)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS PlayerItems
+(
+    PlayerItemID INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserID INTEGER NOT NULL,
+    DefinitionID INTEGER NOT NULL,
+    GeneratedName TEXT,
+    Rarity TEXT,
+    IsEquipped INTEGER NOT NULL DEFAULT 0,
+    ObtainedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (UserID)
+        REFERENCES Users(UserID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (DefinitionID)
+        REFERENCES ItemDefinitions(DefinitionID)
+        ON DELETE CASCADE
+);
