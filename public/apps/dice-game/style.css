@@ -303,6 +303,19 @@
     font-weight: bold;
 }
 
+.item-effects {
+    margin-top: 1rem;
+}
+
+.item-effects ul {
+    padding-left: 1.25rem;
+    margin-top: 0.5rem;
+}
+
+.item-effects li {
+    margin-bottom: 0.25rem;
+}
+
 @media (max-width: 900px) {
     .profile-grid {
         grid-template-columns: 1fr;

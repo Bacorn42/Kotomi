@@ -19,6 +19,7 @@ router.get("/", requireLogin, (req, res) => {
             icon: item.Icon,
             costCents: item.CostCents,
             owned: owned.has(item.DefinitionID),
+            effects: itemDefinitionRepository.getEffects(item.DefinitionID),
         })),
     );
 });

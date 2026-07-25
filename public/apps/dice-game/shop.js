@@ -1,4 +1,5 @@
 import { initializeKotomiApp } from "/js/kotomi.js";
+import { formatEffect } from "./components/itemFormatter.js";
 
 initializeKotomiApp("dice-game");
 
@@ -37,11 +38,17 @@ function displayShop(items) {
 }
 
 function createItemCard(item) {
+    const effects = item.effects.map((effect) => `<li>${formatEffect(effect)}</li>`).join("");
+
     return `
         <div class="item-card">
             <img src="/apps/dice-game/assets/items/${item.icon}" class="item-icon">
             <h3>${item.name}</h3>
             <p>${item.description}</p>
+            <div class="item-effects">
+                <strong>Effects</strong>
+                <ul>${effects}</ul>
+            </div>
             <div class="item-price">$${(item.costCents / 100).toFixed(2)}</div>
             ${
                 item.owned

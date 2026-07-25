@@ -31,7 +31,7 @@ function applyWeight(configuration, data) {
         return;
     }
 
-    configuration.weights[index] += data.amount;
+    configuration.weights[index] = Math.max(0, configuration.weights[index] + data.amount);
 }
 
 function applyCooldown(configuration, data) {
