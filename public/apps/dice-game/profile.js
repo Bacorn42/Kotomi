@@ -61,12 +61,7 @@ function displayDiceSetup(profile) {
             <span>Dice</span>
             <strong>${profile.diceCount}</strong>
         </div>
-
-        <h3>
-            Weights
-        </h3>
-
-
+        <h3>Weights</h3>
         <table class="weights-table">
             <thead>
                 <tr>
@@ -195,5 +190,77 @@ function formatDate(date) {
     return new Date(date).toLocaleDateString();
 }
 
+async function loadItems() {
+    const response = await fetch("/api/items/inventory");
+    const data = await response.json();
+
+    displayItems(data.items, data.maxActiveItems);
+}
+
+function displayItems(items, maxActiveItems) {
+    const container = document.getElementById("items");
+
+    container.innerHTML = `
+        <p>Equipped: ${items.filter((item) => item.equipped).length}/${maxActiveItems}</p>
+        <div class="item-grid">
+            ${items
+                .map(
+                    (item) => `
+                <div class="item-card">
+                    <img src="/apps/dice-game/assets/items/${item.icon}">
+                    <h3>${item.name}</h3>
+                    <p>${item.description}</p>
+                    <div>${item.effects.map((effect) => `<div>${formatEffect(effect)}</div>`).join("")}</div>
+
+                    <button
+                        class="kotomi-button item-toggle"
+                        data-id="${item.playerItemId}"
+                        data-equipped="${item.equipped}"
+                    >
+                        ${item.equipped ? "Unequip" : "Equip"}
+                    </button>
+                </div>
+                `,
+                )
+                .join("")}
+        </div>
+    `;
+
+    document.querySelectorAll(".item-toggle").forEach((button) => {
+        button.addEventListener("click", () => toggleItem(button));
+    });
+}
+
+function formatEffect(effect) {
+    switch (effect.effectType) {
+        case "dice_count":
+            return `+${effect.effectData.amount} dice`;
+        case "weight":
+            return `
+                ${effect.effectData.amount >= 0 ? "+" : ""}
+                ${effect.effectData.amount}
+                weight to ${effect.effectData.face}s
+            `;
+        case "cooldown":
+            return `${effect.effectData.amount}ms cooldown`;
+        default:
+            return effect.effectType;
+    }
+}
+
+async function toggleItem(button) {
+    const id = button.dataset.id;
+    const equipped = button.dataset.equipped === "true";
+    const endpoint = equipped ? `/api/items/${id}/unequip` : `/api/items/${id}/equip`;
+
+    await fetch(endpoint, {
+        method: "POST",
+    });
+
+    await loadProfile();
+    await loadItems();
+}
+
 await loadProfile();
 await loadAchievements();
+await loadItems();

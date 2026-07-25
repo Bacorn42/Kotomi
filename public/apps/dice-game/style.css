@@ -266,6 +266,26 @@
     margin-top: 0.25rem;
 }
 
+.item-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.item-card {
+    padding: 1rem;
+}
+
+.item-card img {
+    width: 64px;
+    height: 64px;
+    image-rendering: pixelated;
+}
+
+.item-card button {
+    margin-top: 1rem;
+}
+
 @media (max-width: 900px) {
     .profile-grid {
         grid-template-columns: 1fr;

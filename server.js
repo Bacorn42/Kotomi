@@ -8,6 +8,7 @@ const aiRoutes = require("./src/routes/ai");
 const authRoutes = require("./src/routes/auth");
 const diceRoutes = require("./src/routes/dice");
 const achievementRoutes = require("./src/routes/achievements");
+const itemsRoutes = require("./src/routes/items.js");
 
 const app = express();
 const server = http.createServer(app);
@@ -35,6 +36,7 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/dice", diceRoutes);
 app.use("/api/achievements", achievementRoutes);
+app.use("/api/items", itemsRoutes);
 
 // Test route
 app.get("/api/test", (req, res) => {

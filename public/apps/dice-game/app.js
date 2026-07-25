@@ -94,8 +94,8 @@ function displayRoll(result) {
 
     const score = document.createElement("h3");
     score.textContent = `Score: ${result.score}`;
-    if (result.money > 0) {
-        score.textContent += ` (+$${(result.money / 100).toFixed(2)})`;
+    if (result.moneyCents > 0) {
+        score.textContent += ` (+$${(result.moneyCents / 100).toFixed(2)})`;
     }
 
     resultElement.appendChild(title);

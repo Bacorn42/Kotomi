@@ -1,5 +1,6 @@
 const db = require("../database/db.js");
 const { getDiceConfiguration } = require("../services/diceConfiguration.js");
+const { getPlayerConfiguration } = require("../services/playerConfiguration.js");
 
 function getPlayerProfile(userId) {
     const user = db
@@ -45,7 +46,7 @@ function getPlayerProfile(userId) {
         .all(userId);
 
     const player = getPlayer(userId);
-    const configuration = getDiceConfiguration(player);
+    const configuration = getPlayerConfiguration(getDiceConfiguration(player), userId);
 
     return {
         username: user.Username,
