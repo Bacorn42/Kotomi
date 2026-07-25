@@ -8,7 +8,8 @@ const aiRoutes = require("./src/routes/ai");
 const authRoutes = require("./src/routes/auth");
 const diceRoutes = require("./src/routes/dice");
 const achievementRoutes = require("./src/routes/achievements");
-const itemsRoutes = require("./src/routes/items.js");
+const itemsRoutes = require("./src/routes/items");
+const shopRoutes = require("./src/routes/shop");
 
 const app = express();
 const server = http.createServer(app);
@@ -16,9 +17,11 @@ const io = new Server(server);
 
 require("./src/database/db");
 const { seedAchievements } = require("./src/database/seedAchievements.js");
+const seedItems = require("./src/database/seedItems.js");
 require("./src/services/socket").init(io);
 
 seedAchievements();
+seedItems();
 
 const PORT = 3000;
 
@@ -37,6 +40,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/dice", diceRoutes);
 app.use("/api/achievements", achievementRoutes);
 app.use("/api/items", itemsRoutes);
+app.use("/api/shop", shopRoutes);
 
 // Test route
 app.get("/api/test", (req, res) => {

@@ -42,8 +42,62 @@ function getEffects(definitionId) {
         }));
 }
 
+function exists(name) {
+    return db
+        .prepare(
+            `
+        SELECT 1
+        FROM ItemDefinitions
+        WHERE Name = ?
+    `,
+        )
+        .get(name);
+}
+
+function createDefinition(definition) {
+    const result = db
+        .prepare(
+            `
+        INSERT INTO ItemDefinitions
+        (
+            Name,
+            Description,
+            Icon,
+            CostCents,
+            CanGenerate
+        )
+        VALUES (?, ?, ?, ?, ?)
+    `,
+        )
+        .run(
+            definition.name,
+            definition.description,
+            definition.icon,
+            definition.costCents,
+            definition.canGenerate ? 1 : 0,
+        );
+
+    const definitionId = result.lastInsertRowid;
+
+    const insertEffect = db.prepare(`
+        INSERT INTO ItemDefinitionEffects
+        (
+            DefinitionID,
+            EffectType,
+            EffectData
+        )
+        VALUES (?, ?, ?)
+    `);
+
+    for (const effect of definition.effects) {
+        insertEffect.run(definitionId, effect.type, JSON.stringify(effect.data));
+    }
+}
+
 module.exports = {
     getAll,
     getById,
     getEffects,
+    exists,
+    createDefinition,
 };
