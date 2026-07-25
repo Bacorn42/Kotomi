@@ -1,21 +1,25 @@
 import { initializeKotomiApp } from "/js/kotomi.js";
 import { createItemCard } from "./components/itemCard.js";
+import { createUpgradeCard } from "./components/upgradeCard.js";
 
 initializeKotomiApp("dice-game");
 
 await loadShop();
 
 async function loadShop() {
-    const [shopResponse, profileResponse] = await Promise.all([
+    const [shopResponse, profileResponse, upgradesResponse] = await Promise.all([
         fetch("/api/shop"),
         fetch("/api/dice/profile"),
+        fetch("/api/shop/upgrades"),
     ]);
 
     const items = await shopResponse.json();
     const profile = await profileResponse.json();
+    const upgrades = await upgradesResponse.json();
 
     displayMoney(profile.moneyCents);
     displayShop(items);
+    displayUpgrades(upgrades);
 }
 
 function displayMoney(moneyCents) {
@@ -55,6 +59,23 @@ async function buyItem(definitionId) {
         alert(result.message);
         return;
     }
+
+    await loadShop();
+}
+
+function displayUpgrades(upgrades) {
+    const container = document.getElementById("shop-upgrades");
+    container.innerHTML = upgrades.map((upgrade) => createUpgradeCard(upgrade)).join("");
+
+    document.querySelectorAll(".upgrade-buy-button").forEach((button) => {
+        button.addEventListener("click", () => buyUpgrade(button.dataset.id));
+    });
+}
+
+async function buyUpgrade(id) {
+    await fetch(`/api/shop/upgrades/${id}/buy`, {
+        method: "POST",
+    });
 
     await loadShop();
 }

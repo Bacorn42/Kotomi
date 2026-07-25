@@ -326,6 +326,20 @@
     margin-bottom: 0.5rem;
 }
 
+.shop-section {
+    margin-bottom: 2rem;
+}
+
+.upgrade-card {
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.upgrade-price {
+    font-weight: bold;
+    margin: 1rem 0;
+}
+
 @media (max-width: 900px) {
     .profile-grid {
         grid-template-columns: 1fr;
