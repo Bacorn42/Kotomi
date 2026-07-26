@@ -14,12 +14,12 @@ const shopRoutes = require("./src/routes/shop");
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+require("./src/services/socket").init(io);
 
 require("./src/database/db");
 const { seedAchievements } = require("./src/database/seedAchievements.js");
 const seedItems = require("./src/database/seedItems.js");
 const { seedUpgrades } = require("./src/database/seedUpgrades.js");
-require("./src/services/socket").init(io);
 
 seedAchievements();
 seedItems();

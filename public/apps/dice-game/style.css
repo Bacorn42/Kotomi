@@ -526,6 +526,58 @@
     margin-top: 2rem;
 }
 
+#live-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.feed-event {
+    padding: 0.75rem 1rem;
+    background: var(--color-surface);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    animation: feed-slide-in 0.3s ease-out;
+}
+
+.feed-event strong {
+    margin: 0 0.2rem;
+}
+
+.feed-event .common {
+    color: #aaa;
+}
+
+.feed-event .uncommon {
+    color: #55aa55;
+}
+
+.feed-event .rare {
+    color: #4488ff;
+}
+
+.feed-event .epic {
+    color: #aa55ff;
+}
+
+.feed-event .legendary {
+    color: #ffcc33;
+}
+
+@keyframes feed-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 @media (max-width: 900px) {
     .profile-columns {
         grid-template-columns: 1fr;

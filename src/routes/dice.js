@@ -14,6 +14,7 @@ const { calculateMoney } = require("../services/rewards.js");
 const { getPlayerConfiguration } = require("../services/playerConfiguration.js");
 const itemGeneration = require("../services/itemGeneration.js");
 const statisticsService = require("../services/statistics.js");
+const socket = require("../services/socket");
 
 const router = express.Router();
 
@@ -40,6 +41,12 @@ router.post("/roll", requireLogin, (req, res) => {
     let droppedItem = null;
     if (Math.random() < 0.01) {
         droppedItem = itemGeneration.generateItem(userId);
+
+        socket.sendDiceFeed({
+            type: "ITEM",
+            username: playerRepository.getUsername(userId),
+            item: droppedItem,
+        });
     }
 
     const rollId = diceRepository.saveRoll({
@@ -50,6 +57,14 @@ router.post("/roll", requireLogin, (req, res) => {
         moneyCents,
     });
     updateLastRollTime(userId);
+
+    socket.sendDiceFeed({
+        type: "ROLL",
+        username: req.user.Username,
+        score,
+        moneyCents,
+        diceCount: configuration.diceCount,
+    });
 
     const unlocked = checkAchievements(userId, {
         score,
@@ -64,6 +79,14 @@ router.post("/roll", requireLogin, (req, res) => {
         moneyCents,
         totalMoneyCents: diceRepository.getTotalMoneyCents(userId),
     });
+
+    for (const achievement of unlocked) {
+        socket.sendDiceFeed({
+            type: "ACHIEVEMENT",
+            username: playerRepository.getUsername(userId),
+            achievement,
+        });
+    }
 
     res.json({
         rollId,

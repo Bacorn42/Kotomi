@@ -1,49 +1,18 @@
-import { initializeKotomiApp } from "/js/kotomi.js";
+import { initializeKotomiApp, formatUsername } from "/js/kotomi.js";
 import { renderDice } from "./components/diceRenderer.js";
 import { showItemDrop } from "./components/itemNotifications.js";
 
 initializeKotomiApp("dice-game");
+
+const socket = io();
+let feedQueue = [];
+let feedProcessing = false;
 
 let rolling = false;
 let cooldownInterval = null;
 
 function getDieImage(value) {
     return `/apps/dice-game/assets/dice/classic/die-classic-${value}.png`;
-}
-
-async function loadHistory() {
-    const response = await fetch("/api/dice/recent");
-
-    if (!response.ok) {
-        return;
-    }
-
-    const rolls = await response.json();
-
-    displayHistory(rolls);
-}
-
-function displayHistory(rolls) {
-    const history = document.getElementById("history");
-    history.innerHTML = "";
-
-    for (const roll of rolls) {
-        const item = document.createElement("div");
-        item.className = "history-roll";
-
-        const diceContainer = document.createElement("div");
-        diceContainer.className = "history-dice";
-        renderDice(diceContainer, roll.dice);
-
-        const score = document.createElement("div");
-        score.className = "history-score";
-        score.innerHTML = `Score: <strong>${roll.score}</strong>`;
-
-        item.appendChild(diceContainer);
-        item.appendChild(score);
-
-        history.appendChild(item);
-    }
 }
 
 async function rollDice() {
@@ -125,6 +94,10 @@ function sleep(ms) {
 }
 
 async function initialize() {
+    socket.on("dice-feed", (event) => {
+        addFeedEvent(event);
+    });
+
     const response = await fetch("/api/dice/profile");
     const profile = await response.json();
 
@@ -147,7 +120,6 @@ async function initialize() {
             const result = await rollDice();
             await sleep(1000);
             displayRoll(result);
-            await loadHistory();
 
             if (result.unlockedAchievements && result.unlockedAchievements.length > 0) {
                 showAchievementNotifications(result.unlockedAchievements);
@@ -179,8 +151,6 @@ async function initialize() {
             }
         }, 50);
     });
-
-    await loadHistory();
 }
 
 function sortDice(dice) {
@@ -207,6 +177,86 @@ function showAchievementNotifications(achievements) {
         setTimeout(() => {
             notification.remove();
         }, 5000);
+    }
+}
+
+function addFeedEvent(event) {
+    feedQueue.push(event);
+    processFeedQueue();
+}
+
+async function processFeedQueue() {
+    if (feedProcessing) {
+        return;
+    }
+
+    feedProcessing = true;
+
+    while (feedQueue.length > 0) {
+        const event = feedQueue.shift();
+        await sleep(1000);
+        displayFeedEvent(event);
+    }
+
+    feedProcessing = false;
+}
+
+function displayFeedEvent(event) {
+    const feed = document.getElementById("live-feed");
+
+    const item = document.createElement("div");
+    item.className = "feed-event";
+    item.innerHTML = formatFeedEvent(event);
+
+    feed.prepend(item);
+
+    while (feed.children.length > 20) {
+        feed.removeChild(feed.lastChild);
+    }
+}
+
+function formatFeedEvent(event) {
+    switch (event.type) {
+        case "ROLL":
+            return `
+                <div>
+                    <span>🎲</span>
+                    <strong>${formatUsername(event.username)}</strong>
+                    rolled 
+                    <strong>${event.score}</strong>
+                    points
+                    ${
+                        event.moneyCents > 0
+                            ? `<span>(+$${(event.moneyCents / 100).toFixed(2)})</span>`
+                            : ""
+                    }
+                </div>
+            `;
+
+        case "ITEM":
+            return `
+                <div>
+                    <span>✨</span>
+                    <strong>${formatUsername(event.username)}</strong>
+                    found
+                    <strong class="${event.item.rarity.toLowerCase()}">
+                        ${event.item.name}
+                    </strong>
+                </div>
+            `;
+
+        case "ACHIEVEMENT":
+            return `
+                <div>
+                    <span>🏆</span>
+                    <strong>${formatUsername(event.username)}</strong>
+                    unlocked
+                    <strong>${event.achievement.Name}</strong>
+                </div>
+            `;
+
+        default:
+            return "";
     }
 }
 

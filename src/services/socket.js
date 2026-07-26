@@ -24,10 +24,17 @@ function sendGenerationStarted() {
     io.emit("generation-started", "");
 }
 
+function sendDiceFeed(event) {
+    if (io) {
+        io.emit("dice-feed", event);
+    }
+}
+
 module.exports = {
     init,
     sendStatus,
     sendProgress,
     sendPrompt,
     sendGenerationStarted,
+    sendDiceFeed,
 };

@@ -184,6 +184,18 @@ function getPlayerSettings(userId) {
         .get(userId);
 }
 
+function getUsername(userId) {
+    return db
+        .prepare(
+            `
+            SELECT Username
+            FROM Users
+            WHERE UserID = ?
+        `,
+        )
+        .get(userId).Username;
+}
+
 module.exports = {
     getPlayerProfile,
     getTotalRolls,
@@ -194,4 +206,5 @@ module.exports = {
     getMoneyCents,
     addMoneyCents,
     getPlayerSettings,
+    getUsername,
 };
