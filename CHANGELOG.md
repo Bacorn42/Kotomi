@@ -4,181 +4,202 @@
 
 Current development:
 
-- Building additional Kotomi applications
-- Expanding shared platform features
-- Future improvements and experiments
+- Expanding Dice Game content and progression
+- Adding more items, achievements, and balancing
+- Improving Kotomi applications and shared platform features
 
 ---
 
-## 2026-07-22
+# 2026-07-25
 
-### Added
+## Added
 
-Authentication System:
+### Dice Game
 
-Backend:
+Implemented a complete item and progression system:
 
-- Added user account system
-- Added Users database table
-- Added Sessions database table
-- Added password hashing and salting
-- Added registration endpoint
-- Added login endpoint
-- Added logout endpoint
-- Added current user endpoint
-- Added authentication middleware
-- Added session-based authentication
+- Added item definitions
+- Added player inventory
+- Added item effects
+- Added item equip/unequip system
+- Added active item limits
+- Added shop system
+- Added permanent upgrades
+- Added generated loot items
+- Added item rarity system foundation
+- Added random item drops from rolls
 
-Frontend:
+Added generated item support:
 
-- Added registration page
-- Added login page
-- Added authentication-aware application shell
-- Added logged-in user display
-- Added logout controls
-- Added login/register navigation
+- Generated items have rarity
+- Generated items have scaled effects
+- Generated items are stored independently from definitions
 
-Image Generator:
+Added additional progression systems:
 
-- Added user ownership for generated images
-- Restricted image history to authenticated users
-- Updated image operations to use UserID
-
----
-
-### Improved
-
-Kotomi Platform:
-
-- Added shared application shell
-- Improved consistent Kotomi branding across applications
-- Added centralized frontend utilities
-- Converted frontend JavaScript to ES modules
-- Improved shared CSS organization
-
-Image Generator:
-
-- Added authentication-aware initialization
-- Improved handling of logged-out users
+- Configurable dice count
+- Configurable dice weights
+- Roll cooldown upgrades
+- Score and money modifiers
+- Maximum equipped item upgrades
 
 ---
 
-### Refactored
+## Improved
 
-Frontend:
+### Dice Game
 
-- Consolidated shared Kotomi JavaScript functionality
-- Reduced repeated application setup code
-- Standardized application loading process
+- Improved profile page
+- Added inventory display improvements
+- Added shop interface
+- Added item detail displays
+- Added loot notifications
 
-Backend:
+### Architecture
 
-- Integrated user identity into application workflows
-- Connected image data with user accounts
+- Separated item definitions from owned player items
+- Kept repository layer responsible for database operations
+- Improved reusable item UI components
 
 ---
 
-## 2026-07-21
+# 2026-07-24
 
-### Added
+## Added
 
-Backend:
+### Dice Game Foundation
+
+Added core progression systems:
+
+- Player profiles
+- Persistent dice configuration
+- Server-side cooldown enforcement
+- Money system
+- Fixed-point currency storage
+
+Implemented:
+
+- Configurable dice count
+- Configurable dice weights
+- Score calculation
+- Roll cooldown validation
+- Money calculation and storage
+
+---
+
+# 2026-07-23
+
+## Added
+
+### Dice Game
+
+Created achievement system:
+
+- Achievement definitions
+- Achievement checking
+- Achievement unlocking
+- Achievement progress display
+- Achievement notifications
+
+Expanded player profile:
+
+- Roll history
+- Top rolls
+- Player statistics display
+
+---
+
+# 2026-07-22
+
+## Added
+
+### Dice Game
+
+Created initial Dice Game application:
+
+- Dice rolling backend
+- Roll API
+- Dice result display
+- Roll history persistence
+- Basic dice visuals
+
+---
+
+# 2026-07-22
+
+## Added
+
+### Authentication System
+
+Implemented user accounts:
+
+- User registration
+- Login/logout
+- Password hashing
+- Session management
+- Authentication middleware
+
+Integrated authentication into applications:
+
+- User-aware application shell
+- User-specific image history
+
+---
+
+# 2026-07-21
+
+## Added
+
+### Kotomi Platform
+
+Implemented platform foundations:
+
+- Application launcher
+- Application registry
+- Shared application shell
+- Shared frontend utilities
+- Shared styling system
+
+### Image Generator
+
+Added persistence:
 
 - SQLite database integration
-- Database initialization and schema system
-- Image repository layer for database operations
-- Image generation history API
-- Persistent storage of generated image metadata
-- Image deletion endpoint
-
-Frontend:
-
-- Image history gallery
-- Image details modal
-- Generated image download support
-- Regenerate image from previous generation
-
-Database:
-
-- Added Images table for generated image records
-- Stored:
-    - Prompt
-    - Enhanced prompt
-    - Resolution
-    - Steps
-    - Seed
-    - Model
-    - Creation date
-
-### Improved
-
-Image Generator:
-
-- Generation history is now persisted between sessions
-- Improved image management workflow
-- Improved progress bar smoothness during generation
-
-### Refactored
-
-Backend:
-
-- Added repository layer for database access
-- Separated image persistence logic from generation logic
+- Image history storage
+- Image management
+- Image deletion
+- Image regeneration
 
 ---
 
-## 2026-07-19
+# 2026-07-19
 
-### Added
+## Improved
 
-Backend:
+### Image Generator
 
-- Ollama model discovery endpoint
-- Dynamic Ollama model selection
-- Configurable image generation settings:
-    - Image resolution
-    - Generation steps
+Added:
 
-- Prompt generation temperature configuration
-- Real-time prompt events through Socket.IO
-
-Frontend:
-
-- Ollama model selection dropdown
-- Image generation settings controls
-- Display of the final prompt sent to the image model
-- Improved image generator UI components
-
-### Improved
-
-AI Image Generation:
-
-- Improved prompt enhancement template for better diffusion prompts
-- Added better preservation of user intent during prompt expansion
-- Tuned prompt generation consistency
-
-### Refactored
-
-Backend:
-
-- Improved Ollama service organization
-- Separated reusable image generation logic into modules
+- Ollama model discovery
+- Configurable generation settings
+- Prompt preview
+- Improved prompt enhancement
+- Better UI components
 
 ---
 
-## 2026-07-18
+# 2026-07-18
 
-### Added
+## Added
 
-Backend:
+### Kotomi Foundation
+
+Created initial project:
 
 - Express server
+- Frontend application structure
+- Kotomi theme
+- AI Image Generator
 - Ollama integration
 - ComfyUI integration
 - Socket.IO progress updates
-
-Frontend:
-
-- Image generator interface
-- Warm Kotomi theme
-- Shared UI components

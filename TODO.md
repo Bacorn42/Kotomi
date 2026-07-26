@@ -4,7 +4,7 @@
 
 # Current Development Direction
 
-Kotomi's core platform is now established:
+Kotomi's core platform is established:
 
 Completed:
 
@@ -16,11 +16,87 @@ Completed:
 - Authentication
 - User-owned application data
 
-Future development should focus on:
+Current focus:
 
-- adding new applications
-- improving shared systems
-- expanding existing tools
+- Expanding Dice Game
+- Adding content and progression
+- Improving shared platform systems
+- Refining existing applications
+
+---
+
+# Dice Game
+
+Current status:
+
+Playable foundation complete.
+
+Implemented:
+
+- Dice rolling
+- Server-side cooldown enforcement
+- Player profiles
+- Money system
+- Shop
+- Items
+- Item effects
+- Inventory
+- Item equipment
+- Upgrades
+- Generated loot
+- Item rarities
+- Achievements
+
+---
+
+## Content Expansion
+
+High priority:
+
+- [ ] Add more shop items
+- [ ] Add more generated item definitions
+- [ ] Add more item effect types
+- [ ] Add more achievements
+- [ ] Create item icons
+- [ ] Create achievement icons
+- [ ] Add more dice skins
+
+---
+
+## Balance
+
+- [ ] Balance money progression
+- [ ] Balance item prices
+- [ ] Balance upgrade costs
+- [ ] Balance item effects
+- [ ] Balance rarity scaling
+- [ ] Add more economy simulations
+- [ ] Tune early game progression
+
+---
+
+## Item System Improvements
+
+Future ideas:
+
+- [ ] Add more complex item effects
+- [ ] Add better negative effect balancing
+- [ ] Add item families/set bonuses
+- [ ] Add more interesting dice modifiers
+- [ ] Add higher dice values (7s, 8s, 9s)
+- [ ] Add additional item categories
+
+---
+
+## Game UI Improvements
+
+- [ ] Improve profile page
+- [ ] Add dedicated statistics page
+- [ ] Improve inventory display
+- [ ] Improve item details
+- [ ] Add better loot notifications
+- [ ] Add live feed
+- [ ] Improve mobile layout
 
 ---
 
@@ -53,7 +129,7 @@ Future development should focus on:
 
 ## Generation Management
 
-- [ ] Add ComfyUI cancellation improvements
+- [ ] Improve ComfyUI cancellation
 - [ ] Add generation status tracking
 - [ ] Add generation job management
 - [ ] Store workflow configurations
@@ -80,7 +156,7 @@ Future improvements:
 Completed:
 
 - Homepage app launcher
-- App registry foundation
+- App registry
 - Shared navigation foundation
 
 Future:
@@ -121,27 +197,26 @@ Future:
 
 # Future Applications
 
-## Dice Game
-
-Planned next application.
-
 Ideas:
-
-- User-specific scores
-- Leaderboards
-- Game history
-- Statistics
-- Shared Kotomi styling
-
----
-
-## Other Ideas
 
 - Dashboard
 - Utility tools
 - Automation tools
 - Games
 - AI assistants
+
+---
+
+# Refactoring
+
+After systems stabilize:
+
+- [ ] Review service/repository boundaries
+- [ ] Remove duplicated frontend code
+- [ ] Improve error handling
+- [ ] Add validation layer
+- [ ] Improve configuration management
+- [ ] Add automated testing
 
 ---
 

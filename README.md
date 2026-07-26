@@ -2,138 +2,177 @@
 
 > A personal project hub for AI tools, utilities, dashboards, experiments, and creative projects.
 
-Kotomi is a self-hosted personal workspace designed to bring together various projects into one unified interface, with shared services, persistent storage, authentication, and a consistent user experience.
+Kotomi is a self-hosted personal workspace designed to bring different applications together under one unified platform.
 
-The goal is to create a cozy, extensible environment where tools, experiments, and applications can live together under one consistent platform.
+The goal is to create a cozy, extensible environment where tools and experiments can share:
+
+- authentication
+- storage
+- UI components
+- themes
+- common services
+
+Kotomi is both a personal tool platform and a portfolio project exploring modern application architecture.
 
 ---
 
-## ✨ Current Features
+# Current Applications
 
-### 🖼️ AI Image Generator
+## 🖼️ AI Image Generator
 
 Kotomi's first application is an AI image generation workspace.
 
-Current pipeline:
+Pipeline:
 
-```
-User Prompt
-|
-v
-Local Language Model (Ollama)
-|
-v
-Enhanced Image Prompt
-|
-v
-ComfyUI + Z-Image Turbo
-|
-v
-Generated Image
-|
-v
-SQLite History Storage
-```
+User prompt → optional AI enhancement → ComfyUI generation → saved image history
 
 Features:
 
 - Natural language prompt input
-- AI-assisted prompt enhancement
+- AI-assisted prompt enhancement using Ollama
 - ComfyUI workflow integration
 - Real-time generation progress
-- Image preview in browser
-- Dynamic local model selection through Ollama
+- Local model selection
 - Configurable generation settings:
     - Resolution
     - Generation steps
-
-- Preview of the final image prompt
-- Persistent image generation history
-- User-specific image history
-- Image metadata storage
-- History gallery
+- Final prompt preview
+- Persistent image history
+- User-specific image ownership
 - Image detail viewer
-- Download generated images
-- Delete generated images
-- Regenerate images from previous generations
+- Download images
+- Delete images
+- Regenerate previous generations
 
 ---
 
-### 👤 User Accounts
+## 🎲 Dice Game
 
-Kotomi includes a local account system for personal and multi-user deployments.
+Kotomi's second application is a progression-based dice game.
+
+Players roll dice, earn money, buy upgrades, collect items, and improve their setup over time.
 
 Features:
 
-- Username/password accounts
-- Password hashing with salts
-- Cookie-based sessions
-- User-specific application data
-- Authentication-aware applications
+- Configurable dice system
+- Variable dice count
+- Variable dice weights
+- Roll cooldown system
+- Score calculation
+- Persistent player profiles
+- Money system
+- Shop
+- Permanent upgrades
+- Inventory
+- Equippable items
+- Item effects
+- Generated loot drops
+- Item rarity system
+- Achievements
+- Roll history
 
-The system is designed for personal hosting and can be expanded for public deployments in the future.
+Future development will focus on:
 
----
-
-## 🏗️ Architecture
-
-Kotomi is built as a modular web application.
-
-```
-Kotomi
-|
-├── Core Server
-│ └── Node.js + Express
-│
-├── Applications
-│ └── Image Generator
-│
-├── Authentication
-│ ├── Users
-│ └── Sessions
-│
-├── AI Services
-│ ├── Ollama
-│ ├── ComfyUI
-│ └── Socket.IO
-│
-├── Persistence
-│ └── SQLite Database
-│
-└── Shared Platform
-    ├── Theme
-    ├── Components
-    ├── Layout
-    └── Application Shell
-```
-
-The long-term goal is to support additional applications such as:
-
-- Utilities
-- Dashboards
-- Games
-- Automation tools
-- Other personal projects
+- More items
+- More achievements
+- Balancing progression
+- More dice mechanics
+- Additional polish
 
 ---
 
-## 🎨 Design Philosophy
+# Platform Features
 
-Kotomi is designed around the idea of a personal digital workspace.
+Kotomi provides shared functionality for all applications.
+
+Current platform systems:
+
+- Application launcher
+- Shared application shell
+- Shared theme system
+- User accounts
+- Authentication
+- Session management
+- SQLite persistence
+- Reusable frontend components
+
+Future applications can use these shared systems instead of rebuilding common functionality.
+
+---
+
+# Architecture
+
+Kotomi is built as a modular Node.js application.
+
+Major components:
+
+## Core Server
+
+- Node.js
+- Express
+- Socket.IO
+
+## Applications
+
+Each application is built as a module that can use shared Kotomi functionality.
+
+Current applications:
+
+- Image Generator
+- Dice Game
+
+## Authentication
+
+Includes:
+
+- User accounts
+- Password hashing
+- Session-based authentication
+- User-owned application data
+
+## Persistence
+
+Uses SQLite for local storage.
+
+Currently stores:
+
+- Users
+- Sessions
+- Generated images
+- Player data
+- Game progress
+
+## AI Services
+
+Uses local AI tools:
+
+- Ollama
+- ComfyUI
+- Z-Image Turbo
+
+---
+
+# Design Philosophy
+
+Kotomi is designed as a personal digital workspace.
+
+The design goal is:
+
+"Comfortable evening workspace"
 
 The interface uses a warm dark theme inspired by:
 
-- cozy evening environments
 - creative studios
 - personal workspaces
+- cozy environments
 
-The goal is to feel less like an enterprise dashboard and more like a place where projects can grow.
+The goal is to create something that feels personal rather than like an enterprise dashboard.
 
 ---
 
-## 🛠️ Tech Stack
+# Tech Stack
 
-### Backend
+## Backend
 
 - Node.js
 - Express
@@ -141,26 +180,18 @@ The goal is to feel less like an enterprise dashboard and more like a place wher
 - Axios
 - SQLite (better-sqlite3)
 
-### Database
-
-- SQLite
-- Local application storage
-
-Stores:
-
-- User accounts
-- Sessions
-- Application data
-- Image generation history
-
-### Frontend
+## Frontend
 
 - HTML
 - CSS
 - JavaScript
 - ES Modules
 
-### AI
+## Database
+
+- SQLite
+
+## AI
 
 - Ollama
 - Local language models
@@ -169,113 +200,103 @@ Stores:
 
 ---
 
-## 🚀 Installation
+# Installation
 
-### Requirements
-
-You will need:
+Requirements:
 
 - Node.js
 - npm
 - Ollama
 - ComfyUI
-- SQLite support (included through the application)
+
+Install dependencies:
+
+    npm install
+
+Start Kotomi:
+
+    npm start
+
+The application runs locally at:
+
+    http://localhost:3000
 
 ---
 
-### Clone the repository
+# Configuration
 
-```bash
-git clone https://github.com/yourusername/kotomi.git
+Kotomi currently assumes local AI services.
 
-cd kotomi
-```
-
-### Install dependencies
-
-```bash
-npm install
-```
-
-### Start Kotomi
-
-```bash
-npm start
-```
-
-The server will start at:
-
-```
-http://localhost:3000
-```
-
----
-
-## ⚙️ Configuration
-
-Kotomi currently assumes local services:
+Default services:
 
 Ollama:
 
-```
-http://127.0.0.1:11434
-```
+    http://127.0.0.1:11434
 
 ComfyUI:
 
-```
-http://127.0.0.1:8188
-```
+    http://127.0.0.1:8188
 
-These can be customized as the project develops.
+These settings can be expanded as the project develops.
 
 ---
 
-## 📌 Roadmap
+# Roadmap
 
-Planned:
+## Image Generator
 
-### Image Generator
+Future improvements:
 
 - Image thumbnails
-- Image organization:
-    - Tags
-    - Favorites
-    - Search
-
+- Tags
+- Favorites
+- Search
 - Image-to-image workflows
-- Multiple ComfyUI workflows
+- Additional ComfyUI workflows
 - Generation queue improvements
 
-### Platform
+## Dice Game
+
+Future improvements:
+
+- More items
+- More achievements
+- Better statistics
+- Live feed
+- More dice mechanics
+- Better balancing
+- More visual polish
+
+## Platform
+
+Future improvements:
 
 - Application categories
 - Application metadata
-- Shared settings system
+- Shared settings
 - Notifications/status system
-- Additional reusable components
-
-### Applications
-
-- Dice Game
-- Dashboard applications
-- Utility tools
-- Automation tools
-- More AI-powered tools
+- More reusable components
+- Additional applications
 
 ---
 
-## 📜 License
+# License
 
 MIT License
 
 ---
 
-## 💡 About
+# About
 
-Kotomi is a personal software environment built to explore AI, automation, and creative tools while creating a unified home for future projects.
+Kotomi is a personal software environment built to explore:
 
-The goal is not just to build individual tools, but to create a place where tools can grow together:
+- AI tools
+- automation
+- game development
+- application architecture
+- creative software projects
+
+The goal is not just to create individual tools, but to create a place where projects can grow together through:
 
 - shared identity
 - shared design

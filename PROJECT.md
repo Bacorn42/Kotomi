@@ -4,7 +4,7 @@
 
 Kotomi is a personal project hub built with Node.js and Express.
 
-The goal is to create a central home for:
+The goal is a modular platform for:
 
 - AI tools
 - utilities
@@ -12,24 +12,21 @@ The goal is to create a central home for:
 - games
 - experiments
 
-Kotomi is intended to be both:
-
-- a personal tool server that runs on the user's machine
-- a portfolio project demonstrating modern software development practices
-
-Applications are built as modules that share:
+Applications share:
 
 - authentication
-- UI components
-- themes
-- navigation
+- UI theme
+- application shell
 - common services
 
-The first application is an AI image generator.
+Current applications:
+
+- AI Image Generator
+- Dice Game
 
 ---
 
-# Current Stack
+# Stack
 
 Backend:
 
@@ -39,697 +36,385 @@ Backend:
 - Axios
 - SQLite (better-sqlite3)
 
-Database:
-
-- SQLite
-- Local application database
-- Stores:
-    - user accounts
-    - sessions
-    - application data
-    - image generation history
-
-Authentication:
-
-- Username/password accounts
-- Password hashing with salts
-- Cookie-based sessions
-
-AI:
-
-- Ollama for local language models
-- ComfyUI for image generation
-- Z-Image Turbo workflow
-
 Frontend:
 
 - HTML/CSS/JavaScript
 - ES modules
-- Shared Kotomi theme system
-- Shared application shell
+- Shared Kotomi UI components
+
+AI:
+
+- Ollama
+- ComfyUI
+
+Database:
+
+- SQLite
+
+Architecture:
+
+- Routes handle HTTP endpoints
+- Services contain business logic
+- Repositories handle database access
+- Frontend applications live under public/apps
 
 ---
 
 # Current Architecture
 
-kotomi/
-
-├── server.js
-
-├── src/
-│
-│ ├── routes/
-│ │ ├── image.js
-│ │ └── auth.js
-│ │
-│ ├── services/
-│ │ ├── ollama.js
-│ │ ├── comfyui.js
-│ │ ├── socket.js
-│ │ └── auth.js
-│ │
-│ ├── middleware/
-│ │ └── auth.js
-│ │
-│ ├── database/
-│ │ ├── db.js
-│ │ └── schema.sql
-│ │
-│ └── repositories/
-│ ├── imageRepository.js
-│ ├── userRepository.js
-│ └── sessionRepository.js
-│
-├── modules/
-│ └── image-generation/
-│ ├── generator.js
-│ ├── prompts.js
-│ └── img_gen_z-image_turbo.json
-│
-├── public/
-│
-│ ├── css/
-│ │ ├── theme.css
-│ │ ├── base.css
-│ │ ├── layout.css
-│ │ ├── components.css
-│ │ ├── app-shell.css
-│ │ └── kotomi.css
-│
-│ ├── js/
-│ │ ├── kotomi.js
-│ │ ├── appShell.js
-│ │ └── appRegistry.js
-│
-│ ├── index.html
-│
-│ ├── login/
-│ │ ├── index.html
-│ │ └── app.js
-│
-│ ├── register/
-│ │ ├── index.html
-│ │ └── app.js
-│
-│ └── apps/
-│ └── image-generator/
-│ ├── index.html
-│ ├── app.js
-│ └── style.css
-
-Database files:
-
-- SQLite database file is generated locally
-- Database contents are excluded from git
-- Schema is stored separately in schema.sql
-
----
-
-# Database
-
-Kotomi uses SQLite for local persistence.
-
-Purpose:
-
-- Store generated image history
-- Preserve generation metadata
-- Store user accounts
-- Store login sessions
-- Enable future features such as:
-    - search
-    - favorites
-    - tags
-    - analytics
-    - user statistics
-
-Current schema:
-
-## Users
-
-Stores application accounts.
-
-Fields:
-
-- UserID
-- Username
-- PasswordHash
-- PasswordSalt
-- CreatedDate
-
-Users authenticate using username/password.
-
-Passwords are never stored directly.
-
----
-
-## Sessions
-
-Stores active login sessions.
-
-Fields:
-
-- SessionID
-- UserID
-- CreatedDate
-- ExpiresDate
-
-Sessions are stored server-side and linked through cookies.
-
----
-
-## Images
-
-Stores one row per generated image.
-
-Fields:
-
-- ImageID
-- UserID
-- Filename
-- Prompt
-- EnhancedPrompt
-- Width
-- Height
-- Steps
-- Seed
-- Model
-- CreatedDate
-
-Images belong to users.
-
-Repository:
-
-src/repositories/imageRepository.js
-
-Current operations:
-
-- save()
-- getById()
-- getRecent()
-- deleteById()
-
-Operations require UserID so users only access their own images.
-
----
-
-# Authentication System
-
-Kotomi currently supports:
-
-## Registration
-
-Users provide:
-
-- username
-- password
-- password confirmation
-
-Requirements:
-
-- Username must be unique
-- Password length: 8-64 characters
-
----
-
-## Login
-
-Users authenticate with:
-
-- username
-- password
-
-Successful login creates a session cookie.
-
----
-
-## Current authentication flow
-
-Browser:
+Important directories:
 
 ```
-Login page
-    |
-    v
-POST /api/auth/login
-    |
-    v
-Validate password
-    |
-    v
-Create session
-    |
-    v
-Set cookie
+src/
+├── routes/
+├── services/
+├── repositories/
+├── middleware/
+└── database/
+
+public/
+├── css/
+├── js/
+└── apps/
 ```
 
-Application pages:
+Database:
 
-```
-Page loads
-
-    |
-    v
-
-GET /api/auth/me
-
-    |
-    v
-
-Current user available
-```
+- SQLite database created locally
+- Schema stored in schema.sql
+- Database files excluded from git
 
 ---
 
-# Working Features
-
-## Image Generator
-
-Flow:
-
-User enters prompt and settings
-
-↓
-
-Prompt sent to Ollama (optional enhancement)
-
-↓
-
-Enhanced prompt displayed in frontend
-
-↓
-
-Prompt sent to ComfyUI
-
-↓
-
-ComfyUI generates image
-
-↓
-
-Image returned to browser
-
-↓
-
-Metadata saved to SQLite
-
-Current working:
-
-- Prompt enhancement
-- Ollama model selection
-- Ollama model discovery through API
-- Configurable generation settings:
-    - Resolution
-    - Steps
-
-- Random seed generation
-- ComfyUI workflow execution
-- Image retrieval
-- WebSocket progress updates
-- Display of final prompt sent to image model
-- Image generation history
-- SQLite storage of generation metadata
-- User-specific image history
-- History gallery
-- Image details modal
-- Download generated images
-- Delete images from history
-- Regenerate images from previous generations
-- Authentication requirement
-
----
-
-# AI Prompt Generation
-
-Kotomi uses Ollama as a prompt enhancement layer.
-
-Current behavior:
-
-User prompt:
-
-"A cute green frog jumping onto a tree"
-
-↓
-
-Language model transforms it into a detailed image prompt.
-
-Prompt generation is tuned using:
-
-- Custom prompt template
-- Temperature setting
-
-Current temperature:
-
-0.42
-
-Goal:
-
-Generate consistent, visually useful prompts while preserving the user's original intent.
-
----
-
-# UI Theme
-
-Kotomi uses a warm dark theme.
-
-Design goal:
-
-"Comfortable evening workspace"
-
-Colors:
-
-Background:
-
-```
-#211c18
-```
-
-Surface:
-
-```
-#302923
-```
-
-Accent:
-
-```
-#e3a35c
-```
-
-Shared CSS:
-
-## theme.css
-
-- colors
-
-## base.css
-
-- global styles
-
-## layout.css
-
-- headers
-- containers
-
-## components.css
-
-- cards
-- buttons
-- inputs
-- progress bars
-- modal components
-
-## app-shell.css
-
-- shared application layout
-
----
-
-# Shared Application Shell
-
-All Kotomi applications use:
-
-- shared header
-- Kotomi branding
-- authentication awareness
-- common styling
-- shared JavaScript utilities
-
-The shell provides:
-
-- Kotomi logo
-- application title/subtitle
-- login/register links when logged out
-- username display when logged in
-- logout action
-
----
-
-# Current State
-
-Working:
-
-✅ Express server
-✅ Image generation pipeline
-✅ Ollama integration
-✅ Dynamic model selection
-✅ ComfyUI integration
-✅ Socket.IO progress updates
-✅ Prompt preview
-✅ Shared UI theme
-✅ Shared application shell
-✅ SQLite database integration
-✅ User accounts
-✅ Password hashing
-✅ Sessions
-✅ Login/logout
-✅ User-specific image ownership
-✅ Image history persistence
-✅ Image management UI
-
----
-
-# Current Development Direction
-
-Kotomi is moving toward a modular application platform.
-
-Future applications should be added as modules that use shared:
-
-- services
-- UI components
-- themes
-- navigation
-- authentication
-- job/status handling
-
-Applications should avoid rebuilding platform functionality.
-
----
-
-# Next Possible Tasks
-
-## Image Generator
-
-- Improve image organization:
-    - Tags
-    - Favorites
-    - Search
-
-- Add image thumbnails
-- Add image generation presets
-- Add image-to-image support
-- Add reference image upload
-- Add denoise control
-- Add seed control
-- Add batch generation support
-- Support multiple ComfyUI workflows
-- Improve generation queue handling
-
----
-
-## Authentication
-
-Future improvements:
-
-- Session cleanup
-- Password change
-- Account deletion
-- Database migrations
-- Improved security for public deployment
-
----
-
-## Kotomi Platform
-
-- Improve launcher
-- Expand app registry
-- Add application categories
-- Add shared settings system
-- Add notifications/status system
-- Add reusable application layouts
-
----
-
-## Future Applications
-
-Ideas:
-
-- Dice Game
-- Dashboard
-- Utility tools
-- Automation tools
-- Games
-- AI assistants
-
----
-
-# Development Status
-
-Completed milestones:
-
-## Milestone 1:
-
-AI Image Generator
-
-Status:
-
-Complete.
-
----
-
-## Milestone 2:
-
-Kotomi Launcher / Platform
-
-Status:
-
-Complete.
-
-Includes:
-
-- homepage launcher
-- app registry foundation
-- shared shell
-- shared theme system
-
----
-
-## Milestone 3:
-
-Authentication and User System
-
-Status:
-
-Complete.
-
-Includes:
-
-- user accounts
-- sessions
-- login/register pages
-- authentication-aware UI
-- user-owned application data
-
----
-
-Next milestone:
-
-## Milestone 4:
-
-Additional Kotomi Applications
-
-Candidate:
-
-Dice Game
-
----
-
-# Recent Changes
-
-## 2026-07-19
+# Authentication
 
 Implemented:
 
-- Ollama model discovery and selection
-- Configurable image resolution and steps
-- Prompt preview through Socket.IO
-- Improved AI prompt generation template
-- Ollama temperature tuning
-- Refactored AI service handling
+- Username/password accounts
+- Password hashing with salts
+- Cookie-based sessions
+- Login/register/logout
+- Authentication middleware
 
-Explored:
-
-- ComfyUI cancellation support
-- Future job management architecture
+Users are the root ownership entity for application data.
 
 ---
 
-## 2026-07-21
+# Image Generator
+
+Status: Complete foundation.
+
+Features:
+
+- Ollama prompt enhancement
+- ComfyUI generation
+- Configurable resolution
+- Configurable steps
+- Seed support
+- Socket.IO progress updates
+- Image history
+- User-owned images
+- Regeneration
+- Delete/download support
+
+Future ideas:
+
+- Tags
+- Favorites
+- Search
+- More workflows
+- Batch generation
+
+---
+
+# Dice Game
+
+Status: Functional prototype.
+
+The Dice Game is a progression-based game where players roll dice, earn money, buy upgrades, equip items, and occasionally find loot.
+
+Current systems:
+
+## Rolling
 
 Implemented:
 
-- Added SQLite database support
-- Created database initialization and schema system
-- Added image repository layer
-- Stored generated image metadata
-- Added image history API
-- Added history gallery UI
-- Added image detail modal
-- Added image download support
-- Added image deletion
-- Added image regeneration from history
+- Server-side roll generation
+- Server-side cooldown enforcement
+- Configurable dice count
+- Configurable dice weights
+- Score calculation
+- Money calculation
 
-Improved:
+Player configuration is generated from:
 
-- Smoothed generation progress display
-- Added persistent image generation workflow
+- base player configuration
+- equipped item effects
+- upgrades
 
 ---
 
-## 2026-07-22
+## Economy
+
+Money uses fixed-point storage.
+
+Database stores:
+
+```
+MoneyCents INTEGER
+```
+
+Current money formula:
+
+```
+moneyCents = floor(0.0030137 * log10(score)^8.38)
+```
+
+Scores below 100 award no money.
+
+---
+
+## Items
 
 Implemented:
 
-### Kotomi Platform
+- Item definitions
+- Shop items
+- Player inventory
+- Equip/unequip system
+- Maximum equipped item limit
+- Item effects
+- Generated items
+- Item rarity system foundation
 
-- Added homepage launcher
-- Added shared application shell
-- Added shared header rendering
-- Added centralized CSS loading
-- Converted frontend JavaScript to ES modules
-- Added shared Kotomi frontend utilities
+Important design decisions:
 
-### Authentication
+Shop items:
 
-- Added Users table
-- Added Sessions table
-- Added password hashing and salting
-- Added registration endpoint
-- Added login endpoint
-- Added session creation
-- Added logout support
-- Added current user endpoint
-- Added login/register pages
-- Added authentication-aware header UI
+- Fixed and predictable
+- No rarity
+- Purchased once
 
-### Image Generator
+Generated items:
 
-- Added UserID ownership to images
-- Restricted image history to logged-in users
-- Added authentication checks
-- Updated frontend initialization for login state
-
-Improved:
-
-- Kotomi branding consistency
-- Header account controls
-- Shared component styling
+- Dropped from rolls
+- Have rarity
+- Have generated effects
+- Stored as independent PlayerItems
 
 ---
 
-# Running Kotomi
+## Item Database
 
-Start server:
+Main tables:
 
-```
-npm start
-```
+### ItemDefinitions
 
-Required services:
+Stores item templates.
 
-Ollama:
+Important fields:
 
-```
-http://127.0.0.1:11434
-```
+- Name
+- Description
+- Icon
+- CostCents
+- CanGenerate
 
-ComfyUI:
-
-```
-http://127.0.0.1:8188
-```
-
-Development:
+Shop items have:
 
 ```
-npm run dev
+CanGenerate = 0
 ```
+
+Generated loot has:
+
+```
+CanGenerate = 1
+```
+
+---
+
+### ItemDefinitionEffects
+
+Stores base effects for definitions.
+
+Example:
+
+```
+EffectType: weight
+
+EffectData:
+{
+"face": 5,
+"amount": 5
+}
+```
+
+---
+
+### PlayerItems
+
+Stores owned items.
+
+Important fields:
+
+- UserID
+- DefinitionID
+- GeneratedName
+- Rarity
+- IsEquipped
+
+Shop items:
+
+- Rarity = NULL
+
+Generated items:
+
+- Rarity = Common/Uncommon/Rare/Epic/Legendary
+
+---
+
+### PlayerItemEffects
+
+Stores actual effects on owned items.
+
+Generated items copy and modify definition effects.
+
+This means existing loot does not change when item balance changes.
+
+---
+
+# Generated Loot
+
+Implemented:
+
+- Random generated item definitions
+- Random rarity selection
+- Effect scaling
+- Generated PlayerItems
+- Roll drops
+
+Current rarity levels:
+
+- Common
+- Uncommon
+- Rare
+- Epic
+- Legendary
+
+Current scaling is simple multiplication.
+
+Future balancing may need smarter rules because negative effects can become stronger too.
+
+---
+
+# Achievements
+
+Implemented:
+
+- Achievement definitions
+- Unlock checking
+- Progress display
+- Unlock notifications
+
+Future:
+
+- More achievements
+- Better integration with statistics
+
+---
+
+# Current UI
+
+Implemented:
+
+- Shared Kotomi theme
+- Application shell
+- Dice game UI
+- Profile page
+- Inventory display
+- Shop UI
+- Achievement display
+
+Needs improvement:
+
+- Profile layout
+- Better inventory presentation
+- Loot popup polish
+- Icons/art
+
+---
+
+# Current Game Loop
+
+Current loop:
+
+```
+Roll dice
+|
+Earn money
+|
+Buy upgrades/items
+|
+Equip items
+|
+Improve dice configuration
+|
+Roll more
+|
+Find loot
+```
+
+The goal is to keep the game simple while allowing interesting builds.
+
+---
+
+# Future Work
+
+High priority:
+
+1. Improve loot popup
+2. Add more items
+3. Add more generated item types
+4. Balance economy and progression
+5. Add more achievements
+6. Create item/achievement icons
+7. Improve profile page
+8. Create statistics page
+
+Later:
+
+- Live feed
+- More advanced item effects
+- More dice values (7s, 8s, etc.)
+- More game mechanics
+- Large refactor after systems stabilize
+
+---
+
+# Current Development Status
+
+Completed:
+
+- Milestone 1: AI Image Generator
+- Milestone 2: Kotomi launcher/platform foundation
+- Milestone 3: Authentication system
+- Milestone 4: Dice Game foundation
+
+Current focus:
+
+Dice Game expansion and balancing.
+
+The game is considered functionally playable. Future work is mostly content, polish, balancing, and additional mechanics.
+
+---
+
+# Development Notes
+
+Important architecture preferences:
+
+- Keep business logic out of routes.
+- Database access belongs in repositories.
+- Services should operate on objects, repositories handle serialization.
+- Avoid overengineering before gameplay requirements exist.
+- Keep the Dice Game understandable and simple.
