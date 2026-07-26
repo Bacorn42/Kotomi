@@ -388,6 +388,26 @@
     border: 2px solid #ffcc33;
 }
 
+.item-notification.common {
+    border-color: #aaa;
+}
+
+.item-notification.uncommon {
+    border-color: #55aa55;
+}
+
+.item-notification.rare {
+    border-color: #4488ff;
+}
+
+.item-notification.epic {
+    border-color: #aa55ff;
+}
+
+.item-notification.legendary {
+    border-color: #ffcc33;
+}
+
 #item-notifications {
     position: fixed;
     top: 1.5rem;

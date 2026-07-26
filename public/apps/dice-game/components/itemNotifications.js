@@ -1,13 +1,19 @@
+import { formatEffect } from "./itemFormatter.js";
+
 export function showItemDrop(item) {
     const container = document.getElementById("item-notifications");
     const notification = document.createElement("div");
-    notification.className = "item-notification";
+    notification.className = `item-notification ${item.rarity.toLowerCase()}`;
+
+    const effects = item.effects.map((effect) => `<p>${formatEffect(effect)}</p>`).join("");
+
     notification.innerHTML = `
         <img src="assets/items/${item.icon}">
         <div>
             <strong>${item.name}</strong>
             <p class="item-rarity">${item.rarity}</p>
-            <p>Item added to inventory</p>
+            ${effects}
+            <p>✨ New item discovered!</p>
         </div>
     `;
 
@@ -15,5 +21,5 @@ export function showItemDrop(item) {
 
     setTimeout(() => {
         notification.remove();
-    }, 5000);
+    }, 7000);
 }

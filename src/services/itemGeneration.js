@@ -32,6 +32,10 @@ function generateItem(userId) {
         name: `${rarity.name} ${definition.Name}`,
         rarity: rarity.name,
         icon: definition.Icon,
+        effects: effects.map((effect) => ({
+            effectType: effect.effectType,
+            effectData: scaleEffect(effect.effectType, effect.effectData, rarity.multiplier),
+        })),
     };
 }
 
