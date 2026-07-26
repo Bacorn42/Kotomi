@@ -4,10 +4,6 @@ import { createItemCard } from "./components/itemCard.js";
 
 initializeKotomiApp("dice-game");
 
-function getDieImage(value) {
-    return `/apps/dice-game/assets/dice/classic/die-classic-${value}.png`;
-}
-
 async function loadProfile() {
     const response = await fetch("/api/dice/profile");
     const profile = await response.json();
@@ -20,38 +16,37 @@ async function loadProfile() {
 
 function displayPlayerInfo(profile) {
     document.getElementById("player-info").innerHTML = `
-        <div class="stat-row">
-            <span>Username</span>
-            <strong>${formatUsername(profile.username)}</strong>
-        </div>
-        <div class="stat-row">
-            <span>Member Since</span>
-            <strong>${new Date(profile.createdDate).toLocaleDateString()}</strong>
+        <div class="profile-player">
+            <div class="profile-avatar">🎲</div>
+            <div>
+                <h2>${formatUsername(profile.username)}</h2>
+                <p>Member since ${new Date(profile.createdDate).toLocaleDateString()}</p>
+            </div>
         </div>
     `;
 }
 
 function displayStats(profile) {
     document.getElementById("stats").innerHTML = `
-        <div class="stat-row">
+        <div class="stat-card">
             <span>Total Rolls</span>
             <strong>${profile.totalRolls}</strong>
         </div>
-        <div class="stat-row">
+        <div class="stat-card">
             <span>Total Score</span>
             <strong>${profile.totalScore}</strong>
         </div>
-        <div class="stat-row">
+        <div class="stat-card">
             <span>Money</span>
             <strong>$${(profile.moneyCents / 100).toFixed(2)}</strong>
         </div>
-        <div class="stat-row">
-            <span>Average Roll</span>
-            <strong>${profile.averageScore}</strong>
-        </div>
-        <div class="stat-row">
+        <div class="stat-card">
             <span>Highest Roll</span>
             <strong>${profile.highestScore}</strong>
+        </div>
+        <div class="stat-card">
+            <span>Average Roll</span>
+            <strong>${Math.round(profile.averageScore)}</strong>
         </div>
     `;
 }
@@ -206,7 +201,6 @@ async function loadItems() {
 function displayItems(items, maxActiveItems) {
     const container = document.getElementById("items");
     const equipped = items.filter((item) => item.equipped);
-    const unequipped = items.filter((item) => !item.equipped);
 
     container.innerHTML = `
         <div class="equipped-items">
@@ -243,23 +237,6 @@ function displayItems(items, maxActiveItems) {
     document.querySelectorAll(".item-toggle").forEach((button) => {
         button.addEventListener("click", () => toggleItem(button));
     });
-}
-
-function formatEffect(effect) {
-    switch (effect.effectType) {
-        case "dice_count":
-            return `+${effect.effectData.amount} dice`;
-        case "weight":
-            return `
-                ${effect.effectData.amount >= 0 ? "+" : ""}
-                ${effect.effectData.amount}
-                weight to ${effect.effectData.face}s
-            `;
-        case "cooldown":
-            return `${effect.effectData.amount}ms cooldown`;
-        default:
-            return effect.effectType;
-    }
 }
 
 async function toggleItem(button) {

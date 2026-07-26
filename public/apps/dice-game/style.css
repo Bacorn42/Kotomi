@@ -459,6 +459,79 @@
     margin-left: 1em;
 }
 
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-subtitle {
+    opacity: 0.7;
+}
+
+.profile-banner {
+    margin-top: 2rem;
+}
+
+.profile-player {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.stat-card {
+    background: var(--color-surface);
+    padding: 1.25rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stat-card span {
+    opacity: 0.7;
+}
+
+.stat-card strong {
+    font-size: 1.8rem;
+}
+
+.profile-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.inventory-card,
+.achievements-card {
+    margin-top: 2rem;
+}
+
+@media (max-width: 900px) {
+    .profile-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
 @keyframes item-slide-in {
     from {
         opacity: 0;

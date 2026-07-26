@@ -13,25 +13,25 @@
 
         <main class="kotomi-container">
             <div class="profile-header">
-                <h1>Player Profile</h1>
+                <div>
+                    <h1>Player Profile</h1>
+                    <p class="profile-subtitle">Your dice journey</p>
+                </div>
+
                 <a href="/apps/dice-game/" class="kotomi-button-secondary"> ← Back to Game </a>
             </div>
 
-            <div class="profile-grid">
-                <div class="profile-info">
-                    <section class="kotomi-card">
-                        <h2>Player</h2>
-                        <div id="player-info"></div>
-                    </section>
-                    <section class="kotomi-card">
-                        <h2>Statistics</h2>
-                        <div id="stats"></div>
-                    </section>
-                    <section class="kotomi-card">
-                        <h2>Current Setup</h2>
-                        <div id="dice-setup"></div>
-                    </section>
-                </div>
+            <section class="kotomi-card profile-banner">
+                <div id="player-info"></div>
+            </section>
+
+            <section class="profile-stats" id="stats"></section>
+
+            <div class="profile-columns">
+                <section class="kotomi-card">
+                    <h2>Current Setup</h2>
+                    <div id="dice-setup"></div>
+                </section>
 
                 <section class="kotomi-card">
                     <h2>Top Rolls</h2>
@@ -39,18 +39,16 @@
                 </section>
             </div>
 
-            <div class="profile-grid">
-                <section class="kotomi-card achievements-card">
-                    <h2>Achievements</h2>
-                    <p id="achievement-count"></p>
-                    <div id="achievements"></div>
-                </section>
+            <section class="kotomi-card inventory-card">
+                <h2>Inventory</h2>
+                <div id="items"></div>
+            </section>
 
-                <section class="kotomi-card inventory-card">
-                    <h2>Inventory</h2>
-                    <div id="items"></div>
-                </section>
-            </div>
+            <section class="kotomi-card achievements-card">
+                <h2>Achievements</h2>
+                <p id="achievement-count"></p>
+                <div id="achievements"></div>
+            </section>
         </main>
 
         <script type="module" src="profile.js"></script>
