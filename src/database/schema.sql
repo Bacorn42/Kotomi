@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS Rolls (
     DiceCount INTEGER NOT NULL,
     Weights TEXT NOT NULL,
     Score INTEGER NOT NULL,
+    MoneyCents INTEGER NOT NULL,
     CreatedDate TEXT NOT NULL,
 
     FOREIGN KEY (UserID)

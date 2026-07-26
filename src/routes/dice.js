@@ -3,6 +3,7 @@ const { rollDice } = require("../../modules/dice-game/roller");
 const { calculateScore } = require("../../modules/dice-game/scoring");
 const diceRepository = require("../repositories/rollRepository");
 const playerRepository = require("../repositories/playerRepository");
+const playerItemRepository = require("../repositories/playerItemRepository.js");
 const { requireLogin } = require("../middleware/auth");
 const { checkAchievements } = require("../services/achievement.js");
 const { getPlayer } = require("../repositories/playerRepository.js");
@@ -29,8 +30,8 @@ router.post("/roll", requireLogin, (req, res) => {
     }
 
     const dice = rollDice(configuration);
-    const score = calculateScore(dice);
-    const moneyCents = calculateMoney(score);
+    const score = calculateScore(dice, configuration.scoreMultiplier);
+    const moneyCents = calculateMoney(score, configuration.moneyMultiplier);
     if (moneyCents > 0) {
         addMoneyCents(userId, moneyCents);
     }
@@ -45,6 +46,7 @@ router.post("/roll", requireLogin, (req, res) => {
         dice,
         weights: configuration.weights,
         score,
+        moneyCents,
     });
     updateLastRollTime(userId);
 
@@ -52,6 +54,14 @@ router.post("/roll", requireLogin, (req, res) => {
         score,
         dice,
         totalRolls: playerRepository.getTotalRolls(userId),
+        itemCount: playerItemRepository.getItemCount(userId),
+        equippedItemCount: playerItemRepository.getEquippedCount(userId),
+        maxEquippedItems: player.MaxActiveItems,
+        droppedItem,
+        faceWeights: configuration.weights,
+        maxFaceWeight: Math.max(...configuration.weights),
+        moneyCents,
+        totalMoneyCents: diceRepository.getTotalMoneyCents(userId),
     });
 
     res.json({

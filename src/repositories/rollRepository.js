@@ -9,9 +9,10 @@ function saveRoll(roll) {
             DiceCount,
             Weights,
             Score,
+            MoneyCents,
             CreatedDate
         )
-        VALUES (?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
 
     const result = statement.run(
@@ -20,6 +21,7 @@ function saveRoll(roll) {
         roll.dice.length,
         JSON.stringify(roll.weights),
         roll.score,
+        roll.moneyCents,
         new Date().toISOString(),
     );
 
@@ -38,7 +40,20 @@ function getRecentRolls(userId, limit = 10) {
     return statement.all(userId, limit);
 }
 
+function getTotalMoneyCents(userId) {
+    const statement = db.prepare(
+        `
+        SELECT SUM(MoneyCents) AS TotalMoneyCents
+        FROM Rolls
+        WHERE UserID = ?
+        `,
+    );
+
+    return statement.get(userId).TotalMoneyCents ?? 0;
+}
+
 module.exports = {
     saveRoll,
     getRecentRolls,
+    getTotalMoneyCents,
 };

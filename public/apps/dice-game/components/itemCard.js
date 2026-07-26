@@ -8,7 +8,7 @@ export function createItemCard(item, options = {}) {
     return `
         <div class="item-card ${item.rarity}">
             <img src="/apps/dice-game/assets/items/${item.icon}" class="item-icon">
-            <h3>${item.rarity ? item.rarity + " " : ""}${item.name}</h3>
+            <h3>${item.name}</h3>
             <p>${item.description}</p>
             <div class="item-effects">
                 <strong>Effects</strong>

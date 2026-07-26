@@ -42,24 +42,23 @@ function formatCooldown(data) {
     return `${data.amount}ms slower rolls`;
 }
 
-function formatScoreMultiplier(data) {
-    const percent = Math.round((data.amount - 1) * 100);
+function formatPercentage(amount) {
+    const percent = (amount - 1) * 100;
+    const rounded = Number(percent.toFixed(2));
 
-    if (percent >= 0) {
-        return `+${percent}% score`;
+    if (rounded >= 0) {
+        return `+${rounded}%`;
     }
 
-    return `${percent}% score`;
+    return `${rounded}%`;
+}
+
+function formatScoreMultiplier(data) {
+    return `${formatPercentage(data.amount)} score`;
 }
 
 function formatMoneyMultiplier(data) {
-    const percent = Math.round((data.amount - 1) * 100);
-
-    if (percent >= 0) {
-        return `+${percent}% money`;
-    }
-
-    return `${percent}% money`;
+    return `${formatPercentage(data.amount)} money`;
 }
 
 function formatScoreBonus(data) {

@@ -109,6 +109,18 @@ function unequip(playerItemId) {
     ).run(playerItemId);
 }
 
+function getItemCount(userId) {
+    return db
+        .prepare(
+            `
+            SELECT COUNT(*) AS Count
+            FROM PlayerItems
+            WHERE UserID = ?
+            `,
+        )
+        .get(userId).Count;
+}
+
 module.exports = {
     getInventory,
     addItem,
@@ -118,4 +130,5 @@ module.exports = {
     getEffects,
     equip,
     unequip,
+    getItemCount,
 };

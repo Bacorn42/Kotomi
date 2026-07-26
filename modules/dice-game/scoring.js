@@ -1,4 +1,4 @@
-function calculateScore(dice) {
+function calculateScore(dice, multiplier) {
     const counts = {};
 
     for (const value of dice) {
@@ -17,7 +17,7 @@ function calculateScore(dice) {
         }
     }
 
-    return score;
+    return Math.round(score * multiplier);
 }
 
 module.exports = {
