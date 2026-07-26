@@ -174,14 +174,14 @@ module.exports = [
             {
                 type: "weight",
                 data: {
-                    value: 5,
+                    face: 5,
                     amount: 5,
                 },
             },
             {
                 type: "weight",
                 data: {
-                    value: 6,
+                    face: 6,
                     amount: -2,
                 },
             },

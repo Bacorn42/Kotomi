@@ -1,5 +1,6 @@
 import { initializeKotomiApp } from "/js/kotomi.js";
 import { renderDice } from "./components/diceRenderer.js";
+import { showItemDrop } from "./components/itemNotifications.js";
 
 initializeKotomiApp("dice-game");
 
@@ -144,6 +145,10 @@ async function initialize() {
 
             if (result.unlockedAchievements && result.unlockedAchievements.length > 0) {
                 showAchievementNotifications(result.unlockedAchievements);
+            }
+
+            if (result.droppedItem) {
+                showItemDrop(result.droppedItem);
             }
         } catch (error) {
             console.error(error);

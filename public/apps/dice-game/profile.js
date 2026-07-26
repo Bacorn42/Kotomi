@@ -198,6 +198,7 @@ function formatDate(date) {
 async function loadItems() {
     const response = await fetch("/api/items/inventory");
     const data = await response.json();
+    console.log(data);
 
     displayItems(data.items, data.maxActiveItems);
 }

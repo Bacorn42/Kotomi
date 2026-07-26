@@ -12,26 +12,27 @@ function generateItem(userId) {
 
     const rarity = getRandomRarity();
 
-    const playerItem = playerItemRepository.createPlayerItem({
+    const playerItemId = playerItemRepository.addItem(
         userId,
-        definitionId: definition.DefinitionID,
-        rarity: rarity.name,
-        generatedName: `${rarity.name} ${definition.Name}`,
-    });
+        definition.DefinitionID,
+        `${rarity.name} ${definition.Name}`,
+        rarity.name,
+    );
 
     const effects = itemRepository.getEffects(definition.DefinitionID);
 
     for (const effect of effects) {
-        const data = scaleEffect(JSON.parse(effect.EffectData), rarity.multiplier);
+        const data = scaleEffect(effect.effectData, rarity.multiplier);
 
-        playerItemRepository.addEffect({
-            playerItemId: playerItem.lastInsertRowid,
-            effectType: effect.EffectType,
-            effectData: JSON.stringify(data),
-        });
+        playerItemRepository.addEffect(playerItemId, effect.effectType, data);
     }
 
-    return playerItem;
+    return {
+        playerItemId: playerItemId,
+        name: `${rarity.name} ${definition.Name}`,
+        rarity: rarity.name,
+        icon: definition.Icon,
+    };
 }
 
 module.exports = {
