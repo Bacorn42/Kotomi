@@ -100,7 +100,8 @@ CREATE TABLE IF NOT EXISTS ItemDefinitions
     Description TEXT NOT NULL,
     Icon TEXT NOT NULL,
     CostCents INTEGER NOT NULL,
-    CanGenerate INTEGER NOT NULL DEFAULT 0
+    CanGenerate INTEGER NOT NULL DEFAULT 0,
+    DropWeight INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS ItemDefinitionEffects

@@ -77,9 +77,10 @@ function createDefinition(definition) {
             Description,
             Icon,
             CostCents,
-            CanGenerate
+            CanGenerate,
+            DropWeight
         )
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?)
     `,
         )
         .run(
@@ -88,6 +89,7 @@ function createDefinition(definition) {
             definition.icon,
             definition.costCents,
             definition.canGenerate ? 1 : 0,
+            definition.dropWeight,
         );
 
     const definitionId = result.lastInsertRowid;
@@ -108,17 +110,29 @@ function createDefinition(definition) {
 }
 
 function getRandomGeneratedDefinition() {
-    return db
+    const definitions = db
         .prepare(
             `
         SELECT *
         FROM ItemDefinitions
         WHERE CanGenerate = 1
-        ORDER BY RANDOM()
-        LIMIT 1
     `,
         )
-        .get();
+        .all();
+
+    const totalWeight = definitions.reduce((sum, item) => sum + item.DropWeight, 0);
+
+    let roll = Math.random() * totalWeight;
+
+    for (const definition of definitions) {
+        roll -= definition.DropWeight;
+
+        if (roll < 0) {
+            return definition;
+        }
+    }
+
+    return definitions[definitions.length - 1];
 }
 
 module.exports = {

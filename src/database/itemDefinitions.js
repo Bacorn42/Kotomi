@@ -5,6 +5,7 @@ module.exports = [
         icon: "lucky-fours.png",
         costCents: 10,
         canGenerate: false,
+        dropWeight: 0,
 
         effects: [
             {
@@ -23,6 +24,7 @@ module.exports = [
         icon: "lucky-fives.png",
         costCents: 15,
         canGenerate: false,
+        dropWeight: 0,
 
         effects: [
             {
@@ -41,6 +43,7 @@ module.exports = [
         icon: "heavy-sixes.png",
         costCents: 20,
         canGenerate: false,
+        dropWeight: 0,
 
         effects: [
             {
@@ -59,6 +62,7 @@ module.exports = [
         icon: "extra-die.png",
         costCents: 25,
         canGenerate: false,
+        dropWeight: 0,
 
         effects: [
             {
@@ -76,6 +80,7 @@ module.exports = [
         icon: "extra-die.png",
         costCents: 250,
         canGenerate: false,
+        dropWeight: 0,
 
         effects: [
             {
@@ -93,6 +98,7 @@ module.exports = [
         icon: "extra-die.png",
         costCents: 1500,
         canGenerate: false,
+        dropWeight: 0,
 
         effects: [
             {
@@ -110,6 +116,7 @@ module.exports = [
         icon: "swift-hands.png",
         costCents: 30,
         canGenerate: false,
+        dropWeight: 0,
 
         effects: [
             {
@@ -127,6 +134,7 @@ module.exports = [
         icon: "swift-hands.png",
         costCents: 200,
         canGenerate: false,
+        dropWeight: 0,
 
         effects: [
             {
@@ -144,6 +152,7 @@ module.exports = [
         icon: "ring-of-fours.png",
         costCents: 75,
         canGenerate: false,
+        dropWeight: 0,
 
         effects: [
             {
@@ -170,6 +179,7 @@ module.exports = [
         icon: "lucky-threes.png",
         costCents: 8,
         canGenerate: false,
+        dropWeight: 0,
 
         effects: [
             {
@@ -188,6 +198,7 @@ module.exports = [
         icon: "swift-hands.png",
         costCents: 1500,
         canGenerate: false,
+        dropWeight: 0,
 
         effects: [
             {
@@ -205,6 +216,7 @@ module.exports = [
         icon: "coin-purse.png",
         costCents: 3500,
         canGenerate: false,
+        dropWeight: 0,
 
         effects: [
             {
@@ -222,6 +234,7 @@ module.exports = [
         icon: "lucky-coin.png",
         costCents: 12000,
         canGenerate: false,
+        dropWeight: 0,
 
         effects: [
             {
@@ -239,6 +252,8 @@ module.exports = [
         icon: "ring-of-fives.png",
         costCents: 0,
         canGenerate: true,
+        dropWeight: 40,
+
         effects: [
             {
                 type: "weight",
@@ -263,6 +278,7 @@ module.exports = [
         icon: "ring-of-odds.png",
         costCents: 0,
         canGenerate: true,
+        dropWeight: 30,
 
         effects: [
             {
@@ -295,6 +311,7 @@ module.exports = [
         icon: "ring-of-evens.png",
         costCents: 0,
         canGenerate: true,
+        dropWeight: 30,
 
         effects: [
             {
@@ -327,6 +344,7 @@ module.exports = [
         icon: "cracked-die.png",
         costCents: 0,
         canGenerate: true,
+        dropWeight: 15,
 
         effects: [
             {
@@ -350,6 +368,7 @@ module.exports = [
         icon: "merchant-charm.png",
         costCents: 0,
         canGenerate: true,
+        dropWeight: 15,
 
         effects: [
             {
@@ -373,6 +392,7 @@ module.exports = [
         icon: "rusty-horseshoe.png",
         costCents: 0,
         canGenerate: true,
+        dropWeight: 20,
 
         effects: [
             {
@@ -398,6 +418,7 @@ module.exports = [
         icon: "heavy-fours.png",
         costCents: 0,
         canGenerate: true,
+        dropWeight: 35,
 
         effects: [
             {
