@@ -13,6 +13,7 @@ const { canRoll, getRemainingCooldown } = require("../services/diceCooldown.js")
 const { calculateMoney } = require("../services/rewards.js");
 const { getPlayerConfiguration } = require("../services/playerConfiguration.js");
 const itemGeneration = require("../services/itemGeneration.js");
+const statisticsService = require("../services/statistics.js");
 
 const router = express.Router();
 
@@ -97,6 +98,10 @@ router.get("/profile", requireLogin, (req, res) => {
     stats.cooldownMs = configuration.cooldownMs;
 
     res.json(stats);
+});
+
+router.get("/statistics", requireLogin, (req, res) => {
+    res.json(statisticsService.getStatistics(req.user.UserID));
 });
 
 module.exports = router;
