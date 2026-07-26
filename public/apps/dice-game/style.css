@@ -450,6 +450,15 @@
     font-weight: bold;
 }
 
+.link-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 30%;
+    margin-bottom: 1em;
+    margin-left: 1em;
+}
+
 @keyframes item-slide-in {
     from {
         opacity: 0;

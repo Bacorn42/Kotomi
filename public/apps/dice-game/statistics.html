@@ -1,0 +1,64 @@
+<!doctype html>
+
+<html>
+    <head>
+        <title>Dice Game Statistics</title>
+
+        <link rel="stylesheet" href="/css/kotomi.css" />
+        <link rel="stylesheet" href="/apps/dice-game/style.css" />
+    </head>
+
+    <body>
+        <div id="app-header"></div>
+
+        <main class="kotomi-container">
+            <div class="profile-header">
+                <h1>Statistics</h1>
+                <a href="/apps/dice-game/" class="kotomi-button-secondary"> ← Back to Game </a>
+            </div>
+
+            <div class="profile-grid">
+                <section class="kotomi-card">
+                    <h2>Global Statistics</h2>
+                    <div id="global-stats"></div>
+                </section>
+
+                <section class="kotomi-card">
+                    <h2>Your Statistics</h2>
+                    <div id="player-stats"></div>
+                </section>
+            </div>
+
+            <div class="profile-grid">
+                <section class="kotomi-card">
+                    <h2>Highest Scores</h2>
+                    <div id="score-leaderboard"></div>
+                </section>
+
+                <section class="kotomi-card">
+                    <h2>Most Rolls</h2>
+                    <div id="roll-leaderboard"></div>
+                </section>
+            </div>
+
+            <div class="profile-grid">
+                <section class="kotomi-card">
+                    <h2>Most Money Earned</h2>
+                    <div id="money-leaderboard"></div>
+                </section>
+
+                <section class="kotomi-card">
+                    <h2>Most Achievements</h2>
+                    <div id="achievement-leaderboard"></div>
+                </section>
+            </div>
+
+            <section class="kotomi-card" style="margin-top: 1em">
+                <h2>Items Found</h2>
+                <div id="item-stats"></div>
+            </section>
+        </main>
+
+        <script type="module" src="statistics.js"></script>
+    </body>
+</html>

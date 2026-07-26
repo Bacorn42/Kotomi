@@ -51,7 +51,7 @@ function getGlobalAchievementStats() {
         .prepare(
             `
         SELECT COUNT(*) AS TotalUnlockedAchievements
-        FROM PlayerAchievements
+        FROM UserAchievements
     `,
         )
         .get();
@@ -94,7 +94,7 @@ function getPlayerAchievementStats(userId) {
         .prepare(
             `
         SELECT COUNT(*) AS UnlockedAchievements
-        FROM PlayerAchievements
+        FROM UserAchievements
         WHERE UserID = ?
     `,
         )
@@ -162,9 +162,9 @@ function getAchievementLeaderboard() {
         SELECT
             Users.Username,
             COUNT(*) AS Achievements
-        FROM PlayerAchievements
+        FROM UserAchievements
         JOIN Users
-            ON Users.UserID = PlayerAchievements.UserID
+            ON Users.UserID = UserAchievements.UserID
         GROUP BY Users.UserID
         ORDER BY Achievements DESC
         LIMIT 10
