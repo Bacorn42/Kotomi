@@ -22,7 +22,7 @@ function generateItem(userId) {
     const effects = itemRepository.getEffects(definition.DefinitionID);
 
     for (const effect of effects) {
-        const data = scaleEffect(effect.effectData, rarity.multiplier);
+        const data = scaleEffect(effect.effectType, effect.effectData, rarity.multiplier);
 
         playerItemRepository.addEffect(playerItemId, effect.effectType, data);
     }

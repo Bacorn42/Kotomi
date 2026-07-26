@@ -16,6 +16,7 @@ async function loadShop() {
     const items = await shopResponse.json();
     const profile = await profileResponse.json();
     const upgrades = await upgradesResponse.json();
+    console.log(items);
 
     displayMoney(profile.moneyCents);
     displayShop(items);

@@ -5,6 +5,7 @@ import { showItemDrop } from "./components/itemNotifications.js";
 initializeKotomiApp("dice-game");
 
 let rolling = false;
+let cooldownInterval = null;
 
 function getDieImage(value) {
     return `/apps/dice-game/assets/dice/classic/die-classic-${value}.png`;
@@ -124,6 +125,9 @@ function sleep(ms) {
 }
 
 async function initialize() {
+    const response = await fetch("/api/dice/profile");
+    const profile = await response.json();
+
     const button = document.getElementById("rollButton");
 
     button.addEventListener("click", async () => {
@@ -136,6 +140,8 @@ async function initialize() {
         button.disabled = true;
         showRollingAnimation();
         button.textContent = "Rolling...";
+
+        const startTimestamp = Date.now();
 
         try {
             const result = await rollDice();
@@ -153,17 +159,25 @@ async function initialize() {
         } catch (error) {
             console.error(error);
             document.getElementById("result").textContent = "Something went wrong.";
+            button.textContent = "Throw Dice";
+            button.disabled = false;
+            rolling = false;
+            return;
         }
 
-        for (let seconds = 4; seconds > 0; seconds--) {
+        cooldownInterval = setInterval(() => {
+            const elapsedTime = Date.now() - startTimestamp;
+            const remainingTime = profile.cooldownMs - elapsedTime;
+            const seconds = (remainingTime / 1000).toFixed(1);
             button.textContent = `Wait ${seconds}s`;
-            await sleep(1000);
-        }
 
-        button.textContent = "Throw Dice";
-        button.disabled = false;
-
-        rolling = false;
+            if (remainingTime <= 0) {
+                button.textContent = "Throw Dice";
+                button.disabled = false;
+                rolling = false;
+                clearInterval(cooldownInterval);
+            }
+        }, 50);
     });
 
     await loadHistory();

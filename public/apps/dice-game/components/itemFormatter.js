@@ -8,6 +8,14 @@ export function formatEffect(effect) {
             return formatDiceCount(data);
         case "cooldown":
             return formatCooldown(data);
+        case "score_multiplier":
+            return formatScoreMultiplier(data);
+        case "money_multiplier":
+            return formatMoneyMultiplier(data);
+        case "score_bonus":
+            return formatScoreBonus(data);
+        case "drop_multiplier":
+            return formatDropMultiplier(data);
         default:
             return "Unknown effect";
     }
@@ -32,4 +40,40 @@ function formatCooldown(data) {
     }
 
     return `${data.amount}ms slower rolls`;
+}
+
+function formatScoreMultiplier(data) {
+    const percent = Math.round((data.amount - 1) * 100);
+
+    if (percent >= 0) {
+        return `+${percent}% score`;
+    }
+
+    return `${percent}% score`;
+}
+
+function formatMoneyMultiplier(data) {
+    const percent = Math.round((data.amount - 1) * 100);
+
+    if (percent >= 0) {
+        return `+${percent}% money`;
+    }
+
+    return `${percent}% money`;
+}
+
+function formatScoreBonus(data) {
+    const sign = data.amount >= 0 ? "+" : "";
+
+    return `${sign}${data.amount} score`;
+}
+
+function formatDropMultiplier(data) {
+    const percent = Math.round((data.amount - 1) * 100);
+
+    if (percent >= 0) {
+        return `+${percent}% loot chance`;
+    }
+
+    return `${percent}% loot chance`;
 }
