@@ -5,12 +5,12 @@ export function renderDice(container, dice, options = {}) {
         container.innerHTML = "";
     }
 
-    const sortedDice = [...dice].sort((a, b) => a - b);
+    const sortedDice = dice.toSorted((a, b) => a - b);
 
-    let previousValue = null;
+    let previousFace = null;
 
-    for (const value of sortedDice) {
-        if (previousValue !== null && previousValue !== value) {
+    for (const face of sortedDice) {
+        if (previousFace !== null && previousFace !== face) {
             const gap = document.createElement("div");
             gap.className = "dice-group-gap";
 
@@ -18,11 +18,15 @@ export function renderDice(container, dice, options = {}) {
         }
 
         const image = document.createElement("img");
-        image.src = `/apps/dice-game/assets/dice/${skin}/die-${skin}-${value}.png`;
-        image.alt = `Die ${value}`;
+        image.src = getDieImage(skin, face);
+        image.alt = `Die ${face}`;
 
         container.appendChild(image);
 
-        previousValue = value;
+        previousFace = face;
     }
+}
+
+function getDieImage(skin, value) {
+    return `/apps/dice-game/assets/dice/${skin}/die-${skin}-${value}.png`;
 }

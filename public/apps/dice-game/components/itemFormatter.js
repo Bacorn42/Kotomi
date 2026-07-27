@@ -1,37 +1,36 @@
-export function formatEffect(effect) {
-    const data = effect.effectData ?? effect.data;
+import { formatPercentage, formatSigned } from "../utils/formatters.js";
 
-    switch (effect.effectType ?? effect.type) {
+export function formatEffect(effect) {
+    const value = effect.effectData ?? effect.data;
+    const type = effect.effectType ?? effect.type;
+
+    switch (type) {
         case "weight":
-            return formatWeight(data);
+            return formatWeight(value);
         case "dice_count":
-            return formatDiceCount(data);
+            return formatDiceCount(value);
         case "cooldown":
-            return formatCooldown(data);
+            return formatCooldown(value);
         case "score_multiplier":
-            return formatScoreMultiplier(data);
+            return formatScoreMultiplier(value);
         case "money_multiplier":
-            return formatMoneyMultiplier(data);
+            return formatMoneyMultiplier(value);
         case "score_bonus":
-            return formatScoreBonus(data);
+            return formatScoreBonus(value);
         case "drop_multiplier":
-            return formatDropMultiplier(data);
+            return formatDropMultiplier(value);
         default:
             return "Unknown effect";
     }
 }
 
 function formatWeight(data) {
-    const sign = data.amount >= 0 ? "+" : "";
-
-    return `${sign}${data.amount} weight to ${data.face}s`;
+    return `${formatSigned(data.amount)} weight to ${data.face}s`;
 }
 
 function formatDiceCount(data) {
-    const sign = data.amount >= 0 ? "+" : "";
     const word = Math.abs(data.amount) === 1 ? "die" : "dice";
-
-    return `${sign}${data.amount} ${word}`;
+    return `${formatSigned(data.amount)} ${word}`;
 }
 
 function formatCooldown(data) {
@@ -40,17 +39,6 @@ function formatCooldown(data) {
     }
 
     return `${data.amount}ms slower rolls`;
-}
-
-function formatPercentage(amount) {
-    const percent = (amount - 1) * 100;
-    const rounded = Number(percent.toFixed(2));
-
-    if (rounded >= 0) {
-        return `+${rounded}%`;
-    }
-
-    return `${rounded}%`;
 }
 
 function formatScoreMultiplier(data) {
@@ -62,17 +50,9 @@ function formatMoneyMultiplier(data) {
 }
 
 function formatScoreBonus(data) {
-    const sign = data.amount >= 0 ? "+" : "";
-
-    return `${sign}${data.amount} score`;
+    return `${formatSigned(data.amount)} score`;
 }
 
 function formatDropMultiplier(data) {
-    const percent = Math.round((data.amount - 1) * 100);
-
-    if (percent >= 0) {
-        return `+${percent}% loot chance`;
-    }
-
-    return `${percent}% loot chance`;
+    return `${formatPercentage(data.amount)} loot chance`;
 }

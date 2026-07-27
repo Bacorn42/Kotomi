@@ -1,37 +1,33 @@
 import { formatEffect } from "./itemFormatter.js";
+import { formatMoney } from "../utils/formatters.js";
 
 export function createItemCard(item, options = {}) {
     const { showBuy = false, showEquip = false } = options;
 
-    const effects = item.effects.map((effect) => `<li>${formatEffect(effect)}</li>`).join("");
-
     return `
-        <div class="item-card ${item.rarity}">
+        <div class="item-card ${item.rarity.toLowerCase()}">
             <img src="/apps/dice-game/assets/items/${item.icon}" class="item-icon">
             <h3>${item.name}</h3>
             <p>${item.description}</p>
             <div class="item-effects">
                 <strong>Effects</strong>
-                <ul>${effects}</ul>
+                <ul>${createEffects(item)}</ul>
             </div>
-            ${createActionArea(item, {
-                showBuy,
-                showEquip,
-            })}
+            ${createItemActions(item, options)}
         </div>
     `;
 }
 
-function createActionArea(item, options) {
+function createItemActions(item, options) {
     if (options.showBuy) {
         return `
         <div class="item-shop-info">
             <div class="item-price">
-                $${(item.costCents / 100).toFixed(2)}
+                ${formatMoney(item.costCents)}
             </div>
             ${
                 item.owned
-                    ? `<button class="kotomi-button-secondary"disabled>Owned</button>`
+                    ? `<button class="kotomi-button-secondary" disabled>Owned</button>`
                     : `<button class="kotomi-button buy-button" data-id="${item.definitionId}">Buy</button>`
             }
         </div>
@@ -47,4 +43,8 @@ function createActionArea(item, options) {
     }
 
     return "";
+}
+
+function createEffects(item) {
+    return (item.effects ?? []).map((effect) => `<li>${formatEffect(effect)}</li>`).join("");
 }
