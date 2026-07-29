@@ -1,4 +1,4 @@
-const db = require("../database/db.js");
+const db = require("../../../database/db.js");
 
 function getAvailableUpgrades(userId) {
     return db

@@ -1,4 +1,4 @@
-const db = require("../database/db.js");
+const db = require("../../../database/db.js");
 const playerRepository = require("../repositories/playerRepository.js");
 const playerItemRepository = require("../repositories/playerItemRepository.js");
 const itemDefinitionRepository = require("../repositories/itemDefinitionRepository.js");

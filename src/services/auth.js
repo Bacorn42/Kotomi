@@ -3,7 +3,10 @@ const crypto = require("crypto");
 
 const userRepository = require("../repositories/userRepository");
 const sessionRepository = require("../repositories/sessionRepository");
-const { createPlayer, ensurePlayer } = require("../repositories/playerRepository.js");
+const {
+    createPlayer,
+    ensurePlayer,
+} = require("../apps/dice-game/repositories/playerRepository.js");
 
 async function register(username, password) {
     username = normalizeUsername(username);

@@ -1,5 +1,5 @@
 const axios = require("axios");
-const prompts = require("../../modules/image-generation/prompts");
+const prompts = require("../apps/image-generator/core/prompts");
 
 const OLLAMA_URL = "http://127.0.0.1:11434";
 

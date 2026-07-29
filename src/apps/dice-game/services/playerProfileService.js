@@ -1,5 +1,5 @@
-const db = require("../database/db.js");
-const userRepository = require("../repositories/userRepository.js");
+const db = require("../../../database/db.js");
+const userRepository = require("../../../repositories/userRepository.js");
 const playerRepository = require("../repositories/playerRepository.js");
 const rollRepository = require("../repositories/rollRepository.js");
 const { getDiceConfiguration } = require("./diceConfiguration.js");

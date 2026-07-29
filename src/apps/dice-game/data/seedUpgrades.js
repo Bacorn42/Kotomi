@@ -1,4 +1,4 @@
-const db = require("./db.js");
+const db = require("../../../database/db.js");
 const upgrades = require("./upgradeDefinitions.js");
 
 function seedUpgrades() {

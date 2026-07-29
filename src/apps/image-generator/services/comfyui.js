@@ -4,16 +4,13 @@ const path = require("path");
 const WebSocket = require("ws");
 const crypto = require("crypto");
 
-const socket = require("./socket");
+const socket = require("../../../services/socket");
 
 const COMFY_URL = "http://127.0.0.1:8188";
 const COMFY_WS = COMFY_URL.replace("http", "ws");
 
 function loadWorkflow() {
-    const workflowPath = path.join(
-        __dirname,
-        "../../modules/image-generation/img_gen_z-image_turbo.json",
-    );
+    const workflowPath = path.join(__dirname, "../config/img_gen_z-image_turbo.json");
 
     return JSON.parse(fs.readFileSync(workflowPath, "utf8"));
 }

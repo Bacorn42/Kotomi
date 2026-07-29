@@ -81,6 +81,16 @@
     font-size: 1.1rem;
 }
 
+.history-dice {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.history-dice img {
+    width: 32px;
+    height: 32px;
+}
+
 .weights-table {
     width: 100%;
     border-collapse: collapse;

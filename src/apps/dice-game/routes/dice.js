@@ -1,10 +1,10 @@
 const express = require("express");
-const { rollDice } = require("../../modules/dice-game/roller");
-const { calculateScore } = require("../../modules/dice-game/scoring");
-const diceRepository = require("../repositories/rollRepository");
-const playerRepository = require("../repositories/playerRepository");
+const { rollDice } = require("../core/roller.js");
+const { calculateScore } = require("../core/scoring.js");
+const diceRepository = require("../repositories/rollRepository.js");
+const playerRepository = require("../repositories/playerRepository.js");
 const playerItemRepository = require("../repositories/playerItemRepository.js");
-const { requireLogin } = require("../middleware/auth");
+const { requireLogin } = require("../../../middleware/auth.js");
 const { checkAchievements } = require("../services/achievement.js");
 const { getPlayer } = require("../repositories/playerRepository.js");
 const { getDiceConfiguration } = require("../services/diceConfiguration.js");
@@ -15,7 +15,7 @@ const { getPlayerConfiguration } = require("../services/playerConfiguration.js")
 const itemGeneration = require("../services/itemGeneration.js");
 const statisticsService = require("../services/statistics.js");
 const playerProfileService = require("../services/playerProfileService.js");
-const socket = require("../services/socket");
+const socket = require("../../../services/socket.js");
 
 const router = express.Router();
 

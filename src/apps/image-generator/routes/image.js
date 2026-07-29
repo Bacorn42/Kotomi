@@ -1,9 +1,9 @@
 const express = require("express");
 const axios = require("axios");
-const generator = require("../../modules/image-generation/generator");
-const comfyui = require("../../src/services/comfyui");
+const generator = require("../core/generator");
+const comfyui = require("../services/comfyui");
 const imageRepository = require("../repositories/imageRepository");
-const { requireLogin } = require("../middleware/auth");
+const { requireLogin } = require("../../../middleware/auth");
 
 const router = express.Router();
 

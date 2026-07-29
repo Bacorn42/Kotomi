@@ -1,7 +1,7 @@
 const itemRepository = require("../repositories/itemDefinitionRepository.js");
 const playerItemRepository = require("../repositories/playerItemRepository.js");
-const { getRandomRarity } = require("../utils/rarity.js");
-const { scaleEffect } = require("../utils/itemScaling.js");
+const { getRandomRarity } = require("../core/rarity.js");
+const { scaleEffect } = require("../core/itemScaling.js");
 
 function generateItem(userId) {
     const definition = itemRepository.getRandomGeneratedDefinition();

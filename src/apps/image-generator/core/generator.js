@@ -1,7 +1,7 @@
-const ollama = require("../../src/services/ollama");
-const comfyui = require("../../src/services/comfyui");
-const socket = require("../../src/services/socket");
-const imageRepository = require("../../src/repositories/imageRepository");
+const ollama = require("../../../services/ollama");
+const comfyui = require("../services/comfyui");
+const socket = require("../../../services/socket");
+const imageRepository = require("../repositories/imageRepository");
 
 async function generate(userId, userPrompt, model, enhancePrompt, settings) {
     let finalPrompt = userPrompt;

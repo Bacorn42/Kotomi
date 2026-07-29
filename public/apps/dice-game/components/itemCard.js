@@ -5,7 +5,7 @@ export function createItemCard(item, options = {}) {
     const { showBuy = false, showEquip = false } = options;
 
     return `
-        <div class="item-card ${item.rarity.toLowerCase()}">
+        <div class="item-card ${item.rarity?.toLowerCase()}">
             <img src="/apps/dice-game/assets/items/${item.icon}" class="item-icon">
             <h3>${item.name}</h3>
             <p>${item.description}</p>

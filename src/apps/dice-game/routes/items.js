@@ -1,5 +1,5 @@
 const express = require("express");
-const { requireLogin } = require("../middleware/auth.js");
+const { requireLogin } = require("../../../middleware/auth.js");
 const playerRepository = require("../repositories/playerRepository.js");
 const playerItemRepository = require("../repositories/playerItemRepository.js");
 const itemDefinitionRepository = require("../repositories/itemDefinitionRepository.js");

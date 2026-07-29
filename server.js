@@ -3,13 +3,14 @@ const http = require("http");
 const { Server } = require("socket.io");
 const cookieParser = require("cookie-parser");
 
-const imageRoutes = require("./src/routes/image");
+const imageRoutes = require("./src/apps/image-generator/routes/image");
 const aiRoutes = require("./src/routes/ai");
 const authRoutes = require("./src/routes/auth");
-const diceRoutes = require("./src/routes/dice");
-const achievementRoutes = require("./src/routes/achievements");
-const itemsRoutes = require("./src/routes/items");
-const shopRoutes = require("./src/routes/shop");
+
+const diceRoutes = require("./src/apps/dice-game/routes/dice");
+const achievementRoutes = require("./src/apps/dice-game/routes/achievements");
+const itemsRoutes = require("./src/apps/dice-game/routes/items");
+const shopRoutes = require("./src/apps/dice-game/routes/shop");
 
 const app = express();
 const server = http.createServer(app);
@@ -17,9 +18,10 @@ const io = new Server(server);
 require("./src/services/socket").init(io);
 
 require("./src/database/db");
-const { seedAchievements } = require("./src/database/seedAchievements.js");
-const seedItems = require("./src/database/seedItems.js");
-const { seedUpgrades } = require("./src/database/seedUpgrades.js");
+
+const { seedAchievements } = require("./src/apps/dice-game/data/seedAchievements.js");
+const seedItems = require("./src/apps/dice-game/data/seedItems.js");
+const { seedUpgrades } = require("./src/apps/dice-game/data/seedUpgrades.js");
 
 seedAchievements();
 seedItems();
