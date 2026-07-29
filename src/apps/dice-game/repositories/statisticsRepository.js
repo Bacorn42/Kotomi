@@ -11,7 +11,7 @@ function getGlobalStats() {
             AVG(Score) AS AverageScore,
             AVG(MoneyCents) AS AverageMoneyCents,
             MAX(Score) AS HighestScore
-        FROM Rolls
+        FROM DiceGameRolls
     `,
         )
         .get();
@@ -28,7 +28,7 @@ function getGlobalItemStats() {
             COALESCE(SUM(Rarity = 'Rare'), 0) AS RareItems,
             COALESCE(SUM(Rarity = 'Epic'), 0) AS EpicItems,
             COALESCE(SUM(Rarity = 'Legendary'), 0) AS LegendaryItems
-        FROM PlayerItems
+        FROM DiceGamePlayerItems
         WHERE Rarity IS NOT NULL
     `,
         )
@@ -51,7 +51,7 @@ function getGlobalAchievementStats() {
         .prepare(
             `
         SELECT COUNT(*) AS TotalUnlockedAchievements
-        FROM UserAchievements
+        FROM DiceGameUserAchievements
     `,
         )
         .get();
@@ -68,7 +68,7 @@ function getPlayerStats(userId) {
             AVG(Score) AS AverageScore,
             AVG(MoneyCents) AS AverageMoneyCents,
             MAX(Score) AS HighestScore
-        FROM Rolls
+        FROM DiceGameRolls
         WHERE UserID = ?
     `,
         )
@@ -82,7 +82,7 @@ function getPlayerInventoryStats(userId) {
         SELECT
             COUNT(*) AS TotalItems,
             COALESCE(SUM(IsEquipped = 1), 0) AS EquippedItems
-        FROM PlayerItems
+        FROM DiceGamePlayerItems
         WHERE UserID = ?
     `,
         )
@@ -94,7 +94,7 @@ function getPlayerAchievementStats(userId) {
         .prepare(
             `
         SELECT COUNT(*) AS UnlockedAchievements
-        FROM UserAchievements
+        FROM DiceGameUserAchievements
         WHERE UserID = ?
     `,
         )
@@ -107,10 +107,10 @@ function getHighestScoreLeaderboard() {
             `
         SELECT
             Users.Username,
-            MAX(Rolls.Score) AS Score
-        FROM Rolls
+            MAX(DiceGameRolls.Score) AS Score
+        FROM DiceGameRolls
         JOIN Users
-            ON Users.UserID = Rolls.UserID
+            ON Users.UserID = DiceGameRolls.UserID
         GROUP BY Users.UserID
         ORDER BY Score DESC
         LIMIT 10
@@ -125,10 +125,10 @@ function getMoneyLeaderboard() {
             `
         SELECT
             Users.Username,
-            COALESCE(SUM(Rolls.MoneyCents), 0) AS TotalMoneyCents
+            COALESCE(SUM(DiceGameRolls.MoneyCents), 0) AS TotalMoneyCents
         FROM Users
-        JOIN Rolls
-            ON Users.UserID = Rolls.UserID
+        JOIN DiceGameRolls
+            ON Users.UserID = DiceGameRolls.UserID
         GROUP BY Users.UserID
         ORDER BY TotalMoneyCents DESC
         LIMIT 10
@@ -143,10 +143,10 @@ function getRollLeaderboard() {
             `
         SELECT
             Users.Username,
-            COUNT(Rolls.RollID) AS TotalRolls
+            COUNT(DiceGameRolls.RollID) AS TotalRolls
         FROM Users
-        JOIN Rolls
-            ON Users.UserID = Rolls.UserID
+        JOIN DiceGameRolls
+            ON Users.UserID = DiceGameRolls.UserID
         GROUP BY Users.UserID
         ORDER BY TotalRolls DESC
         LIMIT 10
@@ -162,9 +162,9 @@ function getAchievementLeaderboard() {
         SELECT
             Users.Username,
             COUNT(*) AS Achievements
-        FROM UserAchievements
+        FROM DiceGameUserAchievements
         JOIN Users
-            ON Users.UserID = UserAchievements.UserID
+            ON Users.UserID = DiceGameUserAchievements.UserID
         GROUP BY Users.UserID
         ORDER BY Achievements DESC
         LIMIT 10

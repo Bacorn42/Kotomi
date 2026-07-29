@@ -5,7 +5,7 @@ function getAll() {
         .prepare(
             `
         SELECT *
-        FROM ItemDefinitions
+        FROM DiceGameItemDefinitions
         ORDER BY CostCents
     `,
         )
@@ -17,7 +17,7 @@ function getAllShopItems() {
         .prepare(
             `
         SELECT *
-        FROM ItemDefinitions
+        FROM DiceGameItemDefinitions
         WHERE CanGenerate = 0
         ORDER BY CostCents
     `,
@@ -30,7 +30,7 @@ function getById(definitionId) {
         .prepare(
             `
         SELECT *
-        FROM ItemDefinitions
+        FROM DiceGameItemDefinitions
         WHERE DefinitionID = ?
     `,
         )
@@ -42,7 +42,7 @@ function getDefinitionEffects(definitionId) {
         .prepare(
             `
         SELECT *
-        FROM ItemDefinitionEffects
+        FROM DiceGameItemDefinitionEffects
         WHERE DefinitionID = ?
         ORDER BY EffectID
     `,
@@ -60,7 +60,7 @@ function exists(name) {
         .prepare(
             `
         SELECT 1
-        FROM ItemDefinitions
+        FROM DiceGameItemDefinitions
         WHERE Name = ?
     `,
         )
@@ -72,7 +72,7 @@ function createDefinition(definition) {
         const result = db
             .prepare(
                 `
-                INSERT INTO ItemDefinitions
+                INSERT INTO DiceGameItemDefinitions
                 (
                     Name,
                     Description,
@@ -96,7 +96,7 @@ function createDefinition(definition) {
         const definitionId = result.lastInsertRowid;
 
         const insertEffect = db.prepare(`
-            INSERT INTO ItemDefinitionEffects
+            INSERT INTO DiceGameItemDefinitionEffects
             (
                 DefinitionID,
                 EffectType,
@@ -118,7 +118,7 @@ function getRandomGeneratedDefinition() {
         .prepare(
             `
         SELECT *
-        FROM ItemDefinitions
+        FROM DiceGameItemDefinitions
         WHERE CanGenerate = 1
     `,
         )

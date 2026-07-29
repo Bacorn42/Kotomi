@@ -1,22 +1,3 @@
-CREATE TABLE IF NOT EXISTS Images
-(
-    ImageID INTEGER PRIMARY KEY AUTOINCREMENT,
-    UserID INTEGER NOT NULL,
-    Filename TEXT NOT NULL,
-    Prompt TEXT NOT NULL,
-    EnhancedPrompt TEXT,
-    Width INTEGER NOT NULL,
-    Height INTEGER NOT NULL,
-    Steps INTEGER NOT NULL,
-    Seed INTEGER,
-    Model TEXT,
-    CreatedDate TEXT NOT NULL,
-
-    FOREIGN KEY(UserID)
-        REFERENCES Users(UserID)
-        ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS Users (
     UserID INTEGER PRIMARY KEY AUTOINCREMENT,
     Username TEXT NOT NULL UNIQUE,
@@ -35,7 +16,26 @@ CREATE TABLE IF NOT EXISTS Sessions (
         ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Rolls (
+CREATE TABLE IF NOT EXISTS ImageGeneratorImages
+(
+    ImageID INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserID INTEGER NOT NULL,
+    Filename TEXT NOT NULL,
+    Prompt TEXT NOT NULL,
+    EnhancedPrompt TEXT,
+    Width INTEGER NOT NULL,
+    Height INTEGER NOT NULL,
+    Steps INTEGER NOT NULL,
+    Seed INTEGER,
+    Model TEXT,
+    CreatedDate TEXT NOT NULL,
+
+    FOREIGN KEY(UserID)
+        REFERENCES Users(UserID)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS DiceGameRolls (
     RollID INTEGER PRIMARY KEY AUTOINCREMENT,
     UserID INTEGER NOT NULL,
     DiceValues TEXT NOT NULL,
@@ -47,9 +47,10 @@ CREATE TABLE IF NOT EXISTS Rolls (
 
     FOREIGN KEY (UserID)
         REFERENCES Users(UserID)
+        ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Achievements (
+CREATE TABLE IF NOT EXISTS DiceGameAchievements (
     AchievementID INTEGER PRIMARY KEY AUTOINCREMENT,
     Name TEXT NOT NULL UNIQUE,
     Description TEXT NOT NULL,
@@ -59,7 +60,7 @@ CREATE TABLE IF NOT EXISTS Achievements (
 );
 
 
-CREATE TABLE IF NOT EXISTS UserAchievements (
+CREATE TABLE IF NOT EXISTS DiceGameUserAchievements (
     UserID INTEGER NOT NULL,
     AchievementID INTEGER NOT NULL,
     UnlockedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -74,11 +75,11 @@ CREATE TABLE IF NOT EXISTS UserAchievements (
         ON DELETE CASCADE,
 
     FOREIGN KEY(AchievementID)
-        REFERENCES Achievements(AchievementID)
+        REFERENCES DiceGameAchievements(AchievementID)
         ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Players
+CREATE TABLE IF NOT EXISTS DiceGamePlayers
 (
     UserID INTEGER PRIMARY KEY,
     MoneyCents INTEGER NOT NULL DEFAULT 0,
@@ -93,7 +94,7 @@ CREATE TABLE IF NOT EXISTS Players
         ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS ItemDefinitions
+CREATE TABLE IF NOT EXISTS DiceGameItemDefinitions
 (
     DefinitionID INTEGER PRIMARY KEY AUTOINCREMENT,
     Name TEXT NOT NULL,
@@ -104,7 +105,7 @@ CREATE TABLE IF NOT EXISTS ItemDefinitions
     DropWeight INTEGER NOT NULL DEFAULT 0
 );
 
-CREATE TABLE IF NOT EXISTS ItemDefinitionEffects
+CREATE TABLE IF NOT EXISTS DiceGameItemDefinitionEffects
 (
     EffectID INTEGER PRIMARY KEY AUTOINCREMENT,
     DefinitionID INTEGER NOT NULL,
@@ -112,11 +113,11 @@ CREATE TABLE IF NOT EXISTS ItemDefinitionEffects
     EffectData TEXT NOT NULL,
 
     FOREIGN KEY (DefinitionID)
-        REFERENCES ItemDefinitions(DefinitionID)
+        REFERENCES DiceGameItemDefinitions(DefinitionID)
         ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS PlayerItems
+CREATE TABLE IF NOT EXISTS DiceGamePlayerItems
 (
     PlayerItemID INTEGER PRIMARY KEY AUTOINCREMENT,
     UserID INTEGER NOT NULL,
@@ -131,11 +132,11 @@ CREATE TABLE IF NOT EXISTS PlayerItems
         ON DELETE CASCADE,
 
     FOREIGN KEY (DefinitionID)
-        REFERENCES ItemDefinitions(DefinitionID)
+        REFERENCES DiceGameItemDefinitions(DefinitionID)
         ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS PlayerItemEffects
+CREATE TABLE IF NOT EXISTS DiceGamePlayerItemEffects
 (
     EffectID INTEGER PRIMARY KEY AUTOINCREMENT,
     PlayerItemID INTEGER NOT NULL,
@@ -143,11 +144,11 @@ CREATE TABLE IF NOT EXISTS PlayerItemEffects
     EffectData TEXT NOT NULL,
 
     FOREIGN KEY (PlayerItemID)
-        REFERENCES PlayerItems(PlayerItemID)
+        REFERENCES DiceGamePlayerItems(PlayerItemID)
         ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS UpgradeDefinitions
+CREATE TABLE IF NOT EXISTS DiceGameUpgradeDefinitions
 (
     UpgradeID INTEGER PRIMARY KEY AUTOINCREMENT,
     Name TEXT NOT NULL,
@@ -158,7 +159,7 @@ CREATE TABLE IF NOT EXISTS UpgradeDefinitions
 );
 
 
-CREATE TABLE IF NOT EXISTS PlayerUpgrades
+CREATE TABLE IF NOT EXISTS DiceGamePlayerUpgrades
 (
     PlayerUpgradeID INTEGER PRIMARY KEY AUTOINCREMENT,
     UserID INTEGER NOT NULL,
@@ -172,6 +173,6 @@ CREATE TABLE IF NOT EXISTS PlayerUpgrades
         ON DELETE CASCADE,
 
     FOREIGN KEY(UpgradeID)
-        REFERENCES UpgradeDefinitions(UpgradeID)
+        REFERENCES DiceGameUpgradeDefinitions(UpgradeID)
         ON DELETE CASCADE
 );

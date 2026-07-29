@@ -5,7 +5,7 @@ function getInventory(userId) {
         .prepare(
             `
         SELECT *
-        FROM PlayerItems
+        FROM DiceGamePlayerItems
         WHERE UserID = ?
         ORDER BY ObtainedDate DESC
     `,
@@ -17,7 +17,7 @@ function addItem(userId, definitionId, generatedName = null, rarity = null) {
     const result = db
         .prepare(
             `
-        INSERT INTO PlayerItems
+        INSERT INTO DiceGamePlayerItems
         (
             UserID,
             DefinitionID,
@@ -35,7 +35,7 @@ function addItem(userId, definitionId, generatedName = null, rarity = null) {
 function addEffect(playerItemId, effectType, effectData) {
     db.prepare(
         `
-        INSERT INTO PlayerItemEffects
+        INSERT INTO DiceGamePlayerItemEffects
         (
             PlayerItemID,
             EffectType,
@@ -51,8 +51,8 @@ function getEquipped(userId) {
         .prepare(
             `
         SELECT
-            PlayerItems.*
-        FROM PlayerItems
+            DiceGamePlayerItems.*
+        FROM DiceGamePlayerItems
         WHERE UserID = ?
           AND IsEquipped = 1
     `,
@@ -65,7 +65,7 @@ function getEquippedCount(userId) {
         .prepare(
             `
         SELECT COUNT(*) AS Count
-        FROM PlayerItems
+        FROM DiceGamePlayerItems
         WHERE UserID = ?
           AND IsEquipped = 1
     `,
@@ -78,7 +78,7 @@ function getItemEffects(playerItemId) {
         .prepare(
             `
         SELECT *
-        FROM PlayerItemEffects
+        FROM DiceGamePlayerItemEffects
         WHERE PlayerItemID = ?
     `,
         )
@@ -92,7 +92,7 @@ function getItemEffects(playerItemId) {
 function equip(playerItemId) {
     db.prepare(
         `
-        UPDATE PlayerItems
+        UPDATE DiceGamePlayerItems
         SET IsEquipped = 1
         WHERE PlayerItemID = ?
     `,
@@ -102,7 +102,7 @@ function equip(playerItemId) {
 function unequip(playerItemId) {
     db.prepare(
         `
-        UPDATE PlayerItems
+        UPDATE DiceGamePlayerItems
         SET IsEquipped = 0
         WHERE PlayerItemID = ?
     `,
@@ -114,7 +114,7 @@ function getItemCount(userId) {
         .prepare(
             `
             SELECT COUNT(*) AS Count
-            FROM PlayerItems
+            FROM DiceGamePlayerItems
             WHERE UserID = ?
             `,
         )

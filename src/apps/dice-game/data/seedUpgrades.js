@@ -3,7 +3,7 @@ const upgrades = require("./upgradeDefinitions.js");
 
 function seedUpgrades() {
     const insertUpgrade = db.prepare(`
-            INSERT INTO UpgradeDefinitions
+            INSERT INTO DiceGameUpgradeDefinitions
             (
                 Name,
                 Description,
@@ -16,7 +16,7 @@ function seedUpgrades() {
 
     const exists = db.prepare(`
         SELECT 1
-        FROM UpgradeDefinitions
+        FROM DiceGameUpgradeDefinitions
         WHERE Name = ?
     `);
 

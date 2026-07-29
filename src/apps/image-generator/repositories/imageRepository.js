@@ -1,7 +1,7 @@
 const db = require("../../../database/db");
 
 const insertImage = db.prepare(`
-    INSERT INTO Images (
+    INSERT INTO ImageGeneratorImages (
         UserID,
         Filename,
         Prompt,
@@ -18,20 +18,20 @@ const insertImage = db.prepare(`
 
 const getImageById = db.prepare(`
    SELECT *
-   FROM Images
+   FROM ImageGeneratorImages
    WHERE ImageID = ? 
 `);
 
 const getRecentImages = db.prepare(`
     SELECT *
-    FROM Images
+    FROM ImageGeneratorImages
     WHERE UserID = ?
     ORDER BY CreatedDate DESC
     LIMIT ?
 `);
 
 const deleteImage = db.prepare(`
-    DELETE FROM Images
+    DELETE FROM ImageGeneratorImages
     WHERE ImageID = ?
 `);
 

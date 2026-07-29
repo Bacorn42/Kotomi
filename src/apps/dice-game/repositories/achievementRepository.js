@@ -11,7 +11,7 @@ function getAllAchievements() {
                 Icon,
                 RequirementType,
                 RequirementValue
-            FROM Achievements
+            FROM DiceGameAchievements
             `,
         )
         .all();
@@ -22,7 +22,7 @@ function hasAchievement(userId, achievementId) {
         .prepare(
             `
                 SELECT 1
-                FROM UserAchievements
+                FROM DiceGameUserAchievements
                 WHERE UserID = ?
                 AND AchievementID = ?
                 `,
@@ -35,7 +35,7 @@ function hasAchievement(userId, achievementId) {
 function unlockAchievement(userId, achievementId) {
     db.prepare(
         `
-            INSERT OR IGNORE INTO UserAchievements
+            INSERT OR IGNORE INTO DiceGameUserAchievements
             (
                 UserID,
                 AchievementID
@@ -52,7 +52,7 @@ function getUserAchievements(userId) {
             SELECT
                 AchievementID,
                 UnlockedDate
-            FROM UserAchievements
+            FROM DiceGameUserAchievements
             WHERE UserID = ?
             `,
         )

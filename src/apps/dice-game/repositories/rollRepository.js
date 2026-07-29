@@ -2,7 +2,7 @@ const db = require("../../../database/db");
 
 function saveRoll(roll) {
     const statement = db.prepare(`
-        INSERT INTO Rolls
+        INSERT INTO DiceGameRolls
         (
             UserID,
             DiceValues,
@@ -31,7 +31,7 @@ function saveRoll(roll) {
 function getRecentRolls(userId, limit = 10) {
     const statement = db.prepare(`
         SELECT *
-        FROM Rolls
+        FROM DiceGameRolls
         WHERE UserID = ?
         ORDER BY CreatedDate DESC
         LIMIT ?
@@ -49,7 +49,7 @@ function getUserTopRolls(userId) {
                 DiceValues,
                 Score,
                 CreatedDate
-            FROM Rolls
+            FROM DiceGameRolls
             WHERE UserID = ?
             ORDER BY Score DESC
             LIMIT 10
@@ -62,7 +62,7 @@ function getTotalMoneyCents(userId) {
     const statement = db.prepare(
         `
         SELECT SUM(MoneyCents) AS TotalMoneyCents
-        FROM Rolls
+        FROM DiceGameRolls
         WHERE UserID = ?
         `,
     );
@@ -79,7 +79,7 @@ function getUserStats(userId) {
                 COALESCE(SUM(Score), 0) AS totalScore,
                 COALESCE(AVG(Score), 0) AS averageScore,
                 COALESCE(MAX(Score), 0) AS highestScore
-            FROM Rolls
+            FROM DiceGameRolls
             WHERE UserID = ?
         `,
         )

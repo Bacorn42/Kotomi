@@ -11,8 +11,8 @@ function getAvailableUpgrades(userId) {
                 THEN 0
                 ELSE 1
             END AS Purchased
-        FROM UpgradeDefinitions u
-        LEFT JOIN PlayerUpgrades pu
+        FROM DiceGameUpgradeDefinitions u
+        LEFT JOIN DiceGamePlayerUpgrades pu
             ON pu.UpgradeID = u.UpgradeID
             AND pu.UserID = ?
 
@@ -35,7 +35,7 @@ function getById(upgradeId) {
         .prepare(
             `
                 SELECT *
-                FROM UpgradeDefinitions
+                FROM DiceGameUpgradeDefinitions
                 WHERE UpgradeID = ?
             `,
         )
@@ -50,7 +50,7 @@ function getById(upgradeId) {
 function addPlayerUpgrade(userId, upgradeId) {
     db.prepare(
         `
-            INSERT INTO PlayerUpgrades
+            INSERT INTO DiceGamePlayerUpgrades
             (
                 UserID,
                 UpgradeID
@@ -63,7 +63,7 @@ function addPlayerUpgrade(userId, upgradeId) {
 function applyActiveItemSlots(userId, amount) {
     db.prepare(
         `
-                UPDATE Players
+                UPDATE DiceGamePlayers
                 SET MaxActiveItems =
                     MaxActiveItems + ?
                 WHERE UserID = ?
@@ -76,7 +76,7 @@ function hasPlayerUpgrade(userId, upgradeId) {
         .prepare(
             `
             SELECT 1
-            FROM PlayerUpgrades
+            FROM DiceGamePlayerUpgrades
             WHERE UserID = ?
                 AND UpgradeID = ?
         `,
@@ -91,8 +91,8 @@ function getPlayerUpgrades(userId) {
         SELECT
             ud.UpgradeType,
             ud.UpgradeData
-        FROM PlayerUpgrades pu
-        JOIN UpgradeDefinitions ud ON ud.UpgradeID = pu.UpgradeID
+        FROM DiceGamePlayerUpgrades pu
+        JOIN DiceGameUpgradeDefinitions ud ON ud.UpgradeID = pu.UpgradeID
         WHERE pu.UserID = ?
         `,
         )

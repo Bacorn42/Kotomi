@@ -366,7 +366,7 @@ const achievements = [
 
 function seedAchievements() {
     const insert = db.prepare(`
-        INSERT OR IGNORE INTO Achievements
+        INSERT OR IGNORE INTO DiceGameAchievements
         (
             Name,
             Description,

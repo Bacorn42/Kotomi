@@ -7,7 +7,7 @@ function getTotalRolls(userId) {
         .prepare(
             `
             SELECT COUNT(*) AS totalRolls
-            FROM Rolls
+            FROM DiceGameRolls
             WHERE UserID = ?
             `,
         )
@@ -19,7 +19,7 @@ function getTotalRolls(userId) {
 function createPlayer(userId) {
     db.prepare(
         `
-        INSERT INTO Players
+        INSERT INTO DiceGamePlayers
         (
             UserID
         )
@@ -35,7 +35,7 @@ function ensurePlayer(userId) {
             `
             SELECT
                 UserID
-            FROM Players
+            FROM DiceGamePlayers
             WHERE UserID = ?
             `,
         )
@@ -60,7 +60,7 @@ function getPlayer(userId) {
             LastRollTime,
             CreatedDate,
             UpdatedDate
-        FROM Players
+        FROM DiceGamePlayers
         WHERE UserID = ?
         `,
         )
@@ -70,7 +70,7 @@ function getPlayer(userId) {
 function updateLastRollTime(userId) {
     db.prepare(
         `
-        UPDATE Players
+        UPDATE DiceGamePlayers
         SET
             LastRollTime = CURRENT_TIMESTAMP,
             UpdatedDate = CURRENT_TIMESTAMP
@@ -84,7 +84,7 @@ function getMoneyCents(userId) {
         .prepare(
             `
         SELECT MoneyCents
-        FROM Players
+        FROM DiceGamePlayers
         WHERE UserID = ?
     `,
         )
@@ -94,7 +94,7 @@ function getMoneyCents(userId) {
 function addMoneyCents(userId, amount) {
     db.prepare(
         `
-        UPDATE Players
+        UPDATE DiceGamePlayers
         SET
             MoneyCents = MoneyCents + ?,
             UpdatedDate = CURRENT_TIMESTAMP
@@ -110,7 +110,7 @@ function getPlayerSettings(userId) {
         SELECT
             MaxActiveItems,
             DiceSkin
-        FROM Players
+        FROM DiceGamePlayers
         WHERE UserID = ?
     `,
         )
