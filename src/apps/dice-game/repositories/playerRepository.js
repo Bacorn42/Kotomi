@@ -1,6 +1,4 @@
 const db = require("../../../database/db.js");
-const { getDiceConfiguration } = require("../services/diceConfiguration.js");
-const { getPlayerConfiguration } = require("../services/playerConfiguration.js");
 
 function getTotalRolls(userId) {
     const result = db
@@ -49,22 +47,32 @@ function ensurePlayer(userId) {
 function getPlayer(userId) {
     ensurePlayer(userId);
 
-    return db
+    const player = db
         .prepare(
             `
-        SELECT
-            UserID,
-            MoneyCents,
-            DiceSkin,
-            MaxActiveItems,
-            LastRollTime,
-            CreatedDate,
-            UpdatedDate
-        FROM DiceGamePlayers
-        WHERE UserID = ?
-        `,
+            SELECT
+                UserID,
+                MoneyCents,
+                DiceSkin,
+                MaxActiveItems,
+                LastRollTime,
+                CreatedDate,
+                UpdatedDate
+            FROM DiceGamePlayers
+            WHERE UserID = ?
+            `,
         )
         .get(userId);
+
+    return {
+        userId: player.UserID,
+        moneyCents: player.MoneyCents,
+        diceSkin: player.DiceSkin,
+        maxActiveItems: player.MaxActiveItems,
+        lastRollTime: player.LastRollTime,
+        createdDate: player.CreatedDate,
+        updatedDate: player.UpdatedDate,
+    };
 }
 
 function updateLastRollTime(userId) {
@@ -104,17 +112,22 @@ function addMoneyCents(userId, amount) {
 }
 
 function getPlayerSettings(userId) {
-    return db
+    const settings = db
         .prepare(
             `
-        SELECT
-            MaxActiveItems,
-            DiceSkin
-        FROM DiceGamePlayers
-        WHERE UserID = ?
-    `,
+            SELECT
+                MaxActiveItems,
+                DiceSkin
+            FROM DiceGamePlayers
+            WHERE UserID = ?
+            `,
         )
         .get(userId);
+
+    return {
+        maxActiveItems: settings.MaxActiveItems,
+        diceSkin: settings.DiceSkin,
+    };
 }
 
 function getUsername(userId) {

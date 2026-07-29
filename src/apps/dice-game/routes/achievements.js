@@ -2,34 +2,28 @@ const express = require("express");
 
 const router = express.Router();
 
-const {
-    getAllAchievements,
-    getUserAchievements,
-} = require("../repositories/achievementRepository.js");
-const { getPlayerProfile } = require("../services/playerProfileService.js");
+const achievementRepository = require("../repositories/achievementRepository.js");
+const rollRepository = require("../repositories/rollRepository.js");
 
 const { requireLogin } = require("../../../middleware/auth.js");
 
 router.get("/", requireLogin, (req, res) => {
     const userId = req.user.UserID;
-    const achievements = getAllAchievements();
-    const unlocked = getUserAchievements(userId);
-    const stats = getPlayerProfile(userId);
-    const unlockedMap = new Map(unlocked.map((a) => [a.AchievementID, a]));
+
+    const achievements = achievementRepository.getAllAchievements();
+    const unlocked = achievementRepository.getUserAchievements(userId);
+    const stats = rollRepository.getUserStats(userId);
+
+    const unlockedMap = new Map(unlocked.map((a) => [a.achievementId, a]));
 
     res.json({
         achievements: achievements.map((achievement) => {
-            const unlockedAchievement = unlockedMap.get(achievement.AchievementID);
+            const unlockedAchievement = unlockedMap.get(achievement.id);
 
             return {
-                id: achievement.AchievementID,
-                name: achievement.Name,
-                description: achievement.Description,
-                icon: achievement.Icon,
-                requirementType: achievement.RequirementType,
-                requirementValue: achievement.RequirementValue,
+                ...achievement,
                 unlocked: !!unlockedAchievement,
-                unlockedDate: unlockedAchievement?.UnlockedDate ?? null,
+                unlockedDate: unlockedAchievement?.unlockedDate ?? null,
             };
         }),
 

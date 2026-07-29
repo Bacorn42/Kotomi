@@ -11,23 +11,23 @@ const router = express.Router();
 router.get("/", requireLogin, (req, res) => {
     const definitions = itemDefinitionRepository.getAllShopItems();
     const inventory = playerItemRepository.getInventory(req.user.UserID);
-    const owned = new Set(inventory.map((item) => item.DefinitionID));
+    const owned = new Set(inventory.map((item) => item.definitionID));
 
     res.json(
         definitions.map((item) => ({
-            definitionId: item.DefinitionID,
-            name: item.Name,
-            description: item.Description,
-            icon: item.Icon,
-            costCents: item.CostCents,
-            owned: owned.has(item.DefinitionID),
-            effects: itemDefinitionRepository.getDefinitionEffects(item.DefinitionID),
+            definitionId: item.definitionID,
+            name: item.name,
+            description: item.description,
+            icon: item.icon,
+            costCents: item.costCents,
+            owned: owned.has(item.definitionID),
+            effects: itemDefinitionRepository.getDefinitionEffects(item.definitionID),
         })),
     );
 });
 
 router.post("/:id/buy", requireLogin, (req, res) => {
-    const result = shopService.buyItem(req.user.UserID, Number(req.params.id));
+    const result = shopService.purchaseItem(req.user.UserID, Number(req.params.id));
 
     res.json(result);
 });

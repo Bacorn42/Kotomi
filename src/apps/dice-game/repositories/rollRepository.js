@@ -29,15 +29,29 @@ function saveRoll(roll) {
 }
 
 function getRecentRolls(userId, limit = 10) {
-    const statement = db.prepare(`
-        SELECT *
-        FROM DiceGameRolls
-        WHERE UserID = ?
-        ORDER BY CreatedDate DESC
-        LIMIT ?
-    `);
-
-    return statement.all(userId, limit);
+    return db
+        .prepare(
+            `
+            SELECT
+                RollID,
+                DiceValues,
+                Score,
+                MoneyCents,
+                CreatedDate
+            FROM DiceGameRolls
+            WHERE UserID = ?
+            ORDER BY CreatedDate DESC
+            LIMIT ?
+            `,
+        )
+        .all(userId, limit)
+        .map((roll) => ({
+            rollId: roll.RollID,
+            dice: JSON.parse(roll.DiceValues),
+            score: roll.Score,
+            moneyCents: roll.MoneyCents,
+            createdDate: roll.CreatedDate,
+        }));
 }
 
 function getUserTopRolls(userId) {
@@ -55,7 +69,13 @@ function getUserTopRolls(userId) {
             LIMIT 10
         `,
         )
-        .all(userId);
+        .all(userId)
+        .map((roll) => ({
+            rollId: roll.RollID,
+            dice: JSON.parse(roll.DiceValues),
+            score: roll.Score,
+            createdDate: roll.CreatedDate,
+        }));
 }
 
 function getTotalMoneyCents(userId) {

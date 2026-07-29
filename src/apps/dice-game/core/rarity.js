@@ -3,20 +3,12 @@ const rarities = require("../constants/rarities.js");
 function getRandomRarity() {
     const roll = Math.random();
 
-    if (roll < 0.7) {
-        return rarities.COMMON;
-    }
+    for (const rarity of rarities.list) {
+        total += rarity.chance;
 
-    if (roll < 0.9) {
-        return rarities.UNCOMMON;
-    }
-
-    if (roll < 0.97) {
-        return rarities.RARE;
-    }
-
-    if (roll < 0.995) {
-        return rarities.EPIC;
+        if (roll < total) {
+            return rarity;
+        }
     }
 
     return rarities.LEGENDARY;

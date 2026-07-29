@@ -1,14 +1,14 @@
-const diceConfig = require("../config/dice.js");
+const defaultDiceConfig = require("../config/dice.js");
 
 function getDiceConfiguration(player) {
     return {
-        diceCount: diceConfig.defaultDiceCount,
-        weights: [...diceConfig.defaultWeights],
-        cooldownMs: diceConfig.defaultCooldownMs,
-        skin: player.DiceSkin,
-        maxActiveItems: player.MaxActiveItems,
-        scoreMultiplier: diceConfig.scoreMultiplier,
-        moneyMultiplier: diceConfig.moneyMultiplier,
+        diceCount: defaultDiceConfig.defaultDiceCount,
+        weights: [...defaultDiceConfig.defaultWeights],
+        cooldownMs: defaultDiceConfig.defaultCooldownMs,
+        skin: player.diceSkin,
+        maxActiveItems: player.maxActiveItems,
+        scoreMultiplier: defaultDiceConfig.scoreMultiplier,
+        moneyMultiplier: defaultDiceConfig.moneyMultiplier,
     };
 }
 

@@ -65,9 +65,9 @@ function getPlayerStats(userId) {
             COUNT(*) AS TotalRolls,
             COALESCE(SUM(Score), 0) AS TotalScore,
             COALESCE(SUM(MoneyCents), 0) AS TotalMoneyCents,
-            AVG(Score) AS AverageScore,
-            AVG(MoneyCents) AS AverageMoneyCents,
-            MAX(Score) AS HighestScore
+            COALESCE(AVG(Score), 0) AS AverageScore,
+            COALESCE(AVG(MoneyCents), 0) AS AverageMoneyCents,
+            COALESCE(MAX(Score), 0) AS HighestScore
         FROM DiceGameRolls
         WHERE UserID = ?
     `,

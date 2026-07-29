@@ -5,14 +5,21 @@ function equipItem(userId, playerItemId) {
     const settings = playerRepository.getPlayerSettings(userId);
     const equippedCount = playerItemRepository.getEquippedCount(userId);
 
-    if (equippedCount >= settings.MaxActiveItems) {
+    if (equippedCount >= settings.maxActiveItems) {
         return {
             success: false,
             message: "Maximum equipped items reached.",
         };
     }
 
-    playerItemRepository.equip(playerItemId);
+    const updated = playerItemRepository.equip(userId, playerItemId);
+
+    if (!updated) {
+        return {
+            success: false,
+            message: "Item not found.",
+        };
+    }
 
     return {
         success: true,
@@ -20,7 +27,14 @@ function equipItem(userId, playerItemId) {
 }
 
 function unequipItem(userId, playerItemId) {
-    playerItemRepository.unequip(playerItemId);
+    const updated = playerItemRepository.unequip(userId, playerItemId);
+
+    if (!updated) {
+        return {
+            success: false,
+            message: "Item not found.",
+        };
+    }
 
     return {
         success: true,

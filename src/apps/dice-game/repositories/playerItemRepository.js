@@ -4,13 +4,40 @@ function getInventory(userId) {
     return db
         .prepare(
             `
-        SELECT *
+            SELECT
+                PlayerItemID,
+                DefinitionID,
+                GeneratedName,
+                Rarity,
+                IsEquipped,
+                ObtainedDate
+            FROM DiceGamePlayerItems
+            WHERE UserID = ?
+            ORDER BY ObtainedDate DESC
+            `,
+        )
+        .all(userId)
+        .map((item) => ({
+            playerItemId: item.PlayerItemID,
+            definitionId: item.DefinitionID,
+            generatedName: item.GeneratedName,
+            rarity: item.Rarity,
+            equipped: Boolean(item.IsEquipped),
+            obtainedDate: item.ObtainedDate,
+        }));
+}
+
+function ownsItem(userId, definitionId) {
+    return !!db
+        .prepare(
+            `
+        SELECT 1
         FROM DiceGamePlayerItems
         WHERE UserID = ?
-        ORDER BY ObtainedDate DESC
+          AND DefinitionID = ?
     `,
         )
-        .all(userId);
+        .get(userId, definitionId);
 }
 
 function addItem(userId, definitionId, generatedName = null, rarity = null) {
@@ -89,24 +116,30 @@ function getItemEffects(playerItemId) {
         }));
 }
 
-function equip(playerItemId) {
-    db.prepare(
-        `
+function equip(userId, playerItemId) {
+    db
+        .prepare(
+            `
         UPDATE DiceGamePlayerItems
         SET IsEquipped = 1
-        WHERE PlayerItemID = ?
+        WHERE UserID = ?
+            AND PlayerItemID = ?
     `,
-    ).run(playerItemId);
+        )
+        .run(userId, playerItemId).changes;
 }
 
-function unequip(playerItemId) {
-    db.prepare(
-        `
+function unequip(userId, playerItemId) {
+    db
+        .prepare(
+            `
         UPDATE DiceGamePlayerItems
         SET IsEquipped = 0
-        WHERE PlayerItemID = ?
+        WHERE UserID = ?
+            AND PlayerItemID = ?
     `,
-    ).run(playerItemId);
+        )
+        .run(userId, playerItemId).changes;
 }
 
 function getItemCount(userId) {
@@ -123,6 +156,7 @@ function getItemCount(userId) {
 
 module.exports = {
     getInventory,
+    ownsItem,
     addItem,
     addEffect,
     getEquipped,

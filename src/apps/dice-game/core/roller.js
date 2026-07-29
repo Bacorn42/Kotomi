@@ -1,5 +1,10 @@
 function rollWeightedDie(weights) {
     const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+
+    if (totalWeight <= 0) {
+        throw new Error("Invalid dice weights");
+    }
+
     let random = Math.random() * totalWeight;
 
     for (let i = 0; i < weights.length; i++) {

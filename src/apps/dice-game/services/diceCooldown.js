@@ -1,23 +1,31 @@
 function canRoll(player, cooldownMs) {
-    if (!player.LastRollTime) {
+    const lastRoll = getLastRollTimestamp(player);
+
+    if (!lastRoll) {
         return true;
     }
 
-    const lastRoll = new Date(player.LastRollTime.replace(" ", "T") + "Z").getTime();
-    const now = Date.now();
-
-    return now - lastRoll >= cooldownMs;
+    return Date.now() - lastRoll >= cooldownMs;
 }
 
 function getRemainingCooldown(player, cooldownMs) {
-    if (!player.LastRollTime) {
+    const lastRoll = getLastRollTimestamp(player);
+
+    if (!lastRoll) {
         return 0;
     }
 
-    const lastRoll = new Date(player.LastRollTime.replace(" ", "T") + "Z").getTime();
     const elapsed = Date.now() - lastRoll;
 
     return Math.max(0, cooldownMs - elapsed);
+}
+
+function getLastRollTimestamp(player) {
+    if (!player.lastRollTime) {
+        return null;
+    }
+
+    return new Date(player.lastRollTime.replace(" ", "T") + "Z").getTime();
 }
 
 module.exports = {

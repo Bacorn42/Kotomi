@@ -9,26 +9,33 @@ const router = express.Router();
 
 router.get("/inventory", requireLogin, (req, res) => {
     const userId = req.user.UserID;
-    const player = playerRepository.getPlayer(req.user.UserID);
+    const player = playerRepository.getPlayer(userId);
     const items = playerItemRepository.getInventory(userId);
 
-    const inventory = items.map((item) => {
-        const definition = itemDefinitionRepository.getById(item.DefinitionID);
-        const effects = playerItemRepository.getItemEffects(item.PlayerItemID);
+    const inventory = items
+        .map((item) => {
+            const definition = itemDefinitionRepository.getById(item.definitionID);
 
-        return {
-            playerItemId: item.PlayerItemID,
-            name: item.GeneratedName || definition.Name,
-            description: definition.Description,
-            icon: definition.Icon,
-            rarity: item.Rarity,
-            equipped: Boolean(item.IsEquipped),
-            effects,
-        };
-    });
+            if (!definition) {
+                return null;
+            }
+
+            const effects = playerItemRepository.getItemEffects(item.playerItemID);
+
+            return {
+                playerItemId: item.playerItemID,
+                name: item.generatedName || definition.name,
+                description: definition.description,
+                icon: definition.icon,
+                rarity: item.rarity,
+                equipped: Boolean(item.isEquipped),
+                effects,
+            };
+        })
+        .filter(Boolean);
 
     res.json({
-        maxActiveItems: player.MaxActiveItems,
+        maxActiveItems: player.maxActiveItems,
         items: inventory,
     });
 });

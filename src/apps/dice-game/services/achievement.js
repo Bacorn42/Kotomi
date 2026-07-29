@@ -39,7 +39,7 @@ function meetsRequirement(achievement, context) {
         case "ALL_SIXES":
             return context.dice.every((value) => value === 6);
         case "ALL_VALUES":
-            return new Set(context.dice).size === 6;
+            return new Set(context.dice).size === diceConfig.defaultWeights.length;
         case "ALL_ODDS":
             return context.dice.every((value) => value % 2 === 1);
         case "ALL_EVENS":

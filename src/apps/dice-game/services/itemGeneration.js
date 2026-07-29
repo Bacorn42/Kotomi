@@ -11,31 +11,31 @@ function generateItem(userId) {
     }
 
     const rarity = getRandomRarity();
+    const generatedName = `${rarity.name} ${definition.Name}`;
 
     const playerItemId = playerItemRepository.addItem(
         userId,
         definition.DefinitionID,
-        `${rarity.name} ${definition.Name}`,
+        generatedName,
         rarity.name,
     );
 
     const effects = itemRepository.getDefinitionEffects(definition.DefinitionID);
+    const scaledEffects = effects.map((effect) => ({
+        effectType: effect.effectType,
+        effectData: scaleEffect(effect.effectType, effect.effectData, rarity.multiplier),
+    }));
 
-    for (const effect of effects) {
-        const data = scaleEffect(effect.effectType, effect.effectData, rarity.multiplier);
-
+    for (const effect of scaledEffects) {
         playerItemRepository.addEffect(playerItemId, effect.effectType, data);
     }
 
     return {
-        playerItemId: playerItemId,
-        name: `${rarity.name} ${definition.Name}`,
+        playerItemId,
+        name: generatedName,
         rarity: rarity.name,
         icon: definition.Icon,
-        effects: effects.map((effect) => ({
-            effectType: effect.effectType,
-            effectData: scaleEffect(effect.effectType, effect.effectData, rarity.multiplier),
-        })),
+        effects: scaledEffects,
     };
 }
 

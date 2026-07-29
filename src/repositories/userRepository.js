@@ -26,16 +26,24 @@ function getByUsername(username) {
 }
 
 function getById(userId) {
-    const statement = db.prepare(`
+    const user = db
+        .prepare(
+            `
         SELECT
             UserID,
             Username,
             CreatedDate
         FROM Users
         WHERE UserID = ?
-    `);
+    `,
+        )
+        .get(userId);
 
-    return statement.get(userId);
+    return {
+        userId: user.UserID,
+        username: user.Username,
+        createdDate: user.CreatedDate,
+    };
 }
 
 module.exports = {

@@ -1,5 +1,21 @@
 const db = require("../../../database/db.js");
 
+function mapDefinition(row) {
+    if (!row) {
+        return null;
+    }
+
+    return {
+        definitionId: row.DefinitionID,
+        name: row.Name,
+        description: row.Description,
+        icon: row.Icon,
+        costCents: row.CostCents,
+        canGenerate: row.CanGenerate === 1,
+        dropWeight: row.DropWeight,
+    };
+}
+
 function getAll() {
     return db
         .prepare(
@@ -9,7 +25,8 @@ function getAll() {
         ORDER BY CostCents
     `,
         )
-        .all();
+        .all()
+        .map(mapDefinition);
 }
 
 function getAllShopItems() {
@@ -22,19 +39,22 @@ function getAllShopItems() {
         ORDER BY CostCents
     `,
         )
-        .all();
+        .all()
+        .map(mapDefinition);
 }
 
 function getById(definitionId) {
-    return db
+    const definition = db
         .prepare(
             `
-        SELECT *
-        FROM DiceGameItemDefinitions
-        WHERE DefinitionID = ?
-    `,
+            SELECT *
+            FROM DiceGameItemDefinitions
+            WHERE DefinitionID = ?
+        `,
         )
         .get(definitionId);
+
+    return mapDefinition(definition);
 }
 
 function getDefinitionEffects(definitionId) {

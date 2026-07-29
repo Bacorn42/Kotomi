@@ -1,9 +1,8 @@
-const db = require("../../../database/db.js");
 const playerRepository = require("../repositories/playerRepository.js");
 const playerItemRepository = require("../repositories/playerItemRepository.js");
 const itemDefinitionRepository = require("../repositories/itemDefinitionRepository.js");
 
-const buyItem = db.transaction((userId, definitionId) => {
+function purchaseItem(userId, definitionId) {
     const definition = itemDefinitionRepository.getById(definitionId);
 
     if (!definition) {
@@ -13,11 +12,7 @@ const buyItem = db.transaction((userId, definitionId) => {
         };
     }
 
-    const owned = playerItemRepository
-        .getInventory(userId)
-        .some((item) => item.DefinitionID === definitionId);
-
-    if (owned) {
+    if (playerItemRepository.ownsItem(userId, definitionId)) {
         return {
             success: false,
             message: "You already own this item.",
@@ -26,14 +21,14 @@ const buyItem = db.transaction((userId, definitionId) => {
 
     const money = playerRepository.getMoneyCents(userId);
 
-    if (money < definition.CostCents) {
+    if (money < definition.costCents) {
         return {
             success: false,
             message: "Not enough money.",
         };
     }
 
-    playerRepository.addMoneyCents(userId, -definition.CostCents);
+    playerRepository.addMoneyCents(userId, -definition.costCents);
 
     const playerItemId = playerItemRepository.addItem(userId, definitionId);
     const effects = itemDefinitionRepository.getDefinitionEffects(definitionId);
@@ -44,10 +39,15 @@ const buyItem = db.transaction((userId, definitionId) => {
 
     return {
         success: true,
-        playerItemId,
+        item: {
+            playerItemId,
+            name: definition.name,
+            icon: definition.icon,
+            effects,
+        },
     };
-});
+}
 
 module.exports = {
-    buyItem,
+    purchaseItem,
 };

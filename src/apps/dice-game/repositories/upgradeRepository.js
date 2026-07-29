@@ -41,9 +41,17 @@ function getById(upgradeId) {
         )
         .get(upgradeId);
 
+    if (!upgrade) {
+        return null;
+    }
+
     return {
-        ...upgrade,
-        UpgradeData: JSON.parse(upgrade.UpgradeData),
+        upgradeId: upgrade.UpgradeID,
+        name: upgrade.Name,
+        description: upgrade.Description,
+        costCents: upgrade.CostCents,
+        upgradeType: upgrade.UpgradeType,
+        data: JSON.parse(upgrade.UpgradeData),
     };
 }
 

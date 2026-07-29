@@ -1,20 +1,18 @@
 const express = require("express");
 const { rollDice } = require("../core/roller.js");
-const { calculateScore } = require("../core/scoring.js");
-const diceRepository = require("../repositories/rollRepository.js");
+const { calculateScore, calculateMoney } = require("../core/calculation.js");
+const rollRepository = require("../repositories/rollRepository.js");
 const playerRepository = require("../repositories/playerRepository.js");
 const playerItemRepository = require("../repositories/playerItemRepository.js");
 const { requireLogin } = require("../../../middleware/auth.js");
 const { checkAchievements } = require("../services/achievement.js");
-const { getPlayer } = require("../repositories/playerRepository.js");
 const { getDiceConfiguration } = require("../services/diceConfiguration.js");
-const { updateLastRollTime, addMoneyCents } = require("../repositories/playerRepository.js");
 const { canRoll, getRemainingCooldown } = require("../services/diceCooldown.js");
-const { calculateMoney } = require("../services/rewards.js");
 const { getPlayerConfiguration } = require("../services/playerConfiguration.js");
 const itemGeneration = require("../services/itemGeneration.js");
 const statisticsService = require("../services/statistics.js");
-const playerProfileService = require("../services/playerProfileService.js");
+const playerProfileService = require("../services/playerProfile.js");
+const diceConfig = require("../config/dice.js");
 const socket = require("../../../services/socket.js");
 
 const router = express.Router();
@@ -22,7 +20,7 @@ const router = express.Router();
 router.post("/roll", requireLogin, (req, res) => {
     const userId = req.user.UserID;
 
-    const player = getPlayer(userId);
+    const player = playerRepository.getPlayer(userId);
     const configuration = getPlayerConfiguration(getDiceConfiguration(player), userId);
 
     if (!canRoll(player, configuration.cooldownMs)) {
@@ -36,11 +34,11 @@ router.post("/roll", requireLogin, (req, res) => {
     const score = calculateScore(dice, configuration.scoreMultiplier);
     const moneyCents = calculateMoney(score, configuration.moneyMultiplier);
     if (moneyCents > 0) {
-        addMoneyCents(userId, moneyCents);
+        playerRepository.addMoneyCents(userId, moneyCents);
     }
 
     let droppedItem = null;
-    if (Math.random() < 0.01) {
+    if (Math.random() < diceConfig.itemDropChance) {
         droppedItem = itemGeneration.generateItem(userId);
 
         socket.sendDiceFeed({
@@ -50,7 +48,7 @@ router.post("/roll", requireLogin, (req, res) => {
         });
     }
 
-    const rollId = diceRepository.saveRoll({
+    const rollId = rollRepository.saveRoll({
         userId,
         dice,
         weights: configuration.weights,
@@ -58,7 +56,7 @@ router.post("/roll", requireLogin, (req, res) => {
         moneyCents,
         createdDate: new Date().toISOString(),
     });
-    updateLastRollTime(userId);
+    playerRepository.updateLastRollTime(userId);
 
     socket.sendDiceFeed({
         type: "ROLL",
@@ -74,12 +72,12 @@ router.post("/roll", requireLogin, (req, res) => {
         totalRolls: playerRepository.getTotalRolls(userId),
         itemCount: playerItemRepository.getItemCount(userId),
         equippedItemCount: playerItemRepository.getEquippedCount(userId),
-        maxEquippedItems: player.MaxActiveItems,
+        maxEquippedItems: player.maxActiveItems,
         droppedItem,
         faceWeights: configuration.weights,
         maxFaceWeight: Math.max(...configuration.weights),
         moneyCents,
-        totalMoneyCents: diceRepository.getTotalMoneyCents(userId),
+        totalMoneyCents: rollRepository.getTotalMoneyCents(userId),
     });
 
     for (const achievement of unlocked) {
@@ -102,27 +100,11 @@ router.post("/roll", requireLogin, (req, res) => {
 });
 
 router.get("/recent", requireLogin, (req, res) => {
-    const rolls = diceRepository.getRecentRolls(req.user.UserID, 10);
-
-    const formattedRolls = rolls.map((roll) => ({
-        rollId: roll.RollID,
-        dice: JSON.parse(roll.DiceValues),
-        score: roll.Score,
-        createdDate: roll.CreatedDate,
-    }));
-
-    res.json(formattedRolls);
+    res.json(rollRepository.getRecentRolls(req.user.UserID, 10));
 });
 
 router.get("/profile", requireLogin, (req, res) => {
-    const stats = playerProfileService.getPlayerProfile(req.user.UserID);
-
-    const player = getPlayer(req.user.UserID);
-    const configuration = getPlayerConfiguration(getDiceConfiguration(player), req.user.UserID);
-
-    stats.cooldownMs = configuration.cooldownMs;
-
-    res.json(stats);
+    res.json(playerProfileService.getPlayerProfile(req.user.UserID));
 });
 
 router.get("/statistics", requireLogin, (req, res) => {
