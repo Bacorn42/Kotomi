@@ -173,16 +173,28 @@ function getAchievementLeaderboard() {
         .all();
 }
 
+function getGlobalStatistics() {
+    return {
+        ...getGlobalStats(),
+        ...getGlobalItemStats(),
+        ...getGlobalPlayerStats(),
+        ...getGlobalAchievementStats(),
+    };
+}
+
+function getPlayerStatistics(userId) {
+    return {
+        ...getPlayerStats(userId),
+        ...getPlayerInventoryStats(userId),
+        ...getPlayerAchievementStats(userId),
+    };
+}
+
 module.exports = {
-    getGlobalStats,
-    getGlobalItemStats,
-    getGlobalPlayerStats,
-    getGlobalAchievementStats,
-    getPlayerStats,
-    getPlayerInventoryStats,
-    getPlayerAchievementStats,
     getHighestScoreLeaderboard,
     getMoneyLeaderboard,
     getRollLeaderboard,
     getAchievementLeaderboard,
+    getGlobalStatistics,
+    getPlayerStatistics,
 };

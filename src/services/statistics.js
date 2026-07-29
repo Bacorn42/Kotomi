@@ -2,19 +2,8 @@ const statisticsRepository = require("../repositories/statisticsRepository.js");
 
 function getStatistics(userId) {
     return {
-        global: {
-            ...statisticsRepository.getGlobalStats(),
-            ...statisticsRepository.getGlobalItemStats(),
-            ...statisticsRepository.getGlobalPlayerStats(),
-            ...statisticsRepository.getGlobalAchievementStats(),
-        },
-
-        player: {
-            ...statisticsRepository.getPlayerStats(userId),
-            ...statisticsRepository.getPlayerInventoryStats(userId),
-            ...statisticsRepository.getPlayerAchievementStats(userId),
-        },
-
+        global: statisticsRepository.getGlobalStatistics(),
+        player: statisticsRepository.getPlayerStatistics(userId),
         leaderboards: {
             highestScores: statisticsRepository.getHighestScoreLeaderboard(),
             money: statisticsRepository.getMoneyLeaderboard(),

@@ -14,19 +14,15 @@ function seedUpgrades() {
             VALUES (?, ?, ?, ?, ?)
         `);
 
+    const exists = db.prepare(`
+        SELECT 1
+        FROM UpgradeDefinitions
+        WHERE Name = ?
+    `);
+
     const insertMany = db.transaction(() => {
         for (const upgrade of upgrades) {
-            const exists = db
-                .prepare(
-                    `
-                        SELECT 1
-                        FROM UpgradeDefinitions
-                        WHERE Name = ?
-                    `,
-                )
-                .get(upgrade.name);
-
-            if (!exists) {
+            if (!exists.get(upgrade.name)) {
                 insertUpgrade.run(
                     upgrade.name,
                     upgrade.description,

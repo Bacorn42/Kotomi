@@ -37,7 +37,7 @@ function getById(definitionId) {
         .get(definitionId);
 }
 
-function getEffects(definitionId) {
+function getDefinitionEffects(definitionId) {
     return db
         .prepare(
             `
@@ -56,7 +56,7 @@ function getEffects(definitionId) {
 }
 
 function exists(name) {
-    return db
+    return !!db
         .prepare(
             `
         SELECT 1
@@ -68,45 +68,49 @@ function exists(name) {
 }
 
 function createDefinition(definition) {
-    const result = db
-        .prepare(
-            `
-        INSERT INTO ItemDefinitions
-        (
-            Name,
-            Description,
-            Icon,
-            CostCents,
-            CanGenerate,
-            DropWeight
-        )
-        VALUES (?, ?, ?, ?, ?, ?)
-    `,
-        )
-        .run(
-            definition.name,
-            definition.description,
-            definition.icon,
-            definition.costCents,
-            definition.canGenerate ? 1 : 0,
-            definition.dropWeight,
-        );
+    const transaction = db.transaction(() => {
+        const result = db
+            .prepare(
+                `
+                INSERT INTO ItemDefinitions
+                (
+                    Name,
+                    Description,
+                    Icon,
+                    CostCents,
+                    CanGenerate,
+                    DropWeight
+                )
+                VALUES (?, ?, ?, ?, ?, ?)
+            `,
+            )
+            .run(
+                definition.name,
+                definition.description,
+                definition.icon,
+                definition.costCents,
+                definition.canGenerate ? 1 : 0,
+                definition.dropWeight,
+            );
 
-    const definitionId = result.lastInsertRowid;
+        const definitionId = result.lastInsertRowid;
 
-    const insertEffect = db.prepare(`
-        INSERT INTO ItemDefinitionEffects
-        (
-            DefinitionID,
-            EffectType,
-            EffectData
-        )
-        VALUES (?, ?, ?)
-    `);
+        const insertEffect = db.prepare(`
+            INSERT INTO ItemDefinitionEffects
+            (
+                DefinitionID,
+                EffectType,
+                EffectData
+            )
+            VALUES (?, ?, ?)
+        `);
 
-    for (const effect of definition.effects) {
-        insertEffect.run(definitionId, effect.type, JSON.stringify(effect.data));
-    }
+        for (const effect of definition.effects) {
+            insertEffect.run(definitionId, effect.type, JSON.stringify(effect.data));
+        }
+    });
+
+    transaction();
 }
 
 function getRandomGeneratedDefinition() {
@@ -139,7 +143,7 @@ module.exports = {
     getAll,
     getAllShopItems,
     getById,
-    getEffects,
+    getDefinitionEffects,
     exists,
     createDefinition,
     getRandomGeneratedDefinition,

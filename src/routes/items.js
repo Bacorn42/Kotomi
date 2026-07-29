@@ -14,7 +14,7 @@ router.get("/inventory", requireLogin, (req, res) => {
 
     const inventory = items.map((item) => {
         const definition = itemDefinitionRepository.getById(item.DefinitionID);
-        const effects = playerItemRepository.getEffects(item.PlayerItemID);
+        const effects = playerItemRepository.getItemEffects(item.PlayerItemID);
 
         return {
             playerItemId: item.PlayerItemID,

@@ -73,7 +73,7 @@ function getEquippedCount(userId) {
         .get(userId).Count;
 }
 
-function getEffects(playerItemId) {
+function getItemEffects(playerItemId) {
     return db
         .prepare(
             `
@@ -127,7 +127,7 @@ module.exports = {
     addEffect,
     getEquipped,
     getEquippedCount,
-    getEffects,
+    getItemEffects,
     equip,
     unequip,
     getItemCount,

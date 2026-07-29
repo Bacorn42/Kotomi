@@ -30,46 +30,26 @@ function getAvailableUpgrades(userId) {
         }));
 }
 
-function purchaseUpgrade(userId, upgradeId) {
-    const transaction = db.transaction(() => {
-        const upgrade = db
-            .prepare(
-                `
+function getById(upgradeId) {
+    const upgrade = db
+        .prepare(
+            `
                 SELECT *
                 FROM UpgradeDefinitions
                 WHERE UpgradeID = ?
             `,
-            )
-            .get(upgradeId);
+        )
+        .get(upgradeId);
 
-        if (!upgrade) {
-            throw new Error("Upgrade not found");
-        }
+    return {
+        ...upgrade,
+        UpgradeData: JSON.parse(upgrade.UpgradeData),
+    };
+}
 
-        const player = db
-            .prepare(
-                `
-                SELECT MoneyCents
-                FROM Players
-                WHERE UserID = ?
-            `,
-            )
-            .get(userId);
-
-        if (player.MoneyCents < upgrade.CostCents) {
-            throw new Error("Not enough money");
-        }
-
-        db.prepare(
-            `
-            UPDATE Players
-            SET MoneyCents = MoneyCents - ?
-            WHERE UserID = ?
-        `,
-        ).run(upgrade.CostCents, userId);
-
-        db.prepare(
-            `
+function addPlayerUpgrade(userId, upgradeId) {
+    db.prepare(
+        `
             INSERT INTO PlayerUpgrades
             (
                 UserID,
@@ -77,23 +57,31 @@ function purchaseUpgrade(userId, upgradeId) {
             )
             VALUES (?, ?)
         `,
-        ).run(userId, upgradeId);
+    ).run(userId, upgradeId);
+}
 
-        if (upgrade.UpgradeType === "active_item_slots") {
-            const data = JSON.parse(upgrade.UpgradeData);
-
-            db.prepare(
-                `
+function applyActiveItemSlots(userId, amount) {
+    db.prepare(
+        `
                 UPDATE Players
                 SET MaxActiveItems =
                     MaxActiveItems + ?
                 WHERE UserID = ?
             `,
-            ).run(data.amount, userId);
-        }
-    });
+    ).run(amount, userId);
+}
 
-    transaction();
+function hasPlayerUpgrade(userId, upgradeId) {
+    return !!db
+        .prepare(
+            `
+            SELECT 1
+            FROM PlayerUpgrades
+            WHERE UserID = ?
+                AND UpgradeID = ?
+        `,
+        )
+        .get(userId, upgradeId);
 }
 
 function getPlayerUpgrades(userId) {
@@ -113,6 +101,9 @@ function getPlayerUpgrades(userId) {
 
 module.exports = {
     getAvailableUpgrades,
-    purchaseUpgrade,
+    getById,
+    addPlayerUpgrade,
+    applyActiveItemSlots,
+    hasPlayerUpgrade,
     getPlayerUpgrades,
 };

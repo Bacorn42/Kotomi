@@ -6,7 +6,7 @@ const {
     getAllAchievements,
     getUserAchievements,
 } = require("../repositories/achievementRepository.js");
-const { getPlayerProfile } = require("../repositories/playerRepository.js");
+const { getPlayerProfile } = require("../services/playerProfileService.js");
 
 const { requireLogin } = require("../middleware/auth.js");
 

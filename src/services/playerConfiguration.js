@@ -11,7 +11,7 @@ function getPlayerConfiguration(baseConfiguration, userId) {
     let effects = [];
 
     for (const item of equippedItems) {
-        const itemEffects = playerItemRepository.getEffects(item.PlayerItemID);
+        const itemEffects = playerItemRepository.getItemEffects(item.PlayerItemID);
 
         effects.push(...itemEffects);
     }

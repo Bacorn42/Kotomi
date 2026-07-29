@@ -4,6 +4,7 @@ const itemDefinitionRepository = require("../repositories/itemDefinitionReposito
 const playerItemRepository = require("../repositories/playerItemRepository.js");
 const shopService = require("../services/shop.js");
 const upgradeRepository = require("../repositories/upgradeRepository.js");
+const upgradeService = require("../services/upgrade.js");
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ router.get("/", requireLogin, (req, res) => {
             icon: item.Icon,
             costCents: item.CostCents,
             owned: owned.has(item.DefinitionID),
-            effects: itemDefinitionRepository.getEffects(item.DefinitionID),
+            effects: itemDefinitionRepository.getDefinitionEffects(item.DefinitionID),
         })),
     );
 });
@@ -36,7 +37,7 @@ router.get("/upgrades", requireLogin, (req, res) => {
 });
 
 router.post("/upgrades/:id/buy", requireLogin, (req, res) => {
-    upgradeRepository.purchaseUpgrade(req.user.UserID, Number(req.params.id));
+    upgradeService.purchaseUpgrade(req.user.UserID, Number(req.params.id));
 
     res.json({
         success: true,

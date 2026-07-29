@@ -36,7 +36,7 @@ const buyItem = db.transaction((userId, definitionId) => {
     playerRepository.addMoneyCents(userId, -definition.CostCents);
 
     const playerItemId = playerItemRepository.addItem(userId, definitionId);
-    const effects = itemDefinitionRepository.getEffects(definitionId);
+    const effects = itemDefinitionRepository.getDefinitionEffects(definitionId);
 
     for (const effect of effects) {
         playerItemRepository.addEffect(playerItemId, effect.effectType, effect.effectData);

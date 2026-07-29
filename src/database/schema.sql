@@ -165,6 +165,8 @@ CREATE TABLE IF NOT EXISTS PlayerUpgrades
     UpgradeID INTEGER NOT NULL,
     PurchasedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
+    UNIQUE(UserID, UpgradeID),
+
     FOREIGN KEY(UserID)
         REFERENCES Users(UserID)
         ON DELETE CASCADE,

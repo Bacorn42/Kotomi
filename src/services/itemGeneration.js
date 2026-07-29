@@ -19,7 +19,7 @@ function generateItem(userId) {
         rarity.name,
     );
 
-    const effects = itemRepository.getEffects(definition.DefinitionID);
+    const effects = itemRepository.getDefinitionEffects(definition.DefinitionID);
 
     for (const effect of effects) {
         const data = scaleEffect(effect.effectType, effect.effectData, rarity.multiplier);

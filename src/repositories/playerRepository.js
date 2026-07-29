@@ -2,73 +2,6 @@ const db = require("../database/db.js");
 const { getDiceConfiguration } = require("../services/diceConfiguration.js");
 const { getPlayerConfiguration } = require("../services/playerConfiguration.js");
 
-function getPlayerProfile(userId) {
-    const user = db
-        .prepare(
-            `
-            SELECT
-                Username,
-                CreatedDate
-            FROM Users
-            WHERE UserID = ?
-        `,
-        )
-        .get(userId);
-
-    const stats = db
-        .prepare(
-            `
-        SELECT
-            COUNT(*) AS totalRolls,
-            COALESCE(SUM(Score), 0) AS totalScore,
-            COALESCE(AVG(Score), 0) AS averageScore,
-            COALESCE(MAX(Score), 0) AS highestScore
-        FROM Rolls
-        WHERE UserID = ?
-    `,
-        )
-        .get(userId);
-
-    const topRolls = db
-        .prepare(
-            `
-        SELECT
-            RollID,
-            DiceValues,
-            Score,
-            CreatedDate
-        FROM Rolls
-        WHERE UserID = ?
-        ORDER BY Score DESC
-        LIMIT 10
-    `,
-        )
-        .all(userId);
-
-    const player = getPlayer(userId);
-    const configuration = getPlayerConfiguration(getDiceConfiguration(player), userId);
-
-    return {
-        username: user.Username,
-        createdDate: user.CreatedDate,
-
-        totalRolls: stats.totalRolls,
-        totalScore: stats.totalScore,
-        moneyCents: player.MoneyCents,
-        averageScore: Number(stats.averageScore.toFixed(2)),
-        highestScore: stats.highestScore,
-
-        diceCount: configuration.diceCount,
-        weights: configuration.weights,
-        topRolls: topRolls.map((roll) => ({
-            rollId: roll.RollID,
-            dice: JSON.parse(roll.DiceValues),
-            score: roll.Score,
-            createdDate: roll.CreatedDate,
-        })),
-    };
-}
-
 function getTotalRolls(userId) {
     const result = db
         .prepare(
@@ -197,7 +130,6 @@ function getUsername(userId) {
 }
 
 module.exports = {
-    getPlayerProfile,
     getTotalRolls,
     createPlayer,
     ensurePlayer,

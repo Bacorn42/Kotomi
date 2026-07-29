@@ -14,6 +14,7 @@ const { calculateMoney } = require("../services/rewards.js");
 const { getPlayerConfiguration } = require("../services/playerConfiguration.js");
 const itemGeneration = require("../services/itemGeneration.js");
 const statisticsService = require("../services/statistics.js");
+const playerProfileService = require("../services/playerProfileService.js");
 const socket = require("../services/socket");
 
 const router = express.Router();
@@ -55,6 +56,7 @@ router.post("/roll", requireLogin, (req, res) => {
         weights: configuration.weights,
         score,
         moneyCents,
+        createdDate: new Date().toISOString(),
     });
     updateLastRollTime(userId);
 
@@ -113,7 +115,7 @@ router.get("/recent", requireLogin, (req, res) => {
 });
 
 router.get("/profile", requireLogin, (req, res) => {
-    const stats = playerRepository.getPlayerProfile(req.user.UserID);
+    const stats = playerProfileService.getPlayerProfile(req.user.UserID);
 
     const player = getPlayer(req.user.UserID);
     const configuration = getPlayerConfiguration(getDiceConfiguration(player), req.user.UserID);
