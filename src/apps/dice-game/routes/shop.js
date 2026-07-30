@@ -11,17 +11,17 @@ const router = express.Router();
 router.get("/", requireLogin, (req, res) => {
     const definitions = itemDefinitionRepository.getAllShopItems();
     const inventory = playerItemRepository.getInventory(req.user.UserID);
-    const owned = new Set(inventory.map((item) => item.definitionID));
+    const owned = new Set(inventory.map((item) => item.definitionId));
 
     res.json(
         definitions.map((item) => ({
-            definitionId: item.definitionID,
+            definitionId: item.definitionId,
             name: item.name,
             description: item.description,
             icon: item.icon,
             costCents: item.costCents,
-            owned: owned.has(item.definitionID),
-            effects: itemDefinitionRepository.getDefinitionEffects(item.definitionID),
+            owned: owned.has(item.definitionId),
+            effects: itemDefinitionRepository.getDefinitionEffects(item.definitionId),
         })),
     );
 });

@@ -14,25 +14,27 @@ router.get("/inventory", requireLogin, (req, res) => {
 
     const inventory = items
         .map((item) => {
-            const definition = itemDefinitionRepository.getById(item.definitionID);
+            const definition = itemDefinitionRepository.getById(item.definitionId);
 
             if (!definition) {
                 return null;
             }
 
-            const effects = playerItemRepository.getItemEffects(item.playerItemID);
+            const effects = playerItemRepository.getItemEffects(item.playerItemId);
 
             return {
-                playerItemId: item.playerItemID,
+                playerItemId: item.playerItemId,
                 name: item.generatedName || definition.name,
                 description: definition.description,
                 icon: definition.icon,
                 rarity: item.rarity,
-                equipped: Boolean(item.isEquipped),
+                equipped: item.equipped,
                 effects,
             };
         })
         .filter(Boolean);
+
+    console.log(inventory);
 
     res.json({
         maxActiveItems: player.maxActiveItems,

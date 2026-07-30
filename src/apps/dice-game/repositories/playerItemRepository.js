@@ -117,7 +117,7 @@ function getItemEffects(playerItemId) {
 }
 
 function equip(userId, playerItemId) {
-    db
+    return db
         .prepare(
             `
         UPDATE DiceGamePlayerItems

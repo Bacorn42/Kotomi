@@ -27,7 +27,7 @@ function generateItem(userId) {
     }));
 
     for (const effect of scaledEffects) {
-        playerItemRepository.addEffect(playerItemId, effect.effectType, data);
+        playerItemRepository.addEffect(playerItemId, effect.effectType, effect.effectData);
     }
 
     return {

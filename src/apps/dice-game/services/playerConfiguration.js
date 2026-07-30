@@ -13,7 +13,7 @@ function getPlayerConfiguration(baseConfiguration, userId) {
 
     const equippedItems = playerItemRepository.getEquipped(userId);
     const effects = equippedItems.flatMap((item) =>
-        playerItemRepository.getEffects(item.PlayerItemID),
+        playerItemRepository.getItemEffects(item.PlayerItemID),
     );
 
     return applyEffects(configuration, effects);
