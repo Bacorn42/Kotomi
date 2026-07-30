@@ -10,12 +10,12 @@ function checkAchievements(userId, context) {
     const unlocked = [];
 
     for (const achievement of achievements) {
-        if (hasAchievement(userId, achievement.AchievementID)) {
+        if (hasAchievement(userId, achievement.id)) {
             continue;
         }
 
         if (meetsRequirement(achievement, context)) {
-            unlockAchievement(userId, achievement.AchievementID);
+            unlockAchievement(userId, achievement.id);
             unlocked.push(achievement);
         }
     }
@@ -24,12 +24,12 @@ function checkAchievements(userId, context) {
 }
 
 function meetsRequirement(achievement, context) {
-    const value = parseRequirementValue(achievement.RequirementValue);
+    const value = parseRequirementValue(achievement.requirementValue);
     const weightBonuses = context.faceWeights.map(
         (weight, index) => weight - diceConfig.defaultWeights[index],
     );
 
-    switch (achievement.RequirementType) {
+    switch (achievement.requirementType) {
         case "ROLL_COUNT":
             return context.totalRolls >= value;
         case "HIGH_SCORE":

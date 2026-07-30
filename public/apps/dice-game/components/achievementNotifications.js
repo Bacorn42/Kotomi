@@ -21,11 +21,11 @@ export function showAchievementNotifications(achievements) {
 
 function createNotificationHtml(achievement) {
     return `
-        <img src="/apps/dice-game/assets/achievements/${achievement.Icon}">
+        <img src="/apps/dice-game/assets/achievements/${achievement.icon}">
         <div>
             <strong>Achievement Unlocked!</strong>
-            <div>${achievement.Name}</div>
-            <p>${achievement.Description}</p>
+            <div>${achievement.name}</div>
+            <p>${achievement.description}</p>
         </div>
     `;
 }

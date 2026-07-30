@@ -94,7 +94,7 @@ function formatFeedEvent(event) {
                     <span>🏆</span>
                     <strong>${formatUsername(event.username)}</strong>
                     unlocked
-                    <strong>${event.achievement.Name}</strong>
+                    <strong>${event.achievement.name}</strong>
                 </div>
             `;
 
