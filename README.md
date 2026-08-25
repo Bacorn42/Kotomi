@@ -68,8 +68,10 @@ Features:
 - Item effects
 - Generated loot drops
 - Item rarity system
+- Rarity-scaled generated effects
 - Achievements
 - Roll history
+- Player statistics
 
 Future development will focus on:
 
@@ -102,7 +104,7 @@ Future applications can use these shared systems instead of rebuilding common fu
 
 # Architecture
 
-Kotomi is built as a modular Node.js application.
+Kotomi is built as a modular Node.js application. Applications are organized into routes, services, repositories, and core game logic, with shared platform functionality outside individual applications.
 
 Major components:
 
@@ -148,7 +150,7 @@ Uses local AI tools:
 
 - Ollama
 - ComfyUI
-- Z-Image Turbo
+- Z-Image Turbo workflow/model
 
 ---
 
@@ -265,7 +267,8 @@ Future improvements:
 - Live feed
 - More dice mechanics
 - Better balancing
-- More visual polish
+- Automated testing
+- Better visual polish
 
 ## Platform
 

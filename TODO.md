@@ -19,6 +19,7 @@ Completed:
 Current focus:
 
 - Expanding Dice Game
+- Testing Dice Game systems
 - Adding content and progression
 - Improving shared platform systems
 - Refining existing applications
@@ -29,7 +30,7 @@ Current focus:
 
 Current status:
 
-Playable foundation complete.
+Playable foundation complete; architecture refactored and ready for broader testing.
 
 Implemented:
 
@@ -46,6 +47,18 @@ Implemented:
 - Generated loot
 - Item rarities
 - Achievements
+- Modular game core and service architecture
+
+---
+
+## Testing
+
+- [ ] Set up Jest
+- [ ] Add core unit tests
+- [ ] Add service tests
+- [ ] Add repository/database tests
+- [ ] Add route/API tests
+- [ ] Add frontend component tests
 
 ---
 
@@ -216,7 +229,6 @@ After systems stabilize:
 - [ ] Improve error handling
 - [ ] Add validation layer
 - [ ] Improve configuration management
-- [ ] Add automated testing
 
 ---
 

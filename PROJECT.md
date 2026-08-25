@@ -53,9 +53,11 @@ Database:
 
 Architecture:
 
-- Routes handle HTTP endpoints
-- Services contain business logic
-- Repositories handle database access
+- Routes handle HTTP endpoints and response formatting
+- Services orchestrate application/game operations
+- Core contains pure game logic
+- Repositories handle database access and map database rows to application objects
+- Configuration and constants contain static game configuration
 - Frontend applications live under public/apps
 
 ---
@@ -66,9 +68,14 @@ Important directories:
 
 ```
 src/
-├── routes/
-├── services/
-├── repositories/
+├── apps/
+│   └── dice-game/
+│       ├── config/
+│       ├── constants/
+│       ├── core/
+│       ├── repositories/
+│       ├── routes/
+│       └── services/
 ├── middleware/
 └── database/
 
@@ -148,9 +155,9 @@ Implemented:
 
 Player configuration is generated from:
 
-- base player configuration
+- base dice configuration
+- player settings
 - equipped item effects
-- upgrades
 
 ---
 
@@ -167,10 +174,13 @@ MoneyCents INTEGER
 Current money formula:
 
 ```
-moneyCents = floor(0.0030137 * log10(score)^8.38)
+moneyCents = round(0.0030137 * log10(score)^8.38 * moneyMultiplier)
 ```
 
 Scores below 100 award no money.
+
+Scores are affected by the player's score multiplier.
+Money is affected by the player's money multiplier.
 
 ---
 
@@ -284,13 +294,11 @@ This means existing loot does not change when item balance changes.
 
 ---
 
-# Generated Loot
-
-Implemented:
+# Generated loot:
 
 - Random generated item definitions
 - Random rarity selection
-- Effect scaling
+- Rarity-based effect scaling
 - Generated PlayerItems
 - Roll drops
 
@@ -302,9 +310,7 @@ Current rarity levels:
 - Epic
 - Legendary
 
-Current scaling is simple multiplication.
-
-Future balancing may need smarter rules because negative effects can become stronger too.
+Rarity affects generated item effects through rarity-specific multipliers.
 
 ---
 
@@ -313,14 +319,11 @@ Future balancing may need smarter rules because negative effects can become stro
 Implemented:
 
 - Achievement definitions
-- Unlock checking
-- Progress display
+- Requirement-based unlock checking
+- Roll, score, dice, inventory, item rarity, and configuration achievements
+- Persistent unlocks
+- Progress/statistics display
 - Unlock notifications
-
-Future:
-
-- More achievements
-- Better integration with statistics
 
 ---
 
@@ -403,7 +406,7 @@ Completed:
 
 Current focus:
 
-Dice Game expansion and balancing.
+Dice Game testing, expansion, and balancing.
 
 The game is considered functionally playable. Future work is mostly content, polish, balancing, and additional mechanics.
 
