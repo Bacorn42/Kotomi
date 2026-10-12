@@ -144,6 +144,24 @@ function renderConversations() {
     }
 }
 
+function renderAssistantMarkdown(element, content) {
+    const html = marked.parse(content, {
+        gfm: true,
+    });
+
+    element.innerHTML = DOMPurify.sanitize(html);
+
+    renderMathInElement(element, {
+        delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "\\[", right: "\\]", display: true },
+            { left: "\\(", right: "\\)", display: false },
+            { left: "$", right: "$", display: false },
+        ],
+        throwOnError: false,
+    });
+}
+
 function createMessageElement(role, content = "") {
     const message = document.createElement("article");
     message.className = `chat-message ${role}-message`;
@@ -154,7 +172,12 @@ function createMessageElement(role, content = "") {
 
     const body = document.createElement("div");
     body.className = "chat-message-content";
-    body.textContent = content;
+
+    if (role === "assistant" && content) {
+        renderAssistantMarkdown(body, content);
+    } else {
+        body.textContent = content;
+    }
 
     message.append(label, body);
     elements.messageList.append(message);
@@ -370,6 +393,8 @@ async function streamMessage(content, assistantBody) {
             assistantBody.textContent += chunk;
         });
     }
+
+    renderAssistantMarkdown(assistantBody, assistantBody.textContent);
 }
 
 async function sendMessage(event) {
