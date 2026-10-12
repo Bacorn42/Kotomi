@@ -15,4 +15,12 @@ export const AppRegistry = [
         description: "Roll weighted dice, collect upgrades, and chase high scores.",
         url: "/apps/dice-game/",
     },
+    {
+        id: "chat",
+        name: "Chat",
+        icon: "💬",
+        category: "AI",
+        description: "Chat with local AI models.",
+        url: "/apps/chat/",
+    },
 ];

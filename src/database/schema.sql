@@ -176,3 +176,48 @@ CREATE TABLE IF NOT EXISTS DiceGamePlayerUpgrades
         REFERENCES DiceGameUpgradeDefinitions(UpgradeID)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS ChatConversations (
+    ConversationID INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserID INTEGER NOT NULL,
+    Title TEXT NOT NULL DEFAULT 'New Chat',
+    Model TEXT,
+    CreatedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UpdatedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (UserID)
+        REFERENCES Users(UserID)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS ChatMessages (
+    MessageID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ConversationID INTEGER NOT NULL,
+    Role TEXT NOT NULL
+        CHECK (Role IN ('user', 'assistant', 'system')),
+    Content TEXT NOT NULL,
+    CreatedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (ConversationID)
+        REFERENCES ChatConversations(ConversationID)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS ChatSettings (
+    UserID INTEGER PRIMARY KEY,
+    DefaultModel TEXT,
+    ContextWindow INTEGER NOT NULL DEFAULT 8192
+        CHECK (ContextWindow > 0),
+    Temperature REAL NOT NULL DEFAULT 0.7
+        CHECK (Temperature >= 0.0 AND Temperature <= 2.0),
+
+    FOREIGN KEY (UserID)
+        REFERENCES Users(UserID)
+        ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS IX_ChatConversations_UserID_UpdatedDate
+    ON ChatConversations(UserID, UpdatedDate DESC);
+
+CREATE INDEX IF NOT EXISTS IX_ChatMessages_ConversationID_MessageID
+    ON ChatMessages(ConversationID, MessageID);

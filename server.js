@@ -12,6 +12,8 @@ const achievementRoutes = require("./src/apps/dice-game/routes/achievements");
 const itemsRoutes = require("./src/apps/dice-game/routes/items");
 const shopRoutes = require("./src/apps/dice-game/routes/shop");
 
+const chatRoutes = require("./src/apps/chat/routes/chat");
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
@@ -45,6 +47,7 @@ app.use("/api/dice", diceRoutes);
 app.use("/api/achievements", achievementRoutes);
 app.use("/api/items", itemsRoutes);
 app.use("/api/shop", shopRoutes);
+app.use("/api/chat", chatRoutes);
 
 // Test route
 app.get("/api/test", (req, res) => {
