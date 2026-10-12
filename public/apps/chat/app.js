@@ -192,6 +192,13 @@ function createMessageElement(role, content = "") {
     return { message, body };
 }
 
+function addMessageNotice(message, className, text) {
+    const notice = document.createElement("div");
+    notice.className = className;
+    notice.textContent = text;
+    message.append(notice);
+}
+
 function renderMessages(messages) {
     elements.messageList.replaceChildren();
 
@@ -448,6 +455,10 @@ async function sendMessage(event) {
     if (!content) return;
 
     state.abortController = new AbortController();
+
+    let assistant = null;
+    let responseCompleted = false;
+
     setStreaming(true);
 
     try {
@@ -468,9 +479,10 @@ async function sendMessage(event) {
         elements.messageInput.style.height = "auto";
 
         createMessageElement("user", content);
-        const assistant = createMessageElement("assistant");
+        assistant = createMessageElement("assistant");
 
         await streamMessage(content, assistant.body, state.settings.ContextWindow);
+        responseCompleted = true;
 
         await loadConversations();
 
@@ -479,8 +491,33 @@ async function sendMessage(event) {
         updateChatHeader(conversation);
         renderConversations();
     } catch (error) {
-        if (error.name === "AbortError") {
+        const wasStopped = error.name === "AbortError" || state.abortController?.signal.aborted;
+
+        if (wasStopped) {
+            const partialContent = assistant?.body.textContent || "";
+
+            if (partialContent.trim()) {
+                renderAssistantMarkdown(assistant.body, partialContent);
+                addMessageNotice(assistant.message, "chat-message-stopped", "Response stopped.");
+            } else {
+                assistant?.message.remove();
+            }
+
             return;
+        }
+
+        if (assistant && !responseCompleted) {
+            const partialContent = assistant.body.textContent;
+
+            if (partialContent.trim()) {
+                renderAssistantMarkdown(assistant.body, partialContent);
+            }
+
+            addMessageNotice(
+                assistant.message,
+                "chat-message-error",
+                "I couldn't finish generating a response. You can try again.",
+            );
         }
 
         setChatStatus(error.message);

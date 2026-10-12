@@ -182,6 +182,19 @@
     border: 1px solid #494037;
 }
 
+.chat-message-error {
+    margin-top: 0.5rem;
+    color: #e06b5e;
+    font-size: 0.9rem;
+}
+
+.chat-message-stopped {
+    margin-top: 0.5rem;
+    color: #b8a99a;
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
 .chat-message-label {
     margin-bottom: 0.45rem;
     color: #e3a35c;
