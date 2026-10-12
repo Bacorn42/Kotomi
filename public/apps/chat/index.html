@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Chat | Kotomi</title>
+        <link rel="stylesheet" href="/css/theme.css" />
+        <link rel="stylesheet" href="/css/base.css" />
+        <link rel="stylesheet" href="/css/layout.css" />
+        <link rel="stylesheet" href="/css/components.css" />
+        <link rel="stylesheet" href="/css/app-shell.css" />
+        <link rel="stylesheet" href="style.css" />
+        <script type="module" src="app.js"></script>
+    </head>
+    <body>
+        <div id="app-header"></div>
+        <main class="kotomi-container">
+            <section class="chat-app">
+                <aside class="chat-sidebar kotomi-card">
+                    <button id="newChatButton" class="kotomi-button">+ New Chat</button>
+
+                    <div class="chat-sidebar-heading">Conversations</div>
+                    <div id="conversationList" class="conversation-list"></div>
+
+                    <div class="chat-sidebar-footer">
+                        <button id="settingsButton" class="kotomi-button">Settings</button>
+                    </div>
+                </aside>
+
+                <section class="chat-main kotomi-card">
+                    <div class="chat-toolbar">
+                        <div>
+                            <h2 id="chatTitle">New Chat</h2>
+                            <p id="chatModelLabel">Select a model in settings</p>
+                        </div>
+
+                        <button
+                            id="deleteChatButton"
+                            class="kotomi-button chat-delete-button"
+                            disabled
+                        >
+                            Delete
+                        </button>
+                    </div>
+
+                    <div id="messageList" class="message-list">
+                        <div id="emptyState" class="chat-empty-state">
+                            <div class="chat-empty-icon">💬</div>
+                            <h3>What would you like to explore?</h3>
+                            <p>Start a conversation with one of your local AI models.</p>
+                        </div>
+                    </div>
+
+                    <form id="messageForm" class="message-form">
+                        <textarea
+                            id="messageInput"
+                            class="kotomi-control message-input"
+                            placeholder="Send a message..."
+                            rows="1"
+                            maxlength="100000"
+                            required
+                        ></textarea>
+
+                        <button id="sendButton" class="kotomi-button" type="submit">Send</button>
+                    </form>
+
+                    <p id="chatStatus" class="chat-status" aria-live="polite"></p>
+                </section>
+            </section>
+
+            <div id="settingsOverlay" class="settings-overlay hide">
+                <section
+                    class="settings-panel kotomi-card"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="settingsTitle"
+                >
+                    <div class="settings-header">
+                        <h2 id="settingsTitle">Chat Settings</h2>
+                        <button
+                            id="closeSettingsButton"
+                            class="kotomi-button settings-close-button"
+                            type="button"
+                            aria-label="Close settings"
+                        >
+                            ×
+                        </button>
+                    </div>
+
+                    <form id="settingsForm" class="settings-form">
+                        <div class="kotomi-field">
+                            <label class="kotomi-label" for="modelSelect"> Default Model </label>
+                            <select id="modelSelect" class="kotomi-control"></select>
+                        </div>
+
+                        <div class="kotomi-field">
+                            <label class="kotomi-label" for="contextWindow"> Context Window </label>
+                            <input
+                                id="contextWindow"
+                                class="kotomi-control"
+                                type="number"
+                                min="512"
+                                max="131072"
+                                step="512"
+                                required
+                            />
+                            <p class="settings-help">Maximum context size in tokens.</p>
+                        </div>
+
+                        <div class="kotomi-field">
+                            <label class="kotomi-label" for="temperature">
+                                Temperature:
+                                <span id="temperatureValue">0.7</span>
+                            </label>
+                            <input
+                                id="temperature"
+                                class="kotomi-control"
+                                type="range"
+                                min="0"
+                                max="2"
+                                step="0.1"
+                            />
+                            <p class="settings-help">
+                                Lower values are more predictable; higher values allow more
+                                variation.
+                            </p>
+                        </div>
+
+                        <p id="settingsStatus" class="chat-status" aria-live="polite"></p>
+
+                        <div class="settings-actions">
+                            <button id="cancelSettingsButton" class="kotomi-button" type="button">
+                                Cancel
+                            </button>
+                            <button id="saveSettingsButton" class="kotomi-button" type="submit">
+                                Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </main>
+    </body>
+</html>
