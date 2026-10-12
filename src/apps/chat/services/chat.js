@@ -99,13 +99,15 @@ async function sendMessage(userId, conversationId, content, onChunk, options = {
         onChunk,
     );
 
-    const messageId = messageRepository.save(conversationId, "assistant", response);
+    const messageId = messageRepository.save(conversationId, "assistant", response.content);
 
     conversationRepository.touch(conversationId, userId);
 
     return {
         messageId,
-        content: response,
+        content: response.content,
+        promptTokens: response.promptTokens,
+        responseTokens: response.responseTokens,
         model,
     };
 }

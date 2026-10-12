@@ -60,6 +60,24 @@
                         </div>
                     </div>
 
+                    <div class="context-meter" id="contextMeter">
+                        <div class="context-meter-header">
+                            <span>Context usage</span>
+                            <span id="contextUsageText">No usage data yet</span>
+                        </div>
+                        <div
+                            class="context-meter-track"
+                            role="progressbar"
+                            aria-label="Context window usage"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            aria-valuenow="0"
+                            id="contextUsageBar"
+                        >
+                            <div class="context-meter-fill" id="contextUsageFill"></div>
+                        </div>
+                    </div>
+
                     <form id="messageForm" class="message-form">
                         <textarea
                             id="messageInput"

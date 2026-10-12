@@ -300,6 +300,46 @@ button:disabled {
     display: none !important;
 }
 
+.context-meter {
+    padding: 0.65rem 1rem;
+    border-top: 1px solid #494037;
+    background: #302923;
+}
+
+.context-meter-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.4rem;
+    color: #c8b9a9;
+    font-size: 0.8rem;
+}
+
+.context-meter-track {
+    height: 5px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #211c18;
+}
+
+.context-meter-fill {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: #e3a35c;
+    transition:
+        width 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.context-meter-fill.warning {
+    background: #e8bb55;
+}
+
+.context-meter-fill.danger {
+    background: #e06b5e;
+}
+
 @media (max-width: 760px) {
     .chat-app {
         grid-template-columns: 1fr;

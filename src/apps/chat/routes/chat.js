@@ -129,6 +129,8 @@ router.post("/conversations/:id/messages", async (req, res) => {
             sendEvent("done", {
                 messageId: result.messageId,
                 model: result.model,
+                promptTokens: result.promptTokens,
+                responseTokens: result.responseTokens,
             });
         }
     } catch (error) {

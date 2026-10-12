@@ -25,6 +25,9 @@ const elements = {
     temperatureValue: document.getElementById("temperatureValue"),
     settingsStatus: document.getElementById("settingsStatus"),
     saveSettingsButton: document.getElementById("saveSettingsButton"),
+    contextUsageText: document.getElementById("contextUsageText"),
+    contextUsageBar: document.getElementById("contextUsageBar"),
+    contextUsageFill: document.getElementById("contextUsageFill"),
 };
 
 const state = {
@@ -309,7 +312,32 @@ async function deleteConversation() {
     }
 }
 
-function parseSseBlock(block, onChunk) {
+function updateContextMeter(promptTokens, responseTokens, contextWindow) {
+    if (
+        !Number.isFinite(promptTokens) ||
+        !Number.isFinite(responseTokens) ||
+        !Number.isFinite(contextWindow) ||
+        contextWindow <= 0
+    ) {
+        elements.contextUsageText.textContent = "No usage data yet";
+        elements.contextUsageFill.style.width = "0%";
+        elements.contextUsageBar.setAttribute("aria-valuenow", "0");
+        return;
+    }
+
+    const usedTokens = promptTokens + responseTokens;
+    const percentage = Math.min(100, (usedTokens / contextWindow) * 100);
+
+    elements.contextUsageText.textContent = `${usedTokens.toLocaleString()} / ${contextWindow.toLocaleString()} tokens (${Math.round(percentage)}%)`;
+
+    elements.contextUsageFill.style.width = `${percentage}%`;
+    elements.contextUsageBar.setAttribute("aria-valuenow", String(Math.round(percentage)));
+
+    elements.contextUsageFill.classList.toggle("warning", percentage >= 70 && percentage < 90);
+    elements.contextUsageFill.classList.toggle("danger", percentage >= 90);
+}
+
+function parseSseBlock(block, onChunk, onDone = () => {}) {
     let event = "message";
     const dataLines = [];
 
@@ -333,12 +361,14 @@ function parseSseBlock(block, onChunk) {
 
     if (event === "chunk") {
         onChunk(data.content || "");
+    } else if (event === "done") {
+        onDone(data);
     } else if (event === "error") {
         throw new Error(data.error || "Response generation failed.");
     }
 }
 
-async function streamMessage(content, assistantBody) {
+async function streamMessage(content, assistantBody, contextWindow) {
     const response = await fetch(`/api/chat/conversations/${state.conversationId}/messages`, {
         method: "POST",
         headers: {
@@ -381,10 +411,16 @@ async function streamMessage(content, assistantBody) {
         buffer = blocks.pop();
 
         for (const block of blocks) {
-            parseSseBlock(block, (chunk) => {
-                assistantBody.textContent += chunk;
-                elements.messageList.scrollTop = elements.messageList.scrollHeight;
-            });
+            parseSseBlock(
+                block,
+                (chunk) => {
+                    assistantBody.textContent += chunk;
+                    elements.messageList.scrollTop = elements.messageList.scrollHeight;
+                },
+                (data) => {
+                    updateContextMeter(data.promptTokens, data.responseTokens, contextWindow);
+                },
+            );
         }
     }
 
@@ -434,7 +470,7 @@ async function sendMessage(event) {
         createMessageElement("user", content);
         const assistant = createMessageElement("assistant");
 
-        await streamMessage(content, assistant.body);
+        await streamMessage(content, assistant.body, state.settings.ContextWindow);
 
         await loadConversations();
 

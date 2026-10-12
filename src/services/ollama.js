@@ -47,6 +47,8 @@ async function generateImagePrompt(userPrompt, model) {
 async function streamChat(messages, model, options = {}, onChunk = () => {}) {
     const { contextWindow = 8192, temperature = 0.7, signal } = options;
     let fullResponse = "";
+    let promptTokens = null;
+    let responseTokens = null;
 
     try {
         const response = await axios.post(
@@ -90,14 +92,24 @@ async function streamChat(messages, model, options = {}, onChunk = () => {}) {
             }
 
             if (data.done) {
+                promptTokens = data.prompt_eval_count ?? null;
+                responseTokens = data.eval_count ?? null;
                 break;
             }
         }
 
-        return fullResponse;
+        return {
+            content: fullResponse,
+            promptTokens,
+            responseTokens,
+        };
     } catch (error) {
         if (signal?.aborted || axios.isCancel(error)) {
-            return fullResponse;
+            return {
+                content: fullResponse,
+                promptTokens,
+                responseTokens,
+            };
         }
 
         console.error("Ollama chat error:", error.message);
