@@ -113,6 +113,13 @@ async function sendMessage(userId, conversationId, content, onChunk, options = {
 
     const messageId = messageRepository.save(conversationId, "assistant", response.content);
 
+    conversationRepository.saveContextUsage(
+        conversationId,
+        userId,
+        response.promptTokens,
+        response.responseTokens,
+    );
+
     conversationRepository.touch(conversationId, userId);
 
     return {

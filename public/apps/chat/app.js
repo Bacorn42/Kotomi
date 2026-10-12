@@ -370,6 +370,13 @@ async function openConversation(conversationId) {
         renderMessages(conversation.messages);
         updateChatHeader(conversation);
         renderConversations();
+
+        updateContextMeter(
+            conversation.LastPromptTokens,
+            conversation.LastResponseTokens,
+            state.settings.ContextWindow,
+        );
+
         setChatStatus("");
     } catch (error) {
         setChatStatus(error.message);

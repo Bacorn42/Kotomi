@@ -182,6 +182,8 @@ CREATE TABLE IF NOT EXISTS ChatConversations (
     UserID INTEGER NOT NULL,
     Title TEXT NOT NULL DEFAULT 'New Chat',
     Model TEXT,
+    LastPromptTokens INTEGER CHECK (LastPromptTokens >= 0),
+    LastResponseTokens INTEGER CHECK (LastResponseTokens >= 0),
     CreatedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UpdatedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 

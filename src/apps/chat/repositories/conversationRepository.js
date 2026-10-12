@@ -33,6 +33,14 @@ const updateConversationModel = db.prepare(`
       AND UserID = ?
 `);
 
+const updateConversationContextUsage = db.prepare(`
+    UPDATE ChatConversations
+    SET LastPromptTokens = ?,
+        LastResponseTokens = ?
+    WHERE ConversationID = ?
+      AND UserID = ?
+`);
+
 const updateConversationDate = db.prepare(`
     UPDATE ChatConversations
     SET UpdatedDate = CURRENT_TIMESTAMP
@@ -67,6 +75,10 @@ function setModel(id, userId, model) {
     return updateConversationModel.run(model, id, userId);
 }
 
+function saveContextUsage(id, userId, promptTokens, responseTokens) {
+    return updateConversationContextUsage.run(promptTokens, responseTokens, id, userId);
+}
+
 function touch(id, userId) {
     return updateConversationDate.run(id, userId);
 }
@@ -81,6 +93,7 @@ module.exports = {
     getByUser,
     rename,
     setModel,
+    saveContextUsage,
     touch,
     deleteById,
 };
