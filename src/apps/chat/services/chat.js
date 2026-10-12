@@ -1,13 +1,15 @@
 const conversationRepository = require("../repositories/conversationRepository");
 const messageRepository = require("../repositories/messageRepository");
 const ollama = require("../../../services/ollama");
+const settingsRepository = require("../repositories/settingsRepository");
 
 function listConversations(userId) {
     return conversationRepository.getByUser(userId);
 }
 
 function createConversation(userId, model = null) {
-    return conversationRepository.create(userId, model);
+    const settings = settingsRepository.getByUser(userId);
+    return conversationRepository.create(userId, model ?? settings.DefaultModel);
 }
 
 function getConversation(userId, conversationId) {
@@ -44,16 +46,21 @@ async function sendMessage(userId, conversationId, content, onChunk, options = {
         return null;
     }
 
+    const userSettings = settingsRepository.getByUser(userId);
     let model = conversation.Model;
 
     if (!model) {
-        const models = await ollama.getModels();
+        model = userSettings.DefaultModel;
 
-        if (models.length === 0) {
-            throw new Error("No Ollama models are available.");
+        if (!model) {
+            const models = await ollama.getModels();
+
+            if (models.length === 0) {
+                throw new Error("No Ollama models are available.");
+            }
+
+            model = models[0].name;
         }
-
-        model = models[0].name;
 
         conversationRepository.setModel(conversationId, userId, model);
     }
@@ -81,7 +88,15 @@ async function sendMessage(userId, conversationId, content, onChunk, options = {
         },
     ];
 
-    const response = await ollama.streamChat(messages, model, options, onChunk);
+    const response = await ollama.streamChat(
+        messages,
+        model,
+        {
+            contextWindow: options.contextWindow ?? userSettings.ContextWindow,
+            temperature: options.temperature ?? userSettings.Temperature,
+        },
+        onChunk,
+    );
 
     const messageId = messageRepository.save(conversationId, "assistant", response);
 
@@ -94,10 +109,28 @@ async function sendMessage(userId, conversationId, content, onChunk, options = {
     };
 }
 
+function getSettings(userId) {
+    return settingsRepository.getByUser(userId);
+}
+
+async function updateSettings(userId, settings) {
+    if (settings.defaultModel !== null) {
+        const models = await ollama.getModels();
+
+        if (!models.some((model) => model.name === settings.defaultModel)) {
+            throw new Error("Selected model is not available.");
+        }
+    }
+
+    return settingsRepository.save(userId, settings);
+}
+
 module.exports = {
     listConversations,
     createConversation,
     getConversation,
     deleteConversation,
     sendMessage,
+    getSettings,
+    updateSettings,
 };

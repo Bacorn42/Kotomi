@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const { requireLogin } = require("../../../middleware/auth");
-const chatService = require("../services/chatService");
+const chatService = require("../services/chat");
 
 router.use(requireLogin);
 
@@ -90,31 +90,6 @@ router.post("/conversations/:id/messages", async (req, res) => {
         });
     }
 
-    const settings = req.body?.settings ?? {};
-
-    if (typeof settings !== "object" || settings === null || Array.isArray(settings)) {
-        return res.status(400).json({
-            error: "Invalid settings.",
-        });
-    }
-
-    const contextWindow = settings.contextWindow ?? 8192;
-    const temperature = settings.temperature ?? 0.7;
-
-    if (
-        !Number.isSafeInteger(contextWindow) ||
-        contextWindow < 512 ||
-        contextWindow > 131072 ||
-        typeof temperature !== "number" ||
-        !Number.isFinite(temperature) ||
-        temperature < 0 ||
-        temperature > 2
-    ) {
-        return res.status(400).json({
-            error: "Invalid generation settings.",
-        });
-    }
-
     res.status(200);
     res.set({
         "Content-Type": "text/event-stream",
@@ -137,7 +112,7 @@ router.post("/conversations/:id/messages", async (req, res) => {
             conversationId,
             content.trim(),
             (chunk) => sendEvent("chunk", { content: chunk }),
-            { contextWindow, temperature },
+            {},
         );
 
         if (result) {
@@ -155,6 +130,51 @@ router.post("/conversations/:id/messages", async (req, res) => {
         if (!res.destroyed) {
             res.end();
         }
+    }
+});
+
+router.get("/settings", (req, res) => {
+    res.json(chatService.getSettings(req.user.UserID));
+});
+
+router.put("/settings", async (req, res) => {
+    const { defaultModel, contextWindow, temperature } = req.body ?? {};
+
+    if (defaultModel !== null && (typeof defaultModel !== "string" || !defaultModel.trim())) {
+        return res.status(400).json({
+            error: "Invalid default model.",
+        });
+    }
+
+    if (
+        !Number.isSafeInteger(contextWindow) ||
+        contextWindow < 512 ||
+        contextWindow > 131072 ||
+        typeof temperature !== "number" ||
+        !Number.isFinite(temperature) ||
+        temperature < 0 ||
+        temperature > 2
+    ) {
+        return res.status(400).json({
+            error: "Invalid settings.",
+        });
+    }
+
+    try {
+        const settings = await chatService.updateSettings(req.user.UserID, {
+            defaultModel: defaultModel?.trim() || null,
+            contextWindow,
+            temperature,
+        });
+
+        res.json(settings);
+    } catch (error) {
+        if (error.message === "Selected model is not available.") {
+            return res.status(400).json({ error: error.message });
+        }
+
+        console.error("Unable to update chat settings:", error.message);
+        res.status(500).json({ error: "Unable to update settings." });
     }
 });
 
