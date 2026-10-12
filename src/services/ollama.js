@@ -45,6 +45,9 @@ async function generateImagePrompt(userPrompt, model) {
 }
 
 async function streamChat(messages, model, options = {}, onChunk = () => {}) {
+    const { contextWindow = 8192, temperature = 0.7, signal } = options;
+    let fullResponse = "";
+
     try {
         const response = await axios.post(
             `${OLLAMA_URL}/api/chat`,
@@ -53,12 +56,13 @@ async function streamChat(messages, model, options = {}, onChunk = () => {}) {
                 messages,
                 stream: true,
                 options: {
-                    num_ctx: options.contextWindow ?? 8192,
-                    temperature: options.temperature ?? 0.7,
+                    num_ctx: contextWindow,
+                    temperature: temperature,
                 },
             },
             {
                 responseType: "stream",
+                signal,
             },
         );
 
@@ -66,8 +70,6 @@ async function streamChat(messages, model, options = {}, onChunk = () => {}) {
             input: response.data,
             crlfDelay: Infinity,
         });
-
-        let fullResponse = "";
 
         for await (const line of lines) {
             if (!line.trim()) {
@@ -94,6 +96,10 @@ async function streamChat(messages, model, options = {}, onChunk = () => {}) {
 
         return fullResponse;
     } catch (error) {
+        if (signal?.aborted || axios.isCancel(error)) {
+            return fullResponse;
+        }
+
         console.error("Ollama chat error:", error.message);
         throw new Error("Could not generate chat response.");
     }

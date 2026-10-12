@@ -37,6 +37,7 @@ const state = {
         Temperature: 0.7,
     },
     isStreaming: false,
+    abortController: null,
 };
 
 async function apiRequest(url, options = {}) {
@@ -78,12 +79,12 @@ function setSettingsStatus(message) {
 
 function setStreaming(isStreaming) {
     state.isStreaming = isStreaming;
-    elements.sendButton.disabled = isStreaming;
     elements.messageInput.disabled = isStreaming;
     elements.newChatButton.disabled = isStreaming;
     elements.deleteChatButton.disabled = isStreaming || state.conversationId === null;
     elements.settingsButton.disabled = isStreaming;
-    elements.sendButton.textContent = isStreaming ? "Generating..." : "Send";
+    elements.sendButton.disabled = false;
+    elements.sendButton.textContent = isStreaming ? "Stop" : "Send";
 }
 
 function formatDate(dateString) {
@@ -345,6 +346,7 @@ async function streamMessage(content, assistantBody) {
             Accept: "text/event-stream",
         },
         body: JSON.stringify({ content }),
+        signal: state.abortController.signal,
     });
 
     if (!response.ok) {
@@ -400,11 +402,17 @@ async function streamMessage(content, assistantBody) {
 async function sendMessage(event) {
     event.preventDefault();
 
-    if (state.isStreaming) return;
+    if (state.isStreaming) {
+        state.abortController?.abort();
+        return;
+    }
 
     const content = elements.messageInput.value.trim();
 
     if (!content) return;
+
+    state.abortController = new AbortController();
+    setStreaming(true);
 
     try {
         if (state.conversationId === null) {
@@ -435,10 +443,15 @@ async function sendMessage(event) {
         updateChatHeader(conversation);
         renderConversations();
     } catch (error) {
+        if (error.name === "AbortError") {
+            return;
+        }
+
         setChatStatus(error.message);
     } finally {
         setStreaming(false);
         elements.messageInput.focus();
+        state.abortController = null;
     }
 }
 

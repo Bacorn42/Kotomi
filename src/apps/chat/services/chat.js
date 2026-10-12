@@ -94,6 +94,7 @@ async function sendMessage(userId, conversationId, content, onChunk, options = {
         {
             contextWindow: options.contextWindow ?? userSettings.ContextWindow,
             temperature: options.temperature ?? userSettings.Temperature,
+            signal: options.signal,
         },
         onChunk,
     );

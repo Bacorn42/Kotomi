@@ -106,13 +106,23 @@ router.post("/conversations/:id/messages", async (req, res) => {
         res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
     };
 
+    const abortController = new AbortController();
+
+    res.on("close", () => {
+        if (!res.writableEnded) {
+            abortController.abort();
+        }
+    });
+
     try {
         const result = await chatService.sendMessage(
             req.user.UserID,
             conversationId,
             content.trim(),
             (chunk) => sendEvent("chunk", { content: chunk }),
-            {},
+            {
+                signal: abortController.signal,
+            },
         );
 
         if (result) {
