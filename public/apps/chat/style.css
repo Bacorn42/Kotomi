@@ -530,3 +530,61 @@ button:disabled {
         font-size: 0.95em;
     }
 }
+
+.conversation-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.conversation-row .conversation-item {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+}
+
+.conversation-rename-button {
+    flex-shrink: 0;
+    align-self: center;
+    padding: 0.4rem 0.55rem;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: #b8a99a;
+    cursor: pointer;
+}
+
+.conversation-rename-button:hover:not(:disabled) {
+    border-color: #66503a;
+    background: #40352a;
+    color: #e3a35c;
+}
+
+.conversation-rename-form {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+    padding: 0.5rem;
+    border: 1px solid #66503a;
+    border-radius: 8px;
+    background: #302923;
+}
+
+.conversation-rename-input {
+    width: 100%;
+    min-width: 0;
+}
+
+.conversation-rename-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.4rem;
+}
+
+.conversation-rename-actions .kotomi-button {
+    padding: 0.35rem 0.55rem;
+    font-size: 0.8rem;
+}

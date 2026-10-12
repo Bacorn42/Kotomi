@@ -46,6 +46,34 @@ router.get("/conversations/:id", (req, res) => {
     res.json(conversation);
 });
 
+router.patch("/conversations/:id", (req, res) => {
+    const conversationId = Number(req.params.id);
+
+    if (!Number.isSafeInteger(conversationId) || conversationId <= 0) {
+        return res.status(400).json({
+            error: "Invalid conversation ID.",
+        });
+    }
+
+    const title = req.body?.title;
+
+    if (typeof title !== "string" || !title.trim() || title.trim().length > 100) {
+        return res.status(400).json({
+            error: "Title must contain between 1 and 100 characters.",
+        });
+    }
+
+    const renamed = chatService.renameConversation(req.user.UserID, conversationId, title.trim());
+
+    if (!renamed) {
+        return res.status(404).json({
+            error: "Conversation not found.",
+        });
+    }
+
+    res.json({ title: title.trim() });
+});
+
 router.delete("/conversations/:id", (req, res) => {
     const conversationId = Number(req.params.id);
 

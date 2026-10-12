@@ -27,6 +27,18 @@ function getConversation(userId, conversationId) {
     };
 }
 
+function renameConversation(userId, conversationId, title) {
+    const conversation = conversationRepository.getById(conversationId, userId);
+
+    if (!conversation) {
+        return false;
+    }
+
+    conversationRepository.rename(conversationId, userId, title);
+
+    return true;
+}
+
 function deleteConversation(userId, conversationId) {
     const conversation = conversationRepository.getById(conversationId, userId);
 
@@ -132,6 +144,7 @@ module.exports = {
     listConversations,
     createConversation,
     getConversation,
+    renameConversation,
     deleteConversation,
     sendMessage,
     getSettings,

@@ -86,6 +86,9 @@ function setStreaming(isStreaming) {
     elements.newChatButton.disabled = isStreaming;
     elements.deleteChatButton.disabled = isStreaming || state.conversationId === null;
     elements.settingsButton.disabled = isStreaming;
+    elements.conversationList.querySelectorAll(".conversation-rename-button").forEach((button) => {
+        button.disabled = isStreaming;
+    });
     elements.sendButton.disabled = false;
     elements.sendButton.textContent = isStreaming ? "Stop" : "Send";
 }
@@ -123,6 +126,9 @@ function renderConversations() {
     }
 
     for (const conversation of state.conversations) {
+        const row = document.createElement("div");
+        row.className = "conversation-row";
+
         const item = document.createElement("button");
         item.type = "button";
         item.className = "conversation-item";
@@ -144,8 +150,101 @@ function renderConversations() {
             openConversation(conversation.ConversationID);
         });
 
-        elements.conversationList.append(item);
+        const renameButton = document.createElement("button");
+        renameButton.type = "button";
+        renameButton.className = "conversation-rename-button";
+        renameButton.textContent = "✎";
+        renameButton.title = "Rename conversation";
+        renameButton.setAttribute("aria-label", `Rename ${conversation.Title || "New Chat"}`);
+        renameButton.disabled = state.isStreaming;
+        renameButton.addEventListener("click", () => {
+            beginRenameConversation(conversation, row);
+        });
+
+        row.append(item, renameButton);
+        elements.conversationList.append(row);
     }
+}
+
+function beginRenameConversation(conversation, row) {
+    if (state.isStreaming) return;
+
+    const form = document.createElement("form");
+    form.className = "conversation-rename-form";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "kotomi-control conversation-rename-input";
+    input.value = conversation.Title || "New Chat";
+    input.maxLength = 100;
+    input.required = true;
+    input.setAttribute("aria-label", "Conversation title");
+
+    const actions = document.createElement("div");
+    actions.className = "conversation-rename-actions";
+
+    const saveButton = document.createElement("button");
+    saveButton.type = "submit";
+    saveButton.className = "kotomi-button";
+    saveButton.textContent = "Save";
+
+    const cancelButton = document.createElement("button");
+    cancelButton.type = "button";
+    cancelButton.className = "kotomi-button";
+    cancelButton.textContent = "Cancel";
+
+    actions.append(saveButton, cancelButton);
+    form.append(input, actions);
+
+    const cancel = () => renderConversations();
+
+    cancelButton.addEventListener("click", cancel);
+
+    input.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            event.preventDefault();
+            cancel();
+        }
+    });
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const title = input.value.trim();
+
+        if (!title || title.length > 100) {
+            input.setCustomValidity("Enter a title of 1–100 characters.");
+            input.reportValidity();
+            return;
+        }
+
+        input.setCustomValidity("");
+        saveButton.disabled = true;
+        cancelButton.disabled = true;
+        setChatStatus("");
+
+        try {
+            await apiRequest(`/api/chat/conversations/${conversation.ConversationID}`, {
+                method: "PATCH",
+                body: JSON.stringify({ title }),
+            });
+
+            if (state.conversationId === conversation.ConversationID) {
+                elements.chatTitle.textContent = title;
+            }
+
+            await loadConversations();
+        } catch (error) {
+            setChatStatus(error.message);
+            saveButton.disabled = false;
+            cancelButton.disabled = false;
+            input.focus();
+        }
+    });
+
+    row.replaceChildren(form);
+    input.focus();
+    input.select();
 }
 
 function renderAssistantMarkdown(element, content) {
