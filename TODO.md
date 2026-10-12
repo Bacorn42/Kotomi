@@ -1,70 +1,44 @@
 # Kotomi TODO
 
----
+## Current Priorities
 
-# Current Development Direction
+- [ ] Test existing applications through regular use and fix discovered bugs
+- [ ] Expand and balance the Dice Game where needed
+- [ ] Add automated tests for important game logic
+- [ ] Improve shared infrastructure when a concrete need arises
 
-Kotomi's core platform is established:
-
-Completed:
-
-- AI Image Generator
-- Shared application shell
-- Shared theme system
-- Application launcher
-- User accounts
-- Authentication
-- User-owned application data
-
-Current focus:
-
-- Expanding Dice Game
-- Testing Dice Game systems
-- Adding content and progression
-- Improving shared platform systems
-- Refining existing applications
+Avoid adding features without a demonstrated use case.
 
 ---
 
-# Dice Game
+## Chat
 
-Current status:
+**Status:** Feature-complete for current needs.
 
-Playable foundation complete; architecture refactored and ready for broader testing.
+- [x] Ollama-powered chat with streaming responses
+- [x] Persistent conversations and messages
+- [x] Conversation creation, selection, deletion, and renaming
+- [x] Configurable model and generation settings
+- [x] Context-usage meter
+- [x] Persist context usage between conversation sessions
 
-Implemented:
-
-- Dice rolling
-- Server-side cooldown enforcement
-- Player profiles
-- Money system
-- Shop
-- Items
-- Item effects
-- Inventory
-- Item equipment
-- Upgrades
-- Generated loot
-- Item rarities
-- Achievements
-- Modular game core and service architecture
+Future improvements should be driven by actual usage.
 
 ---
 
-## Testing
+## Dice Game
+
+**Status:** Playable; ongoing testing, balancing, content, and polish.
+
+### Testing
 
 - [ ] Set up Jest
-- [ ] Add core unit tests
+- [ ] Add core game logic unit tests
 - [ ] Add service tests
 - [ ] Add repository/database tests
-- [ ] Add route/API tests
-- [ ] Add frontend component tests
+- [ ] Add route/API tests where valuable
 
----
-
-## Content Expansion
-
-High priority:
+### Content
 
 - [ ] Add more shop items
 - [ ] Add more generated item definitions
@@ -74,133 +48,88 @@ High priority:
 - [ ] Create achievement icons
 - [ ] Add more dice skins
 
----
-
-## Balance
+### Balance
 
 - [ ] Balance money progression
-- [ ] Balance item prices
-- [ ] Balance upgrade costs
-- [ ] Balance item effects
-- [ ] Balance rarity scaling
-- [ ] Add more economy simulations
-- [ ] Tune early game progression
+- [ ] Balance item prices and upgrade costs
+- [ ] Balance item effects and rarity scaling
+- [ ] Simulate economy and progression
+- [ ] Tune early-game progression
 
----
+### Systems and Mechanics
 
-## Item System Improvements
+- [ ] Explore more complex item effects
+- [ ] Improve negative-effect balancing
+- [ ] Consider item families and set bonuses
+- [ ] Explore additional dice modifiers
+- [ ] Consider higher dice values (7, 8, 9, etc.)
+- [ ] Consider additional item categories
 
-Future ideas:
-
-- [ ] Add more complex item effects
-- [ ] Add better negative effect balancing
-- [ ] Add item families/set bonuses
-- [ ] Add more interesting dice modifiers
-- [ ] Add higher dice values (7s, 8s, 9s)
-- [ ] Add additional item categories
-
----
-
-## Game UI Improvements
+### UI and Quality of Life
 
 - [ ] Improve profile page
-- [ ] Add dedicated statistics page
-- [ ] Improve inventory display
-- [ ] Improve item details
-- [ ] Add better loot notifications
-- [ ] Add live feed
+- [ ] Add a dedicated statistics page
+- [ ] Improve inventory and item details
+- [ ] Polish loot notifications
 - [ ] Improve mobile layout
+- [ ] Consider a live feed
 
 ---
 
-# Image Generator
+## AI Image Generator
 
-## Quality of Life
+### Quality of Life
 
 - [ ] Add image thumbnails
-- [ ] Add image generation presets
-- [ ] Improve image organization:
-    - [ ] Tags
-    - [ ] Favorites
-    - [ ] Search
-
-- [ ] Add better image viewing experience
+- [ ] Add generation presets
+- [ ] Add tags and favorites
+- [ ] Add image search
+- [ ] Improve image viewing
 - [ ] Improve download naming and metadata
 
----
-
-## Advanced Features
+### Advanced Generation
 
 - [ ] Add image-to-image support
 - [ ] Add reference image upload
 - [ ] Add denoise control
-- [ ] Add seed control
-- [ ] Add batch generation support
-- [ ] Support multiple ComfyUI workflows
+- [ ] Add batch generation
+- [ ] Support additional ComfyUI workflows
 
----
+### Generation Management
 
-## Generation Management
-
-- [ ] Improve ComfyUI cancellation
-- [ ] Add generation status tracking
-- [ ] Add generation job management
+- [ ] Improve generation cancellation
+- [ ] Add generation job/status tracking
+- [ ] Add job management and queuing
 - [ ] Store workflow configurations
-- [ ] Add generation queue
 
 ---
 
-# Authentication System
-
-Future improvements:
+## Authentication and Security
 
 - [ ] Add session cleanup
 - [ ] Add password change
 - [ ] Add account deletion
-- [ ] Add database migrations
-- [ ] Add improved security for public deployment
+- [ ] Review security requirements before public deployment
 
 ---
 
-# Kotomi Platform
+## Kotomi Platform
 
-## Launcher
-
-Completed:
-
-- Homepage app launcher
-- App registry
-- Shared navigation foundation
-
-Future:
+### Launcher
 
 - [ ] Add application categories
 - [ ] Improve application discovery
-- [ ] Add application descriptions/metadata
+- [ ] Add application descriptions and metadata
 - [ ] Add application icons
 
----
+### Shared Systems
 
-## Shared Systems
-
-Completed:
-
-- Shared application layout
-- Shared CSS theme
-- Shared frontend utilities
-- Authentication-aware shell
-
-Future:
-
-- [ ] Create shared settings system
-- [ ] Create notification/status system
-- [ ] Create shared job/status handling
+- [ ] Add shared settings where useful
+- [ ] Add notification/status handling where needed
 - [ ] Expand reusable frontend components
-- [ ] Add common API utilities
+- [ ] Consolidate common API utilities
 
----
-
-# Database
+### Database and Maintenance
 
 - [ ] Add database migrations
 - [ ] Add database backup/export support
@@ -208,34 +137,34 @@ Future:
 
 ---
 
-# Future Applications
+## Refactoring
 
-Ideas:
-
-- Dashboard
-- Utility tools
-- Automation tools
-- Games
-- AI assistants
-
----
-
-# Refactoring
-
-After systems stabilize:
+Address these as concrete needs arise rather than undertaking a large refactor prematurely.
 
 - [ ] Review service/repository boundaries
-- [ ] Remove duplicated frontend code
+- [ ] Reduce duplicated frontend code
 - [ ] Improve error handling
-- [ ] Add validation layer
+- [ ] Standardize validation where appropriate
 - [ ] Improve configuration management
 
 ---
 
-# Long-Term Ideas
+## Future Applications
 
-- [ ] Public deployment support
-- [ ] Multi-user improvements
-- [ ] Application permissions
-- [ ] Plugin/module system
-- [ ] More AI-powered applications
+Ideas, not commitments:
+
+- Dashboard
+- Utility tools
+- Automation tools
+- Additional games
+- AI assistants
+
+---
+
+## Long-Term Ideas
+
+- [ ] Explore public deployment support
+- [ ] Improve multi-user support where needed
+- [ ] Consider application permissions
+- [ ] Consider a plugin/module system
+- [ ] Explore additional AI-powered applications

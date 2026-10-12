@@ -2,422 +2,146 @@
 
 ## Overview
 
-Kotomi is a personal project hub built with Node.js and Express.
+Kotomi is a self-hosted personal project hub built with Node.js and Express. It brings together AI tools, utilities, games, dashboards, and experiments under a shared platform.
 
-The goal is a modular platform for:
-
-- AI tools
-- utilities
-- dashboards
-- games
-- experiments
-
-Applications share:
-
-- authentication
-- UI theme
-- application shell
-- common services
+Applications share authentication, theming, the application shell, and common services.
 
 Current applications:
 
 - AI Image Generator
 - Dice Game
+- Chat
 
----
+## Tech Stack
 
-# Stack
+- **Backend:** Node.js, Express, Socket.IO
+- **Frontend:** HTML, CSS, JavaScript ES modules
+- **Database:** SQLite via `better-sqlite3`
+- **HTTP:** Axios
+- **AI:** Ollama, ComfyUI
+- **Image generation:** ComfyUI with Z-Image Turbo workflow
 
-Backend:
-
-- Node.js
-- Express
-- Socket.IO
-- Axios
-- SQLite (better-sqlite3)
-
-Frontend:
-
-- HTML/CSS/JavaScript
-- ES modules
-- Shared Kotomi UI components
-
-AI:
-
-- Ollama
-- ComfyUI
-
-Database:
-
-- SQLite
-
-Architecture:
-
-- Routes handle HTTP endpoints and response formatting
-- Services orchestrate application/game operations
-- Core contains pure game logic
-- Repositories handle database access and map database rows to application objects
-- Configuration and constants contain static game configuration
-- Frontend applications live under public/apps
-
----
-
-# Current Architecture
+## Architecture
 
 Important directories:
 
-```
-src/
-├── apps/
-│   └── dice-game/
-│       ├── config/
-│       ├── constants/
-│       ├── core/
-│       ├── repositories/
-│       ├── routes/
-│       └── services/
-├── middleware/
-└── database/
+- `src/apps/` — application-specific backend code
+- `src/database/` — database connection and schema
+- `src/middleware/` — shared middleware
+- `src/services/` — shared services
+- `public/apps/` — frontend applications
+- `public/css/`, `public/js/` — shared frontend assets
 
-public/
-├── css/
-├── js/
-└── apps/
-```
+Architecture principles:
 
-Database:
+- Routes handle HTTP requests and response formatting.
+- Services coordinate business logic and application operations.
+- Repositories handle database access.
+- Pure game logic belongs in the Dice Game's core layer.
+- Keep applications modular and avoid premature abstraction.
 
-- SQLite database created locally
-- Schema stored in schema.sql
-- Database files excluded from git
+SQLite schema is maintained in `schema.sql`; local database files are excluded from Git.
 
----
-
-# Authentication
+## Authentication
 
 Implemented:
 
-- Username/password accounts
-- Password hashing with salts
+- Username/password accounts with salted password hashing
 - Cookie-based sessions
-- Login/register/logout
+- Registration, login, and logout
 - Authentication middleware
 
-Users are the root ownership entity for application data.
+Users are the ownership boundary for application data. Queries involving user-owned data must enforce ownership.
 
----
+## AI Image Generator
 
-# Image Generator
-
-Status: Complete foundation.
+**Status:** Functional foundation complete.
 
 Features:
 
-- Ollama prompt enhancement
-- ComfyUI generation
-- Configurable resolution
-- Configurable steps
-- Seed support
+- Ollama-based prompt enhancement
+- ComfyUI image generation
+- Configurable resolution, steps, and seed
 - Socket.IO progress updates
-- Image history
-- User-owned images
-- Regeneration
-- Delete/download support
+- Persistent, user-owned image history
+- Image regeneration, deletion, and downloads
 
-Future ideas:
+Potential future improvements include tags, favorites, search, batch generation, and additional workflows.
 
-- Tags
-- Favorites
-- Search
-- More workflows
-- Batch generation
+## Dice Game
 
----
+**Status:** Functionally playable; ongoing development is primarily testing, content, balancing, and polish.
 
-# Dice Game
-
-Status: Functional prototype.
-
-The Dice Game is a progression-based game where players roll dice, earn money, buy upgrades, equip items, and occasionally find loot.
-
-Current systems:
-
-## Rolling
+A progression game built around rolling dice, earning money, buying upgrades, equipping items, and finding loot.
 
 Implemented:
 
-- Server-side roll generation
-- Server-side cooldown enforcement
-- Configurable dice count
-- Configurable dice weights
-- Score calculation
-- Money calculation
+- Server-side rolls and cooldown enforcement
+- Configurable dice and score/money multipliers
+- Fixed-point money storage using `MoneyCents`
+- Shop, inventory, and equip/unequip systems
+- Generated loot with Common, Uncommon, Rare, Epic, and Legendary rarities
+- Rarity-scaled item effects
+- Persistent achievements, progress tracking, and unlock notifications
+- Game UI for inventory, shop, achievements, and player configuration
 
-Player configuration is generated from:
+### Item Design
 
-- base dice configuration
-- player settings
-- equipped item effects
+- `ItemDefinitions` stores item templates.
+- `ItemDefinitionEffects` stores template effects.
+- `PlayerItems` stores individual owned items.
+- `PlayerItemEffects` stores the effects attached to owned items.
 
----
+Shop items are fixed purchases without rarity. Generated loot has rarity and independent effects, so balance changes to templates do not retroactively alter existing items.
 
-## Economy
+Money is stored as integer cents. The current payout formula is:
 
-Money uses fixed-point storage.
-
-Database stores:
-
-```
-MoneyCents INTEGER
-```
-
-Current money formula:
-
-```
-moneyCents = round(0.0030137 * log10(score)^8.38 * moneyMultiplier)
-```
+`moneyCents = round(0.0030137 * log10(score)^8.38 * moneyMultiplier)`
 
 Scores below 100 award no money.
 
-Scores are affected by the player's score multiplier.
-Money is affected by the player's money multiplier.
+Future work may include more items, achievements, statistics, improved UI, and additional mechanics. Keep the game simple and its progression understandable.
 
----
+## Chat
 
-## Items
+**Status:** Feature-complete for current needs.
 
-Implemented:
-
-- Item definitions
-- Shop items
-- Player inventory
-- Equip/unequip system
-- Maximum equipped item limit
-- Item effects
-- Generated items
-- Item rarity system foundation
-
-Important design decisions:
-
-Shop items:
-
-- Fixed and predictable
-- No rarity
-- Purchased once
-
-Generated items:
-
-- Dropped from rolls
-- Have rarity
-- Have generated effects
-- Stored as independent PlayerItems
-
----
-
-## Item Database
-
-Main tables:
-
-### ItemDefinitions
-
-Stores item templates.
-
-Important fields:
-
-- Name
-- Description
-- Icon
-- CostCents
-- CanGenerate
-
-Shop items have:
-
-```
-CanGenerate = 0
-```
-
-Generated loot has:
-
-```
-CanGenerate = 1
-```
-
----
-
-### ItemDefinitionEffects
-
-Stores base effects for definitions.
-
-Example:
-
-```
-EffectType: weight
-
-EffectData:
-{
-"face": 5,
-"amount": 5
-}
-```
-
----
-
-### PlayerItems
-
-Stores owned items.
-
-Important fields:
-
-- UserID
-- DefinitionID
-- GeneratedName
-- Rarity
-- IsEquipped
-
-Shop items:
-
-- Rarity = NULL
-
-Generated items:
-
-- Rarity = Common/Uncommon/Rare/Epic/Legendary
-
----
-
-### PlayerItemEffects
-
-Stores actual effects on owned items.
-
-Generated items copy and modify definition effects.
-
-This means existing loot does not change when item balance changes.
-
----
-
-# Generated loot:
-
-- Random generated item definitions
-- Random rarity selection
-- Rarity-based effect scaling
-- Generated PlayerItems
-- Roll drops
-
-Current rarity levels:
-
-- Common
-- Uncommon
-- Rare
-- Epic
-- Legendary
-
-Rarity affects generated item effects through rarity-specific multipliers.
-
----
-
-# Achievements
+A conversational interface backed by Ollama.
 
 Implemented:
 
-- Achievement definitions
-- Requirement-based unlock checking
-- Roll, score, dice, inventory, item rarity, and configuration achievements
-- Persistent unlocks
-- Progress/statistics display
-- Unlock notifications
+- Streaming model responses
+- Persistent conversations and messages
+- Conversation creation, selection, deletion, and renaming
+- Per-user conversation ownership
+- Configurable model and generation settings
+- Configurable context window and temperature
+- Context-usage meter
+- Persistent prompt and response token counts per conversation
 
----
+Context usage is recorded from Ollama's prompt and response token counts and restored when a conversation is reopened.
 
-# Current UI
+The current feature set is sufficient for everyday use. Avoid adding features without a demonstrated need; future improvements should be driven by actual usage.
 
-Implemented:
+## Development Priorities
 
-- Shared Kotomi theme
-- Application shell
-- Dice game UI
-- Profile page
-- Inventory display
-- Shop UI
-- Achievement display
+Prioritize:
 
-Needs improvement:
+1. Fixing bugs and addressing issues discovered through use
+2. Testing and balancing the Dice Game
+3. Improving existing applications where there is a clear need
+4. Adding features based on actual requirements
 
-- Profile layout
-- Better inventory presentation
-- Loot popup polish
-- Icons/art
+Avoid implementing features merely because other applications commonly have them.
 
----
-
-# Current Game Loop
-
-Current loop:
-
-```
-Roll dice
-|
-Earn money
-|
-Buy upgrades/items
-|
-Equip items
-|
-Improve dice configuration
-|
-Roll more
-|
-Find loot
-```
-
-The goal is to keep the game simple while allowing interesting builds.
-
----
-
-# Future Work
-
-High priority:
-
-1. Improve loot popup
-2. Add more items
-3. Add more generated item types
-4. Balance economy and progression
-5. Add more achievements
-6. Create item/achievement icons
-7. Improve profile page
-8. Create statistics page
-
-Later:
-
-- Live feed
-- More advanced item effects
-- More dice values (7s, 8s, etc.)
-- More game mechanics
-- Large refactor after systems stabilize
-
----
-
-# Current Development Status
-
-Completed:
-
-- Milestone 1: AI Image Generator
-- Milestone 2: Kotomi launcher/platform foundation
-- Milestone 3: Authentication system
-- Milestone 4: Dice Game foundation
-
-Current focus:
-
-Dice Game testing, expansion, and balancing.
-
-The game is considered functionally playable. Future work is mostly content, polish, balancing, and additional mechanics.
-
----
-
-# Development Notes
-
-Important architecture preferences:
+## Development Principles
 
 - Keep business logic out of routes.
-- Database access belongs in repositories.
-- Services should operate on objects, repositories handle serialization.
-- Avoid overengineering before gameplay requirements exist.
-- Keep the Dice Game understandable and simple.
+- Keep database access in repositories.
+- Keep application services responsible for orchestration.
+- Enforce user ownership on all relevant data operations.
+- Prefer straightforward, modular implementations over premature abstraction.
+- Preserve working functionality when extending existing systems.
+- Keep documentation concise and focused on current architecture, behavior, and decisions.
+
+Git history serves as the development record; documentation should describe the current state rather than duplicate the commit history.
