@@ -19,6 +19,13 @@ const ui = {
     history: document.getElementById("history"),
     historyGrid: document.getElementById("historyGrid"),
 
+    toggleSelection: document.getElementById("toggleSelection"),
+    selectionActions: document.getElementById("selectionActions"),
+    selectionCount: document.getElementById("selectionCount"),
+    selectAllImages: document.getElementById("selectAllImages"),
+    deleteSelectedImages: document.getElementById("deleteSelectedImages"),
+    cancelSelection: document.getElementById("cancelSelection"),
+
     modal: document.getElementById("imageModal"),
     modalImage: document.getElementById("modalImage"),
     modalPrompt: document.getElementById("modalPrompt"),
@@ -35,6 +42,8 @@ let targetProgress = 0;
 let progressTimer = null;
 
 let selectedImage = null;
+let selectionMode = false;
+const selectedImageIds = new Set();
 let currentUser = null;
 
 async function initialize() {
@@ -91,6 +100,11 @@ ui.modal.onclick = (event) => {
 ui.downloadImage.onclick = downloadImageFile;
 ui.deleteImage.onclick = deleteSelectedImage;
 ui.regenerateImage.onclick = regenerateSelectedImage;
+
+ui.toggleSelection.onclick = toggleSelectionMode;
+ui.selectAllImages.onclick = selectAllImages;
+ui.deleteSelectedImages.onclick = deleteSelectedImages;
+ui.cancelSelection.onclick = exitSelectionMode;
 
 document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && !ui.modal.classList.contains("hide")) {
@@ -203,17 +217,40 @@ async function loadHistory() {
 function renderHistory(images) {
     ui.historyGrid.innerHTML = "";
 
+    const availableIds = new Set(images.map((image) => String(image.ImageID)));
+
+    for (const id of selectedImageIds) {
+        if (!availableIds.has(id)) {
+            selectedImageIds.delete(id);
+        }
+    }
+
     for (const image of images) {
+        const imageId = String(image.ImageID);
         const card = document.createElement("div");
 
         card.className = "history-card";
-        card.onclick = () => showImageDetails(image.ImageID);
+        card.dataset.imageId = imageId;
+
+        if (selectionMode) {
+            card.classList.add("selection-mode");
+        }
 
         card.innerHTML = `
-            <img src="/api/image/view?filename=${image.Filename}">
+            <input
+                type="checkbox"
+                class="history-select-checkbox ${selectionMode ? "" : "hide"}"
+                aria-label="Select image"
+                ${selectedImageIds.has(imageId) ? "checked" : ""}
+            >
+
+            <img
+                src="/api/image/view?filename=${encodeURIComponent(image.Filename)}"
+                alt="Generated image"
+            >
 
             <div class="history-card-content">
-                <p>${image.Prompt}</p>
+                <p class="history-prompt">${escapeHtml(image.Prompt || "")}</p>
 
                 <small>
                     ${image.Width}×${image.Height}
@@ -223,7 +260,106 @@ function renderHistory(images) {
             </div>
         `;
 
+        card.onclick = () => {
+            if (selectionMode) {
+                toggleImageSelection(imageId);
+            } else {
+                showImageDetails(image.ImageID);
+            }
+        };
+
+        const checkbox = card.querySelector(".history-select-checkbox");
+
+        checkbox.onclick = (event) => {
+            event.stopPropagation();
+        };
+
+        checkbox.onchange = () => {
+            setImageSelected(imageId, checkbox.checked);
+        };
+
         ui.historyGrid.appendChild(card);
+    }
+
+    updateSelectionUI();
+}
+
+function toggleSelectionMode() {
+    selectionMode = !selectionMode;
+
+    if (!selectionMode) {
+        selectedImageIds.clear();
+    }
+
+    ui.toggleSelection.classList.toggle("hide", selectionMode);
+
+    renderHistoryFromDOM();
+}
+
+function renderHistoryFromDOM() {
+    // Rebuild the current card selection controls without re-fetching history.
+    const cards = ui.historyGrid.querySelectorAll(".history-card");
+
+    for (const card of cards) {
+        const checkbox = card.querySelector(".history-select-checkbox");
+
+        card.classList.toggle("selection-mode", selectionMode);
+        card.classList.toggle("selected", selectedImageIds.has(card.dataset.imageId));
+
+        checkbox.classList.toggle("hide", !selectionMode);
+        checkbox.checked = selectedImageIds.has(card.dataset.imageId);
+    }
+
+    updateSelectionUI();
+}
+
+function toggleImageSelection(imageId) {
+    setImageSelected(imageId, !selectedImageIds.has(imageId));
+}
+
+function setImageSelected(imageId, isSelected) {
+    if (isSelected) {
+        selectedImageIds.add(imageId);
+    } else {
+        selectedImageIds.delete(imageId);
+    }
+
+    renderHistoryFromDOM();
+}
+
+function selectAllImages() {
+    const cards = ui.historyGrid.querySelectorAll(".history-card");
+
+    for (const card of cards) {
+        selectedImageIds.add(card.dataset.imageId);
+    }
+
+    renderHistoryFromDOM();
+}
+
+function exitSelectionMode() {
+    selectionMode = false;
+    selectedImageIds.clear();
+
+    ui.toggleSelection.classList.remove("hide");
+
+    renderHistoryFromDOM();
+}
+
+function updateSelectionUI() {
+    ui.selectionActions.classList.toggle("hide", !selectionMode);
+
+    ui.selectionCount.innerHTML = `
+        <span class="selection-indicator"></span>
+        <span>${selectedImageIds.size} selected</span>
+    `;
+
+    ui.deleteSelectedImages.disabled = selectedImageIds.size === 0;
+
+    const cards = ui.historyGrid.querySelectorAll(".history-card");
+
+    for (const card of cards) {
+        card.classList.toggle("selected", selectedImageIds.has(card.dataset.imageId));
     }
 }
 
@@ -357,6 +493,63 @@ async function deleteSelectedImage() {
     ui.status.innerText = "Image deleted";
 }
 
+async function deleteSelectedImages() {
+    if (selectedImageIds.size === 0) {
+        return;
+    }
+
+    const count = selectedImageIds.size;
+    const confirmed = confirm(
+        `Are you sure you want to delete ${count} selected image${count === 1 ? "" : "s"}? This cannot be undone.`,
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    ui.deleteSelectedImages.disabled = true;
+    ui.status.innerText = `Deleting ${count} images...`;
+
+    try {
+        const response = await fetch("/api/image/bulk-delete", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                imageIds: [...selectedImageIds],
+            }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || "Unable to delete images.");
+        }
+
+        const deletedCount = result.deleted.length;
+        const failedCount = result.failed.length;
+
+        selectedImageIds.clear();
+
+        await loadHistory();
+
+        if (failedCount === 0) {
+            exitSelectionMode();
+            ui.status.innerText = `Successfully deleted ${deletedCount} image${deletedCount === 1 ? "" : "s"}.`;
+        } else {
+            ui.status.innerText = `Deleted ${deletedCount} image${deletedCount === 1 ? "" : "s"}; ${failedCount} failed. Check the console for details.`;
+
+            console.error("Bulk deletion failures:", result.failed);
+        }
+    } catch (error) {
+        console.error(error);
+        ui.status.innerText = error.message || "Bulk deletion failed.";
+    } finally {
+        ui.deleteSelectedImages.disabled = selectedImageIds.size === 0;
+    }
+}
+
 async function regenerateSelectedImage() {
     if (!selectedImage) {
         return;
@@ -385,6 +578,15 @@ function resetProgress() {
 
 function hideModal() {
     ui.modal.classList.add("hide");
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 }
 
 initialize();

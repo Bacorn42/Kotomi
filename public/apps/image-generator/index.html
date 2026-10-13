@@ -74,6 +74,40 @@
             <section id="history" class="kotomi-card hide">
                 <h2>Generated Images</h2>
                 <p class="kotomi-status">Your previous generations</p>
+
+                <div class="history-toolbar">
+                    <div id="selectionActions" class="selection-toolbar hide">
+                        <span id="selectionCount" class="selection-count">
+                            <span class="selection-indicator"></span>
+                            <span>0 selected</span>
+                        </span>
+
+                        <div class="selection-toolbar-actions">
+                            <button id="selectAllImages" class="gallery-action">Select all</button>
+
+                            <button
+                                id="deleteSelectedImages"
+                                class="gallery-action gallery-action-danger"
+                                disabled
+                            >
+                                <span aria-hidden="true">⌫</span>
+                                Delete
+                            </button>
+
+                            <button
+                                id="cancelSelection"
+                                class="gallery-icon-action"
+                                aria-label="Exit selection mode"
+                                title="Exit selection mode"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+
+                    <button id="toggleSelection" class="gallery-select-toggle">Select</button>
+                </div>
+
                 <div id="historyGrid"></div>
             </section>
         </main>

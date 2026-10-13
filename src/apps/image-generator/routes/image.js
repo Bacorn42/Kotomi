@@ -99,6 +99,75 @@ router.get("/:id", requireLogin, (req, res) => {
     }
 });
 
+router.post("/bulk-delete", requireLogin, async (req, res) => {
+    const { imageIds } = req.body;
+
+    if (
+        !Array.isArray(imageIds) ||
+        imageIds.length === 0 ||
+        imageIds.length > 50 ||
+        !imageIds.every(
+            (id) =>
+                (typeof id === "number" || typeof id === "string") &&
+                String(id).trim() !== "" &&
+                Number.isSafeInteger(Number(id)) &&
+                Number(id) > 0,
+        )
+    ) {
+        return res.status(400).json({
+            error: "Provide between 1 and 50 valid image IDs.",
+        });
+    }
+
+    const uniqueIds = [...new Set(imageIds.map(String))];
+    const deleted = [];
+    const failed = [];
+
+    for (const imageId of uniqueIds) {
+        try {
+            const image = imageRepository.getByIdAndUser(imageId, req.user.UserID);
+
+            if (!image) {
+                failed.push({
+                    imageId,
+                    error: "Image not found.",
+                });
+                continue;
+            }
+
+            await comfyui.deleteImage(image.Filename);
+
+            const result = imageRepository.deleteById(image.ImageID, req.user.UserID);
+
+            if (result.changes === 0) {
+                failed.push({
+                    imageId,
+                    error: "Database record was not deleted.",
+                });
+                continue;
+            }
+
+            deleted.push(imageId);
+        } catch (error) {
+            console.error(`Failed to delete image ${imageId}:`, error);
+
+            failed.push({
+                imageId,
+                error:
+                    error.code === "ENOENT"
+                        ? "Image file was not found on disk; database record was preserved."
+                        : "Unable to delete image.",
+            });
+        }
+    }
+
+    res.json({
+        success: failed.length === 0,
+        deleted,
+        failed,
+    });
+});
+
 router.delete("/:id", requireLogin, async (req, res) => {
     try {
         const image = imageRepository.getByIdAndUser(req.params.id, req.user.UserID);
