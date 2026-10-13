@@ -3,11 +3,17 @@ const fs = require("fs");
 const path = require("path");
 const WebSocket = require("ws");
 const crypto = require("crypto");
+const fsPromises = require("fs/promises");
 
 const socket = require("../../../services/socket");
 
-const COMFY_URL = "http://127.0.0.1:8188";
+const COMFY_URL = process.env.COMFYUI_URL || "http://127.0.0.1:8188";
 const COMFY_WS = COMFY_URL.replace("http", "ws");
+const COMFY_OUTPUT_DIR = process.env.COMFYUI_OUTPUT_DIR;
+
+if (!COMFY_OUTPUT_DIR) {
+    throw new Error("COMFYUI_OUTPUT_DIR is not configured.");
+}
 
 function loadWorkflow() {
     const workflowPath = path.join(__dirname, "../config/img_gen_z-image_turbo.json");
@@ -134,6 +140,20 @@ async function interrupt() {
     await axios.post(`${COMFY_URL}/interrupt`);
 }
 
+async function deleteImage(filename) {
+    if (
+        typeof filename !== "string" ||
+        filename.length === 0 ||
+        path.basename(filename) !== filename
+    ) {
+        throw new Error("Invalid image filename.");
+    }
+
+    const filePath = path.join(COMFY_OUTPUT_DIR, filename);
+
+    await fsPromises.unlink(filePath);
+}
+
 module.exports = {
     queueWorkflow,
     waitForCompletion,
@@ -141,4 +161,5 @@ module.exports = {
     listenForProgress,
     getImage,
     interrupt,
+    deleteImage,
 };

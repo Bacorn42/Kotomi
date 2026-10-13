@@ -16,12 +16,6 @@ const insertImage = db.prepare(`
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
 
-const getImageById = db.prepare(`
-   SELECT *
-   FROM ImageGeneratorImages
-   WHERE ImageID = ? 
-`);
-
 const getRecentImages = db.prepare(`
     SELECT *
     FROM ImageGeneratorImages
@@ -30,9 +24,15 @@ const getRecentImages = db.prepare(`
     LIMIT ?
 `);
 
+const getImageByIdAndUser = db.prepare(`
+    SELECT *
+    FROM ImageGeneratorImages
+    WHERE ImageID = ? AND UserID = ?
+`);
+
 const deleteImage = db.prepare(`
     DELETE FROM ImageGeneratorImages
-    WHERE ImageID = ?
+    WHERE ImageID = ? AND UserID = ?
 `);
 
 function save(userId, image) {
@@ -51,21 +51,21 @@ function save(userId, image) {
     return result.lastInsertRowid;
 }
 
-function getById(id) {
-    return getImageById.get(id);
-}
-
 function getRecent(userId, limit = 50) {
     return getRecentImages.all(userId, limit);
 }
 
-function deleteById(id) {
-    return deleteImage.run(id);
+function getByIdAndUser(id, userId) {
+    return getImageByIdAndUser.get(id, userId);
+}
+
+function deleteById(id, userId) {
+    return deleteImage.run(id, userId);
 }
 
 module.exports = {
     save,
-    getById,
     getRecent,
+    getByIdAndUser,
     deleteById,
 };

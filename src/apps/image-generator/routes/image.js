@@ -79,9 +79,9 @@ router.get("/history", requireLogin, (req, res) => {
     }
 });
 
-router.get("/:id", (req, res) => {
+router.get("/:id", requireLogin, (req, res) => {
     try {
-        const image = imageRepository.getById(req.params.id);
+        const image = imageRepository.getByIdAndUser(req.params.id, req.user.UserID);
 
         if (!image) {
             return res.status(404).json({
@@ -92,15 +92,26 @@ router.get("/:id", (req, res) => {
         res.json(image);
     } catch (error) {
         console.error(error);
+
         res.status(500).json({
             error: "Unable to retrieve image.",
         });
     }
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", requireLogin, async (req, res) => {
     try {
-        const result = imageRepository.deleteById(req.params.id);
+        const image = imageRepository.getByIdAndUser(req.params.id, req.user.UserID);
+
+        if (!image) {
+            return res.status(404).json({
+                error: "Image not found.",
+            });
+        }
+
+        await comfyui.deleteImage(image.Filename);
+
+        const result = imageRepository.deleteById(image.ImageID, req.user.UserID);
 
         if (result.changes === 0) {
             return res.status(404).json({
@@ -112,6 +123,14 @@ router.delete("/:id", (req, res) => {
             success: true,
         });
     } catch (error) {
+        if (error.code === "ENOENT") {
+            console.error("Image file missing from disk:", error.message);
+
+            return res.status(500).json({
+                error: "Image file was not found on disk. The database record was preserved.",
+            });
+        }
+
         console.error(error);
 
         res.status(500).json({
