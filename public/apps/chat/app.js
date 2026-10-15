@@ -528,7 +528,8 @@ async function streamMessage(content, assistant, contextWindow) {
         if (!chunk) return;
 
         assistant.thinking.details.hidden = false;
-        assistant.thinking.content.textContent += chunk;
+        assistant.thinking.rawContent += chunk;
+        assistant.thinking.content.textContent = assistant.thinking.rawContent;
 
         elements.messageList.scrollTop = elements.messageList.scrollHeight;
     };
@@ -608,6 +609,10 @@ async function sendMessage(event) {
         assistant.thinking = createThinkingUI(assistant.message, assistant.body);
 
         await streamMessage(content, assistant, state.settings.ContextWindow);
+
+        if (assistant.thinking.rawContent) {
+            renderAssistantMarkdown(assistant.thinking.content, assistant.thinking.rawContent);
+        }
         responseCompleted = true;
 
         await loadConversations();
@@ -675,7 +680,7 @@ function createThinkingUI(message, body) {
     message.insertBefore(indicator, body);
     message.insertBefore(details, body);
 
-    return { indicator, details, content };
+    return { indicator, details, content, rawContent: "" };
 }
 
 function openSettings() {
