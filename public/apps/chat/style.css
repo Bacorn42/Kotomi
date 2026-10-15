@@ -20,7 +20,7 @@
 }
 
 .chat-sidebar-heading {
-    color: #b8a99a;
+    color: var(--muted);
     font-size: 0.85rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -37,7 +37,7 @@
 }
 
 .conversation-list-empty {
-    color: #b8a99a;
+    color: var(--muted);
     font-size: 0.9rem;
     text-align: center;
     padding: 1rem 0.5rem;
@@ -52,7 +52,7 @@
     border: 1px solid transparent;
     border-radius: 8px;
     background: transparent;
-    color: #f4eadc;
+    color: var(--text);
     text-align: left;
     cursor: pointer;
     transition:
@@ -61,12 +61,12 @@
 }
 
 .conversation-item:hover {
-    background: #3b322a;
+    background: var(--surface-hover);
 }
 
 .conversation-item.active {
-    background: #40352a;
-    border-color: #e3a35c;
+    background: var(--surface-selected);
+    border-color: var(--accent);
 }
 
 .conversation-item-title {
@@ -78,12 +78,12 @@
 }
 
 .conversation-item-date {
-    color: #b8a99a;
+    color: var(--muted);
     font-size: 0.75rem;
 }
 
 .chat-sidebar-footer {
-    border-top: 1px solid #494037;
+    border-top: 1px solid var(--border-subtle);
     padding-top: 1rem;
 }
 
@@ -103,7 +103,7 @@
     justify-content: space-between;
     gap: 1rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid #494037;
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 .chat-toolbar h2 {
@@ -114,7 +114,7 @@
 
 .chat-toolbar p {
     margin: 0.35rem 0 0;
-    color: #b8a99a;
+    color: var(--muted);
     font-size: 0.85rem;
     overflow-wrap: anywhere;
 }
@@ -158,7 +158,7 @@
 .chat-empty-state p {
     max-width: 340px;
     margin: 0;
-    color: #b8a99a;
+    color: var(--muted);
     line-height: 1.6;
 }
 
@@ -172,14 +172,14 @@
 
 .user-message {
     align-self: flex-end;
-    background: #40352a;
-    border: 1px solid #66503a;
+    background: var(--surface-selected);
+    border: 1px solid var(--border-strong);
 }
 
 .assistant-message {
     align-self: flex-start;
-    background: #302923;
-    border: 1px solid #494037;
+    background: var(--surface);
+    border: 1px solid var(--border-subtle);
 }
 
 .chat-message-error {
@@ -190,14 +190,14 @@
 
 .chat-message-stopped {
     margin-top: 0.5rem;
-    color: #b8a99a;
+    color: var(--muted);
     font-size: 0.8rem;
     font-style: italic;
 }
 
 .chat-message-label {
     margin-bottom: 0.45rem;
-    color: #e3a35c;
+    color: var(--accent);
     font-size: 0.78rem;
     font-weight: 600;
 }
@@ -212,7 +212,7 @@
     align-items: flex-end;
     gap: 0.75rem;
     padding-top: 1rem;
-    border-top: 1px solid #494037;
+    border-top: 1px solid var(--border-subtle);
 }
 
 .message-input {
@@ -232,7 +232,7 @@
 .chat-status {
     min-height: 1.2em;
     margin: 0.5rem 0 0;
-    color: #e3a35c;
+    color: var(--accent);
     font-size: 0.85rem;
     overflow-wrap: anywhere;
 }
@@ -293,7 +293,7 @@
 
 .settings-help {
     margin: 0;
-    color: #b8a99a;
+    color: var(--muted);
     font-size: 0.8rem;
     line-height: 1.5;
 }
@@ -315,8 +315,8 @@ button:disabled {
 
 .context-meter {
     padding: 0.65rem 1rem;
-    border-top: 1px solid #494037;
-    background: #302923;
+    border-top: 1px solid var(--border-subtle);
+    background: var(--surface);
 }
 
 .context-meter-header {
@@ -324,7 +324,7 @@ button:disabled {
     justify-content: space-between;
     gap: 1rem;
     margin-bottom: 0.4rem;
-    color: #c8b9a9;
+    color: var(--muted);
     font-size: 0.8rem;
 }
 
@@ -332,14 +332,14 @@ button:disabled {
     height: 5px;
     overflow: hidden;
     border-radius: 999px;
-    background: #211c18;
+    background: var(--bg);
 }
 
 .context-meter-fill {
     width: 0;
     height: 100%;
     border-radius: inherit;
-    background: #e3a35c;
+    background: var(--accent);
     transition:
         width 0.2s ease,
         background-color 0.2s ease;
@@ -453,7 +453,7 @@ button:disabled {
 }
 
 .chat-message-content a {
-    color: #e3a35c;
+    color: var(--accent);
     text-decoration: underline;
     overflow-wrap: anywhere;
 }
@@ -461,14 +461,14 @@ button:disabled {
 .chat-message-content blockquote {
     margin: 0.5em 0;
     padding: 0.2rem 0 0.2rem 0.8rem;
-    border-left: 3px solid #e3a35c;
-    color: #c8b9a9;
+    border-left: 3px solid var(--accent);
+    color: var(--muted);
 }
 
 .chat-message-content :not(pre) > code {
     padding: 0.15em 0.35em;
     border-radius: 4px;
-    background: #211c18;
+    background: var(--bg);
     font-size: 0.9em;
 }
 
@@ -477,9 +477,9 @@ button:disabled {
     margin: 0.5em 0;
     padding: 0.75rem;
     overflow-x: auto;
-    border: 1px solid #494037;
+    border: 1px solid var(--border-subtle);
     border-radius: 8px;
-    background: #211c18;
+    background: var(--bg);
     line-height: 1.45;
 }
 
@@ -491,7 +491,7 @@ button:disabled {
 .chat-message-content hr {
     margin: 0.75rem 0;
     border: 0;
-    border-top: 1px solid #494037;
+    border-top: 1px solid var(--border-subtle);
 }
 
 .chat-message-content table {
@@ -505,12 +505,12 @@ button:disabled {
 .chat-message-content th,
 .chat-message-content td {
     padding: 0.35rem 0.6rem;
-    border: 1px solid #494037;
+    border: 1px solid var(--border-subtle);
     text-align: left;
 }
 
 .chat-message-content th {
-    background: #211c18;
+    background: var(--bg);
 }
 
 .chat-message-content .katex-display {
@@ -551,14 +551,14 @@ button:disabled {
     border: 1px solid transparent;
     border-radius: 6px;
     background: transparent;
-    color: #b8a99a;
+    color: var(--muted);
     cursor: pointer;
 }
 
 .conversation-rename-button:hover:not(:disabled) {
-    border-color: #66503a;
-    background: #40352a;
-    color: #e3a35c;
+    border-color: var(--border-strong);
+    background: var(--surface-selected);
+    color: var(--accent);
 }
 
 .conversation-rename-form {
@@ -568,9 +568,9 @@ button:disabled {
     gap: 0.5rem;
     min-width: 0;
     padding: 0.5rem;
-    border: 1px solid #66503a;
+    border: 1px solid var(--border-strong);
     border-radius: 8px;
-    background: #302923;
+    background: var(--surface);
 }
 
 .conversation-rename-input {
@@ -623,13 +623,13 @@ button:disabled {
 }
 
 .chat-thinking summary:hover {
-    color: var(--kotomi-text, #f4eadc);
+    color: var(--kotomi-text, var(--text));
 }
 
 .chat-thinking-content {
     margin-top: 0.5rem;
     padding: 0.5rem 0 0.5rem 0.75rem;
-    border-left: 2px solid var(--kotomi-accent, #e3a35c);
+    border-left: 2px solid var(--kotomi-accent, var(--accent));
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     line-height: 1.5;

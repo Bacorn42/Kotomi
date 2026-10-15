@@ -8,6 +8,13 @@
     --accent-hover: #f2c078;
     --border: rgba(255, 255, 255, 0.12);
     --shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+
+    --surface-hover: #3b322a;
+    --surface-selected: #40352a;
+
+    --border-subtle: #494037;
+    --border-strong: #66503a;
+
     --scrollbar-track: var(--bg);
     --scrollbar-thumb: #655044;
     --scrollbar-thumb-hover: #a77b50;
