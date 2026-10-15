@@ -450,7 +450,7 @@ function updateContextMeter(promptTokens, responseTokens, contextWindow) {
     elements.contextUsageFill.classList.toggle("danger", percentage >= 90);
 }
 
-function parseSseBlock(block, onChunk, onDone = () => {}) {
+function parseSseBlock(block, onChunk, onDone = () => {}, onThinking = () => {}) {
     let event = "message";
     const dataLines = [];
 
@@ -474,6 +474,8 @@ function parseSseBlock(block, onChunk, onDone = () => {}) {
 
     if (event === "chunk") {
         onChunk(data.content || "");
+    } else if (event === "thinking") {
+        onThinking(data.content || "");
     } else if (event === "done") {
         onDone(data);
     } else if (event === "error") {
@@ -481,7 +483,7 @@ function parseSseBlock(block, onChunk, onDone = () => {}) {
     }
 }
 
-async function streamMessage(content, assistantBody, contextWindow) {
+async function streamMessage(content, assistant, contextWindow) {
     const response = await fetch(`/api/chat/conversations/${state.conversationId}/messages`, {
         method: "POST",
         headers: {
@@ -513,6 +515,32 @@ async function streamMessage(content, assistantBody, contextWindow) {
     const decoder = new TextDecoder();
     let buffer = "";
 
+    const onChunk = (chunk) => {
+        if (!chunk) return;
+
+        assistant.thinking.indicator.remove();
+        assistant.body.textContent += chunk;
+
+        elements.messageList.scrollTop = elements.messageList.scrollHeight;
+    };
+
+    const onThinking = (chunk) => {
+        if (!chunk) return;
+
+        assistant.thinking.details.hidden = false;
+        assistant.thinking.content.textContent += chunk;
+
+        elements.messageList.scrollTop = elements.messageList.scrollHeight;
+    };
+
+    const onDone = (data) => {
+        updateContextMeter(data.promptTokens, data.responseTokens, contextWindow);
+    };
+
+    const processBlock = (block) => {
+        parseSseBlock(block, onChunk, onDone, onThinking);
+    };
+
     while (true) {
         const { value, done } = await reader.read();
 
@@ -524,28 +552,19 @@ async function streamMessage(content, assistantBody, contextWindow) {
         buffer = blocks.pop();
 
         for (const block of blocks) {
-            parseSseBlock(
-                block,
-                (chunk) => {
-                    assistantBody.textContent += chunk;
-                    elements.messageList.scrollTop = elements.messageList.scrollHeight;
-                },
-                (data) => {
-                    updateContextMeter(data.promptTokens, data.responseTokens, contextWindow);
-                },
-            );
+            processBlock(block);
         }
     }
 
     buffer += decoder.decode();
 
     if (buffer.trim()) {
-        parseSseBlock(buffer, (chunk) => {
-            assistantBody.textContent += chunk;
-        });
+        processBlock(buffer);
     }
 
-    renderAssistantMarkdown(assistantBody, assistantBody.textContent);
+    assistant.thinking.indicator.remove();
+
+    renderAssistantMarkdown(assistant.body, assistant.body.textContent);
 }
 
 async function sendMessage(event) {
@@ -586,8 +605,9 @@ async function sendMessage(event) {
 
         createMessageElement("user", content);
         assistant = createMessageElement("assistant");
+        assistant.thinking = createThinkingUI(assistant.message, assistant.body);
 
-        await streamMessage(content, assistant.body, state.settings.ContextWindow);
+        await streamMessage(content, assistant, state.settings.ContextWindow);
         responseCompleted = true;
 
         await loadConversations();
@@ -597,6 +617,7 @@ async function sendMessage(event) {
         updateChatHeader(conversation);
         renderConversations();
     } catch (error) {
+        assistant?.thinking?.indicator.remove();
         const wasStopped = error.name === "AbortError" || state.abortController?.signal.aborted;
 
         if (wasStopped) {
@@ -632,6 +653,29 @@ async function sendMessage(event) {
         elements.messageInput.focus();
         state.abortController = null;
     }
+}
+
+function createThinkingUI(message, body) {
+    const indicator = document.createElement("div");
+    indicator.className = "chat-thinking-indicator";
+    indicator.setAttribute("role", "status");
+    indicator.textContent = "Thinking…";
+
+    const details = document.createElement("details");
+    details.className = "chat-thinking";
+    details.hidden = true;
+
+    const summary = document.createElement("summary");
+    summary.textContent = "Thinking process";
+
+    const content = document.createElement("div");
+    content.className = "chat-thinking-content";
+
+    details.append(summary, content);
+    message.insertBefore(indicator, body);
+    message.insertBefore(details, body);
+
+    return { indicator, details, content };
 }
 
 function openSettings() {

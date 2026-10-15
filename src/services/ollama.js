@@ -44,9 +44,17 @@ async function generateImagePrompt(userPrompt, model) {
     }
 }
 
-async function streamChat(messages, model, options = {}, onChunk = () => {}) {
+async function streamChat(
+    messages,
+    model,
+    options = {},
+    onChunk = () => {},
+    onThinking = () => {},
+) {
     const { contextWindow = 8192, temperature = 0.7, signal } = options;
+
     let fullResponse = "";
+    let fullThinking = "";
     let promptTokens = null;
     let responseTokens = null;
 
@@ -57,9 +65,10 @@ async function streamChat(messages, model, options = {}, onChunk = () => {}) {
                 model,
                 messages,
                 stream: true,
+                think: true,
                 options: {
                     num_ctx: contextWindow,
-                    temperature: temperature,
+                    temperature,
                 },
             },
             {
@@ -74,9 +83,7 @@ async function streamChat(messages, model, options = {}, onChunk = () => {}) {
         });
 
         for await (const line of lines) {
-            if (!line.trim()) {
-                continue;
-            }
+            if (!line.trim()) continue;
 
             const data = JSON.parse(line);
 
@@ -84,7 +91,13 @@ async function streamChat(messages, model, options = {}, onChunk = () => {}) {
                 throw new Error(data.error);
             }
 
+            const thinking = data.message?.thinking;
             const content = data.message?.content;
+
+            if (thinking) {
+                fullThinking += thinking;
+                onThinking(thinking);
+            }
 
             if (content) {
                 fullResponse += content;
@@ -100,6 +113,7 @@ async function streamChat(messages, model, options = {}, onChunk = () => {}) {
 
         return {
             content: fullResponse,
+            thinking: fullThinking,
             promptTokens,
             responseTokens,
         };
@@ -107,6 +121,7 @@ async function streamChat(messages, model, options = {}, onChunk = () => {}) {
         if (signal?.aborted || axios.isCancel(error)) {
             return {
                 content: fullResponse,
+                thinking: fullThinking,
                 promptTokens,
                 responseTokens,
             };

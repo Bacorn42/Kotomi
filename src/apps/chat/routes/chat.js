@@ -151,6 +151,7 @@ router.post("/conversations/:id/messages", async (req, res) => {
             {
                 signal: abortController.signal,
             },
+            (thinking) => sendEvent("thinking", { content: thinking }),
         );
 
         if (result) {

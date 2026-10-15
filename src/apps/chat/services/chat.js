@@ -51,7 +51,14 @@ function deleteConversation(userId, conversationId) {
     return true;
 }
 
-async function sendMessage(userId, conversationId, content, onChunk, options = {}) {
+async function sendMessage(
+    userId,
+    conversationId,
+    content,
+    onChunk,
+    options = {},
+    onThinking = () => {},
+) {
     const conversation = conversationRepository.getById(conversationId, userId);
 
     if (!conversation) {
@@ -109,6 +116,7 @@ async function sendMessage(userId, conversationId, content, onChunk, options = {
             signal: options.signal,
         },
         onChunk,
+        onThinking,
     );
 
     const messageId = messageRepository.save(conversationId, "assistant", response.content);

@@ -588,3 +588,55 @@ button:disabled {
     padding: 0.35rem 0.55rem;
     font-size: 0.8rem;
 }
+
+.chat-thinking-indicator {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    margin: 0 0 0.75rem;
+    color: var(--kotomi-text-muted, #a99b8b);
+    font-size: 0.9rem;
+    animation: chat-thinking-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes chat-thinking-pulse {
+    0%,
+    100% {
+        opacity: 0.55;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+.chat-thinking {
+    margin: 0 0 0.75rem;
+    color: var(--kotomi-text-muted, #a99b8b);
+    font-size: 0.9rem;
+}
+
+.chat-thinking summary {
+    width: fit-content;
+    cursor: pointer;
+    user-select: none;
+}
+
+.chat-thinking summary:hover {
+    color: var(--kotomi-text, #f4eadc);
+}
+
+.chat-thinking-content {
+    margin-top: 0.5rem;
+    padding: 0.5rem 0 0.5rem 0.75rem;
+    border-left: 2px solid var(--kotomi-accent, #e3a35c);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.5;
+    font-size: 0.85rem;
+}
+
+.chat-thinking[open] .chat-thinking-content {
+    max-height: 24rem;
+    overflow-y: auto;
+}
