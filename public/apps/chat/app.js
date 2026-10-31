@@ -265,13 +265,56 @@ function renderAssistantMarkdown(element, content) {
     });
 }
 
+async function copyTextToClipboard(text) {
+    if (navigator.clipboard?.writeText) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return;
+        } catch (error) {
+            // Fall through to the legacy clipboard method.
+        }
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    textarea.style.pointerEvents = "none";
+
+    document.body.append(textarea);
+    textarea.select();
+
+    const copied = document.execCommand("copy");
+    textarea.remove();
+
+    if (!copied) {
+        throw new Error("Clipboard copy failed.");
+    }
+}
+
 function createMessageElement(role, content = "") {
     const message = document.createElement("article");
     message.className = `chat-message ${role}-message`;
 
+    const header = document.createElement("div");
+    header.className = "chat-message-header";
+
     const label = document.createElement("div");
     label.className = "chat-message-label";
     label.textContent = role === "user" ? "You" : "Assistant";
+
+    const copyButton = document.createElement("button");
+    copyButton.type = "button";
+    copyButton.className = "chat-message-copy";
+    copyButton.setAttribute("aria-label", "Copy message");
+    copyButton.title = "Copy message";
+    copyButton.innerHTML = `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+            <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path>
+        </svg>
+    `;
 
     const body = document.createElement("div");
     body.className = "chat-message-content";
@@ -282,7 +325,39 @@ function createMessageElement(role, content = "") {
         body.textContent = content;
     }
 
-    message.append(label, body);
+    message.rawContent = content;
+
+    copyButton.addEventListener("click", async () => {
+        try {
+            await copyTextToClipboard(message.rawContent);
+
+            copyButton.innerHTML = `
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m5 12 4 4L19 6"></path>
+                </svg>
+            `;
+            copyButton.setAttribute("aria-label", "Copied");
+            copyButton.title = "Copied!";
+            copyButton.classList.add("copied");
+
+            setTimeout(() => {
+                copyButton.innerHTML = `
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                        <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2"></path>
+                    </svg>
+                `;
+                copyButton.setAttribute("aria-label", "Copy message");
+                copyButton.title = "Copy message";
+                copyButton.classList.remove("copied");
+            }, 1500);
+        } catch (error) {
+            setChatStatus("Couldn't copy message to clipboard.");
+        }
+    });
+
+    header.append(label, copyButton);
+    message.append(header, body);
     elements.messageList.append(message);
 
     elements.emptyState.classList.add("hide");
@@ -519,7 +594,8 @@ async function streamMessage(content, assistant, contextWindow) {
         if (!chunk) return;
 
         assistant.thinking.indicator.remove();
-        assistant.body.textContent += chunk;
+        assistant.message.rawContent += chunk;
+        assistant.body.textContent = assistant.message.rawContent;
 
         elements.messageList.scrollTop = elements.messageList.scrollHeight;
     };
@@ -626,7 +702,7 @@ async function sendMessage(event) {
         const wasStopped = error.name === "AbortError" || state.abortController?.signal.aborted;
 
         if (wasStopped) {
-            const partialContent = assistant?.body.textContent || "";
+            const partialContent = assistant?.message.rawContent || "";
 
             if (partialContent.trim()) {
                 renderAssistantMarkdown(assistant.body, partialContent);
