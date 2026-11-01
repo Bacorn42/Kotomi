@@ -334,14 +334,29 @@ export function initializeTrackList({
 
         const actions = document.createElement("div");
         actions.className = "music-track-actions";
-        actions.append(
-            playButton,
-            addToQueueButton,
-            playNextButton,
-            playlistButton,
-            tagsButton,
-            editButton,
-        );
+
+        const moreButton = document.createElement("button");
+        moreButton.type = "button";
+        moreButton.className = "kotomi-button-secondary music-track-more";
+        moreButton.textContent = "⋯";
+        moreButton.setAttribute("aria-label", "More track actions");
+
+        const moreMenu = document.createElement("div");
+        moreMenu.className = "music-track-more-menu hide";
+
+        moreMenu.append(addToQueueButton, playNextButton, playlistButton, tagsButton, editButton);
+
+        moreButton.addEventListener("click", () => {
+            moreMenu.classList.toggle("hide");
+        });
+
+        moreMenu.addEventListener("click", (event) => {
+            if (event.target.closest("button")) {
+                moreMenu.classList.add("hide");
+            }
+        });
+
+        actions.append(playButton, moreButton, moreMenu);
 
         row.append(selection, artwork, details, album, duration, actions);
 
