@@ -20,8 +20,30 @@ export function initializeMusicPlayer({ queue }) {
     const muteButton = document.getElementById("muteButton");
     const volumeSlider = document.getElementById("volumeSlider");
 
+    const shuffleButton = document.createElement("button");
+    shuffleButton.type = "button";
+    shuffleButton.className = "kotomi-button-secondary music-player-mode-button";
+    shuffleButton.textContent = "🔀";
+    shuffleButton.title = "Shuffle off";
+    shuffleButton.setAttribute("aria-label", "Enable shuffle");
+    shuffleButton.setAttribute("aria-pressed", "false");
+
+    const repeatButton = document.createElement("button");
+    repeatButton.type = "button";
+    repeatButton.className = "kotomi-button-secondary music-player-mode-button";
+    repeatButton.textContent = "↻";
+    repeatButton.title = "Repeat off";
+    repeatButton.setAttribute("aria-label", "Repeat off");
+    repeatButton.setAttribute("aria-pressed", "false");
+
+    nextTrackButton.insertAdjacentElement("afterend", shuffleButton);
+    shuffleButton.insertAdjacentElement("afterend", repeatButton);
+
     let currentTrack = null;
     let playbackHistory = [];
+    let shuffleEnabled = false;
+    let repeatMode = "off";
+    let repeatCycle = [];
 
     async function startTrack(track, { addToHistory = true } = {}) {
         if (currentTrack?.TrackID === track.TrackID) {
@@ -77,6 +99,7 @@ export function initializeMusicPlayer({ queue }) {
 
     async function playTrack(track) {
         queue.clear();
+        repeatCycle = [track];
 
         if (currentTrack?.TrackID === track.TrackID) {
             if (audioPlayer.paused) {
@@ -101,6 +124,8 @@ export function initializeMusicPlayer({ queue }) {
         }
 
         queue.replace(tracks.slice(1));
+        repeatCycle = [tracks[0]];
+
         await startTrack(tracks[0]);
     }
 
@@ -130,15 +155,60 @@ export function initializeMusicPlayer({ queue }) {
         playerDuration.textContent = formatDuration(duration);
     }
 
+    function updateModeButtons() {
+        shuffleButton.classList.toggle("active", shuffleEnabled);
+        shuffleButton.title = shuffleEnabled ? "Shuffle on" : "Shuffle off";
+        shuffleButton.setAttribute(
+            "aria-label",
+            shuffleEnabled ? "Disable shuffle" : "Enable shuffle",
+        );
+        shuffleButton.setAttribute("aria-pressed", String(shuffleEnabled));
+
+        const repeatLabels = {
+            off: "Repeat off",
+            queue: "Repeat queue",
+            track: "Repeat track",
+        };
+
+        repeatButton.textContent = repeatMode === "track" ? "↻¹" : "↻";
+        repeatButton.title = repeatLabels[repeatMode];
+        repeatButton.setAttribute("aria-label", repeatLabels[repeatMode]);
+        repeatButton.setAttribute("aria-pressed", String(repeatMode !== "off"));
+        repeatButton.classList.toggle("active", repeatMode !== "off");
+    }
+
     async function playNextTrack() {
-        const nextEntry = queue.takeNext();
+        let nextEntry = queue.takeNext();
+
+        if (!nextEntry && repeatMode === "queue" && repeatCycle.length > 0) {
+            queue.append(repeatCycle);
+            repeatCycle = [];
+            nextEntry = queue.takeNext();
+        }
 
         if (!nextEntry) {
             audioPlayer.pause();
             return;
         }
 
+        repeatCycle.push(nextEntry.track);
         await startTrack(nextEntry.track);
+    }
+
+    async function handleTrackEnded() {
+        if (repeatMode === "track" && currentTrack) {
+            audioPlayer.currentTime = 0;
+
+            try {
+                await audioPlayer.play();
+            } catch (error) {
+                console.error("Playback failed:", error);
+            }
+
+            return;
+        }
+
+        await playNextTrack();
     }
 
     async function playPreviousTrack() {
@@ -181,13 +251,32 @@ export function initializeMusicPlayer({ queue }) {
     previousTrackButton.addEventListener("click", playPreviousTrack);
     nextTrackButton.addEventListener("click", playNextTrack);
 
+    shuffleButton.addEventListener("click", () => {
+        shuffleEnabled = !shuffleEnabled;
+
+        if (shuffleEnabled) {
+            queue.shuffle();
+        }
+
+        updateModeButtons();
+    });
+
+    repeatButton.addEventListener("click", () => {
+        const modes = ["off", "queue", "track"];
+        const currentIndex = modes.indexOf(repeatMode);
+
+        repeatMode = modes[(currentIndex + 1) % modes.length];
+
+        updateModeButtons();
+    });
+
     audioPlayer.addEventListener("play", updatePlayerControls);
     audioPlayer.addEventListener("pause", updatePlayerControls);
 
     audioPlayer.addEventListener("timeupdate", updatePlayerProgress);
     audioPlayer.addEventListener("loadedmetadata", updatePlayerProgress);
 
-    audioPlayer.addEventListener("ended", playNextTrack);
+    audioPlayer.addEventListener("ended", handleTrackEnded);
 
     playerSeek.addEventListener("input", () => {
         if (Number.isFinite(audioPlayer.duration)) {
@@ -210,6 +299,8 @@ export function initializeMusicPlayer({ queue }) {
 
         muteButton.textContent = audioPlayer.muted || audioPlayer.volume === 0 ? "🔇" : "🔊";
     });
+
+    updateModeButtons();
 
     return {
         playTrack,

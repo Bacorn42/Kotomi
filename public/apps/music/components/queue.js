@@ -84,6 +84,15 @@ export function initializeQueue() {
         return true;
     }
 
+    function shuffle() {
+        for (let i = entries.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [entries[i], entries[j]] = [entries[j], entries[i]];
+        }
+
+        notify();
+    }
+
     function clear() {
         if (entries.length === 0) {
             return;
@@ -117,6 +126,7 @@ export function initializeQueue() {
         takeNext,
         remove,
         move,
+        shuffle,
         clear,
         getEntries,
         getTracks,
