@@ -7,11 +7,53 @@ const fs = require("fs");
 const { requireLogin } = require("../../../middleware/auth");
 const { ensureMusicDirectories } = require("../config/storage");
 const libraryService = require("../services/library");
-const { STAGING_DIRECTORY, ARTWORK_DIRECTORY } = require("../config/storage");
+const { STAGING_DIRECTORY, ARTWORK_DIRECTORY, LIBRARY_DIRECTORY } = require("../config/storage");
 const ingestionService = require("../services/ingestion");
 const tracksRepository = require("../repositories/tracks");
 
 const router = express.Router();
+
+function parseByteRange(rangeHeader, fileSize) {
+    const match = /^bytes=(\d*)-(\d*)$/.exec(rangeHeader);
+
+    if (!match || (!match[1] && !match[2])) {
+        return null;
+    }
+
+    let start;
+    let end;
+
+    if (!match[1]) {
+        const suffixLength = Number(match[2]);
+
+        if (!Number.isSafeInteger(suffixLength) || suffixLength <= 0) {
+            return null;
+        }
+
+        start = Math.max(fileSize - suffixLength, 0);
+        end = fileSize - 1;
+    } else {
+        start = Number(match[1]);
+        end = match[2] ? Number(match[2]) : fileSize - 1;
+
+        if (
+            !Number.isSafeInteger(start) ||
+            !Number.isSafeInteger(end) ||
+            start > end ||
+            start >= fileSize
+        ) {
+            return null;
+        }
+
+        end = Math.min(end, fileSize - 1);
+    }
+
+    if (fileSize === 0 || start > end) {
+        return null;
+    }
+
+    return { start, end };
+}
 
 const upload = multer({
     storage: multer.diskStorage({
@@ -157,6 +199,110 @@ router.get("/tracks/:trackID/artwork", (req, res) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
 
     const stream = fs.createReadStream(artworkPath);
+
+    stream.on("error", () => {
+        if (!res.headersSent) {
+            res.status(404).end();
+        } else {
+            res.destroy();
+        }
+    });
+
+    stream.pipe(res);
+});
+
+router.get("/tracks/:trackID/stream", async (req, res) => {
+    const trackID = Number(req.params.trackID);
+
+    if (!Number.isSafeInteger(trackID) || trackID <= 0) {
+        return res.status(400).json({
+            message: "Invalid track ID.",
+        });
+    }
+
+    const track = tracksRepository.getById(trackID, req.user.UserID);
+
+    if (!track) {
+        return res.status(404).json({
+            message: "Track not found.",
+        });
+    }
+
+    const filename = path.basename(track.StorageKey);
+
+    if (filename !== track.StorageKey) {
+        return res.status(404).end();
+    }
+
+    const filePath = path.resolve(LIBRARY_DIRECTORY, filename);
+    const libraryDirectory = path.resolve(LIBRARY_DIRECTORY);
+
+    if (!filePath.startsWith(`${libraryDirectory}${path.sep}`)) {
+        return res.status(404).end();
+    }
+
+    let stats;
+
+    try {
+        stats = await fs.promises.stat(filePath);
+    } catch (error) {
+        if (error.code === "ENOENT") {
+            return res.status(404).json({
+                message: "Audio file not found.",
+            });
+        }
+
+        throw error;
+    }
+
+    if (!stats.isFile()) {
+        return res.status(404).end();
+    }
+
+    const fileSize = stats.size;
+    const rangeHeader = req.headers.range;
+
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.setHeader("Accept-Ranges", "bytes");
+    res.setHeader("Cache-Control", "private, no-cache");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+
+    if (!rangeHeader) {
+        res.status(200);
+        res.setHeader("Content-Length", fileSize);
+
+        const stream = fs.createReadStream(filePath);
+
+        stream.on("error", () => {
+            if (!res.headersSent) {
+                res.status(404).end();
+            } else {
+                res.destroy();
+            }
+        });
+
+        return stream.pipe(res);
+    }
+
+    const range = parseByteRange(rangeHeader, fileSize);
+
+    if (!range) {
+        res.setHeader("Content-Range", `bytes */${fileSize}`);
+
+        return res.status(416).end();
+    }
+
+    const { start, end } = range;
+    const contentLength = end - start + 1;
+
+    res.status(206);
+    res.setHeader("Content-Range", `bytes ${start}-${end}/${fileSize}`);
+    res.setHeader("Content-Length", contentLength);
+
+    const stream = fs.createReadStream(filePath, {
+        start,
+        end,
+    });
 
     stream.on("error", () => {
         if (!res.headersSent) {
