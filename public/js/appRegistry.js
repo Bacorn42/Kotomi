@@ -23,4 +23,12 @@ export const AppRegistry = [
         description: "Chat with local AI models.",
         url: "/apps/chat/",
     },
+    {
+        id: "music",
+        name: "Music",
+        icon: "🎵",
+        category: "Media",
+        description: "Manage and listen to your personal music library.",
+        url: "/apps/music/",
+    },
 ];
