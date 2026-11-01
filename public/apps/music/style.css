@@ -1,0 +1,128 @@
+.music-app {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.music-sidebar {
+    padding: 24px 18px;
+}
+
+.music-sidebar-section {
+    min-width: 0;
+}
+
+.music-sidebar-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.music-sidebar-heading h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.music-playlist-empty {
+    padding: 24px 12px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.music-playlist-empty span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--accent);
+    font-size: 28px;
+}
+
+.music-playlist-empty p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.music-library {
+    min-width: 0;
+}
+
+.music-library-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.music-library-header h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.music-library-header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.music-library-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 350px;
+    padding: 32px;
+    text-align: center;
+}
+
+.music-empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 20px;
+    border-radius: 50%;
+    background: var(--surface-light);
+    color: var(--accent);
+    font-size: 32px;
+}
+
+.music-library-empty h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+}
+
+.music-library-empty p {
+    max-width: 360px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+    .music-app {
+        grid-template-columns: 1fr;
+    }
+
+    .music-sidebar {
+        padding: 18px;
+    }
+
+    .music-sidebar-heading {
+        margin-bottom: 8px;
+    }
+
+    .music-playlist-empty {
+        padding: 12px;
+    }
+
+    .music-library-header h2 {
+        font-size: 22px;
+    }
+
+    .music-library-empty {
+        min-height: 280px;
+    }
+}

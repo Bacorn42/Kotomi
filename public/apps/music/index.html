@@ -1,0 +1,43 @@
+<!doctype html>
+
+<html>
+    <head>
+        <title>Kotomi - Music</title>
+
+        <link rel="stylesheet" href="/css/kotomi.css" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+
+    <body>
+        <div id="app-header"></div>
+
+        <main class="kotomi-container music-app">
+            <section class="music-sidebar-section">
+                <div class="music-sidebar-heading">
+                    <h2>Playlists</h2>
+                </div>
+
+                <aside class="music-sidebar kotomi-card">
+                    <div class="music-playlist-empty">
+                        <span>♫</span>
+                        <p>No playlists yet</p>
+                    </div>
+                </aside>
+            </section>
+
+            <section class="music-library">
+                <div class="music-library-header">
+                    <h2>Music Library</h2>
+                </div>
+
+                <div class="music-library-empty kotomi-card">
+                    <div class="music-empty-icon">♫</div>
+                    <h2>Your library is empty</h2>
+                    <p>Your music collection will appear here once you add some tracks.</p>
+                </div>
+            </section>
+        </main>
+
+        <script type="module" src="app.js"></script>
+    </body>
+</html>
