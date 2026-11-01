@@ -269,6 +269,45 @@
     line-height: 1.6;
 }
 
+.music-library-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 180px 42px;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.music-library-controls .kotomi-control {
+    width: 100%;
+    min-width: 0;
+}
+
+.music-library-controls button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    font-size: 20px;
+}
+
+.music-search-empty {
+    padding: 32px 16px;
+    text-align: center;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+}
+
+@media (max-width: 700px) {
+    .music-library-controls {
+        grid-template-columns: minmax(0, 1fr) 42px;
+    }
+
+    .music-library-controls input {
+        grid-column: 1 / -1;
+    }
+}
+
 @media (max-width: 700px) {
     .music-app {
         grid-template-columns: 1fr;

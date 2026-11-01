@@ -15,7 +15,13 @@ const uploadResults = document.getElementById("uploadResults");
 const trackList = document.getElementById("trackList");
 const libraryEmpty = document.getElementById("libraryEmpty");
 
+const searchInput = document.getElementById("searchInput");
+const sortSelect = document.getElementById("sortSelect");
+const sortDirectionButton = document.getElementById("sortDirectionButton");
+
 let isUploading = false;
+let tracks = [];
+let sortDescending = true;
 
 uploadButton.addEventListener("click", () => {
     if (!isUploading) {
@@ -70,12 +76,50 @@ function formatFileSize(bytes) {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function renderTracks(tracks) {
+function renderTracks() {
     trackList.replaceChildren();
+
+    const search = searchInput.value.trim().toLowerCase();
+    const sortBy = sortSelect.value;
+
+    const filteredTracks = tracks.filter((track) => {
+        const searchableText = [track.Title, track.Artist, track.Album]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
+
+        return searchableText.includes(search);
+    });
+
+    filteredTracks.sort((a, b) => {
+        let comparison = 0;
+
+        if (sortBy === "added") {
+            comparison = new Date(a.AddedDate) - new Date(b.AddedDate);
+        } else {
+            const valueA = (
+                a[sortBy === "title" ? "Title" : sortBy === "artist" ? "Artist" : "Album"] || ""
+            ).toLowerCase();
+            const valueB = (
+                b[sortBy === "title" ? "Title" : sortBy === "artist" ? "Artist" : "Album"] || ""
+            ).toLowerCase();
+
+            comparison = valueA.localeCompare(valueB);
+        }
+
+        return sortDescending ? -comparison : comparison;
+    });
 
     libraryEmpty.classList.toggle("hide", tracks.length > 0);
 
-    for (const track of tracks) {
+    if (tracks.length > 0 && filteredTracks.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "music-search-empty";
+        empty.textContent = "No tracks match your search.";
+        trackList.appendChild(empty);
+    }
+
+    for (const track of filteredTracks) {
         const row = document.createElement("div");
         row.className = "music-track";
 
@@ -140,7 +184,8 @@ async function loadTracks() {
 
         const data = await response.json();
 
-        renderTracks(data.tracks);
+        tracks = data.tracks;
+        renderTracks();
     } catch (error) {
         console.error(error);
     }
@@ -264,5 +309,17 @@ function uploadFiles(files) {
 
     xhr.send(formData);
 }
+
+searchInput.addEventListener("input", renderTracks);
+
+sortSelect.addEventListener("change", renderTracks);
+
+sortDirectionButton.addEventListener("click", () => {
+    sortDescending = !sortDescending;
+
+    sortDirectionButton.textContent = sortDescending ? "↓" : "↑";
+
+    renderTracks();
+});
 
 loadTracks();

@@ -34,6 +34,31 @@
                     <input type="file" id="fileInput" accept=".mp3,audio/mpeg" multiple hidden />
                 </div>
 
+                <div class="music-library-controls">
+                    <input
+                        type="search"
+                        id="searchInput"
+                        class="kotomi-control"
+                        placeholder="Search tracks, artists, or albums..."
+                    />
+
+                    <select id="sortSelect" class="kotomi-control">
+                        <option value="added">Recently added</option>
+                        <option value="title">Title</option>
+                        <option value="artist">Artist</option>
+                        <option value="album">Album</option>
+                    </select>
+
+                    <button
+                        id="sortDirectionButton"
+                        class="kotomi-button-secondary"
+                        title="Toggle sort direction"
+                        aria-label="Toggle sort direction"
+                    >
+                        ↓
+                    </button>
+                </div>
+
                 <div id="dropZone" class="music-drop-zone">
                     <div class="music-drop-icon">♫</div>
                     <h3>Drop your music here</h3>
