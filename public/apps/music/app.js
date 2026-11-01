@@ -4,18 +4,11 @@ import { initializeTags } from "./components/tags.js";
 import { initializePlaylists } from "./components/playlists.js";
 import { initializeTrackList } from "./components/track-list.js";
 import { initializeUpload } from "./components/upload.js";
+import { initializeLibrary } from "./components/library.js";
 
 initializeKotomiApp("music");
 
 const musicPlayer = initializeMusicPlayer();
-
-const libraryEmpty = document.getElementById("libraryEmpty");
-
-const searchInput = document.getElementById("searchInput");
-const sortSelect = document.getElementById("sortSelect");
-const sortDirectionButton = document.getElementById("sortDirectionButton");
-
-const libraryHeading = document.getElementById("libraryHeading");
 
 const bulkToolbar = document.getElementById("bulkToolbar");
 const bulkTagSelect = document.getElementById("bulkTagSelect");
@@ -26,42 +19,46 @@ const applyBulkTagButton = document.getElementById("applyBulkTagButton");
 const removeBulkTagButton = document.getElementById("removeBulkTagButton");
 const clearSelectionButton = document.getElementById("clearSelectionButton");
 
-let tracks = [];
-let sortDescending = true;
-
 let selectedTrackIDs = new Set();
-let visibleTrackIDs = [];
 
 const tags = initializeTags({
-    onTracksChanged: renderTracks,
+    onTracksChanged: () => library.render(),
     onBulkOptionsChanged: updateBulkToolbar,
 });
 
 const playlists = initializePlaylists({
-    onTracksChanged: renderTracks,
+    onTracksChanged: () => library.render(),
 });
 
 const trackList = initializeTrackList({
     tags,
     playlists,
     musicPlayer,
-    onTracksChanged: loadTracks,
+    onTracksChanged: () => library.loadTracks(),
     onSelectionChanged: updateBulkToolbar,
 });
 
+const library = initializeLibrary({
+    tags,
+    playlists,
+    trackList,
+    getSelectedTrackIDs: () => selectedTrackIDs,
+    onVisibleTracksChanged: updateBulkToolbar,
+});
+
 initializeUpload({
-    onUploadComplete: loadTracks,
+    onUploadComplete: () => library.loadTracks(),
 });
 
 function updateBulkToolbar() {
     const selectedCount = selectedTrackIDs.size;
     const allVisibleSelected =
-        visibleTrackIDs.length > 0 &&
-        visibleTrackIDs.every((trackID) => selectedTrackIDs.has(trackID));
+        library.getVisibleTrackIDs.length > 0 &&
+        library.getVisibleTrackIDs.every((trackID) => selectedTrackIDs.has(trackID));
 
     bulkToolbar.classList.toggle(
         "hide",
-        visibleTrackIDs.length === 0 && selectedTrackIDs.size === 0,
+        library.getVisibleTrackIDs.length === 0 && selectedTrackIDs.size === 0,
     );
 
     selectedTrackCount.textContent = `${selectedCount} selected`;
@@ -114,10 +111,12 @@ async function applyBulkTag(method) {
     selectedTrackIDs.clear();
 
     await tags.loadTags();
-    await loadTracks();
+    await library.loadTracks();
 }
 
 document.getElementById("selectVisibleButton").addEventListener("click", () => {
+    const visibleTrackIDs = library.getVisibleTrackIDs();
+
     const allSelected =
         visibleTrackIDs.length > 0 &&
         visibleTrackIDs.every((trackID) => selectedTrackIDs.has(trackID));
@@ -130,7 +129,7 @@ document.getElementById("selectVisibleButton").addEventListener("click", () => {
         }
     }
 
-    renderTracks();
+    library.render();
 });
 
 applyBulkTagButton.addEventListener("click", () => {
@@ -143,7 +142,7 @@ removeBulkTagButton.addEventListener("click", () => {
 
 clearSelectionButton.addEventListener("click", () => {
     selectedTrackIDs.clear();
-    renderTracks();
+    library.render();
 });
 
 bulkTagSelect.addEventListener("change", updateBulkToolbar);
@@ -176,114 +175,6 @@ addBulkPlaylistButton.addEventListener("click", async () => {
     }
 });
 
-function renderTracks() {
-    const sourceTracks =
-        playlists.getSelectedPlaylistID() === null
-            ? tracks
-            : playlists
-                  .getPlaylistTrackIDs()
-                  .map((trackID) => tracks.find((track) => track.TrackID === trackID))
-                  .filter(Boolean);
-
-    const selectedPlaylist = playlists
-        .getPlaylists()
-        .find((playlist) => playlist.PlaylistID === playlists.getSelectedPlaylistID());
-
-    libraryHeading.textContent = selectedPlaylist ? selectedPlaylist.Name : "Music Library";
-
-    const search = searchInput.value.trim().toLowerCase();
-    const sortBy = sortSelect.value;
-
-    const filteredTracks = sourceTracks.filter((track) => {
-        const searchableText = [track.Title, track.Artist, track.Album]
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase();
-
-        const matchesSearch = searchableText.includes(search);
-
-        const matchesTag =
-            tags.getSelectedTagID() === null ||
-            track.Tags.some((tag) => tag.TagID === tags.getSelectedTagID());
-
-        return matchesSearch && matchesTag;
-    });
-
-    filteredTracks.sort((a, b) => {
-        let comparison = 0;
-
-        if (sortBy === "added") {
-            comparison = new Date(a.AddedDate) - new Date(b.AddedDate);
-        } else {
-            const valueA = (
-                a[sortBy === "title" ? "Title" : sortBy === "artist" ? "Artist" : "Album"] || ""
-            ).toLowerCase();
-            const valueB = (
-                b[sortBy === "title" ? "Title" : sortBy === "artist" ? "Artist" : "Album"] || ""
-            ).toLowerCase();
-
-            comparison = valueA.localeCompare(valueB);
-        }
-
-        return sortDescending ? -comparison : comparison;
-    });
-
-    visibleTrackIDs = filteredTracks.map((track) => track.TrackID);
-    updateBulkToolbar();
-
-    libraryEmpty.classList.toggle(
-        "hide",
-        tracks.length > 0 || playlists.getSelectedPlaylistID() !== null,
-    );
-
-    let emptyMessage = null;
-
-    if (
-        filteredTracks.length === 0 &&
-        (tracks.length > 0 || playlists.getSelectedPlaylistID() !== null)
-    ) {
-        if (
-            playlists.getSelectedPlaylistID() !== null &&
-            playlists.getPlaylistTrackIDs().length === 0
-        ) {
-            emptyMessage = "This playlist is empty. Add some tracks to get started.";
-        } else {
-            emptyMessage = "No tracks match your search.";
-        }
-    }
-
-    trackList.render(filteredTracks, selectedTrackIDs, emptyMessage);
-}
-
-async function loadTracks() {
-    try {
-        const response = await fetch("/api/music/tracks");
-
-        if (!response.ok) {
-            throw new Error("Failed to load music library.");
-        }
-
-        const data = await response.json();
-
-        tracks = data.tracks;
-        renderTracks();
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-searchInput.addEventListener("input", renderTracks);
-
-sortSelect.addEventListener("change", renderTracks);
-
-sortDirectionButton.addEventListener("click", () => {
-    sortDescending = !sortDescending;
-
-    sortDirectionButton.textContent = sortDescending ? "↓" : "↑";
-
-    renderTracks();
-});
-
 playlists.loadPlaylists();
 tags.loadTags();
-loadTracks();
+library.loadTracks();
