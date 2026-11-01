@@ -16,6 +16,7 @@ function getTracks(userID) {
         TrackNumber: track.TrackNumber,
         DiscNumber: track.DiscNumber,
         AddedDate: track.AddedDate,
+        ArtworkURL: track.ArtworkStorageKey ? `/api/music/tracks/${track.TrackID}/artwork` : null,
     }));
 }
 

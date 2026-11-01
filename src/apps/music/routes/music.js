@@ -2,12 +2,14 @@ const express = require("express");
 const multer = require("multer");
 const crypto = require("crypto");
 const path = require("path");
+const fs = require("fs");
 
 const { requireLogin } = require("../../../middleware/auth");
 const { ensureMusicDirectories } = require("../config/storage");
 const libraryService = require("../services/library");
-const { STAGING_DIRECTORY } = require("../config/storage");
+const { STAGING_DIRECTORY, ARTWORK_DIRECTORY } = require("../config/storage");
 const ingestionService = require("../services/ingestion");
+const tracksRepository = require("../repositories/tracks");
 
 const router = express.Router();
 
@@ -45,6 +47,59 @@ router.get("/tracks", (req, res) => {
     const tracks = libraryService.getTracks(req.user.UserID);
 
     res.json({ tracks });
+});
+
+router.get("/tracks/:trackID/artwork", (req, res) => {
+    const trackID = Number(req.params.trackID);
+
+    if (!Number.isSafeInteger(trackID) || trackID <= 0) {
+        return res.status(400).json({
+            message: "Invalid track ID.",
+        });
+    }
+
+    const track = tracksRepository.getById(trackID, req.user.UserID);
+
+    if (!track || !track.ArtworkStorageKey) {
+        return res.status(404).end();
+    }
+
+    const filename = path.basename(track.ArtworkStorageKey);
+    const artworkPath = path.resolve(ARTWORK_DIRECTORY, filename);
+    const artworkDirectory = path.resolve(ARTWORK_DIRECTORY);
+
+    if (!artworkPath.startsWith(`${artworkDirectory}${path.sep}`)) {
+        return res.status(404).end();
+    }
+
+    const mimeTypes = {
+        ".jpg": "image/jpeg",
+        ".png": "image/png",
+        ".webp": "image/webp",
+        ".gif": "image/gif",
+    };
+
+    const mimeType = mimeTypes[path.extname(filename).toLowerCase()];
+
+    if (!mimeType) {
+        return res.status(404).end();
+    }
+
+    res.setHeader("Content-Type", mimeType);
+    res.setHeader("Cache-Control", "private, max-age=86400");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+
+    const stream = fs.createReadStream(artworkPath);
+
+    stream.on("error", () => {
+        if (!res.headersSent) {
+            res.status(404).end();
+        } else {
+            res.destroy();
+        }
+    });
+
+    stream.pipe(res);
 });
 
 router.get("/playlists", (req, res) => {

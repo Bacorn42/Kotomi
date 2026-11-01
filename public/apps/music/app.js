@@ -81,7 +81,28 @@ function renderTracks(tracks) {
 
         const artwork = document.createElement("div");
         artwork.className = "music-track-artwork";
-        artwork.textContent = "♫";
+
+        const placeholder = document.createElement("span");
+        placeholder.textContent = "♫";
+        artwork.appendChild(placeholder);
+
+        if (track.ArtworkURL) {
+            const image = document.createElement("img");
+
+            image.src = track.ArtworkURL;
+            image.alt = `${track.Title} artwork`;
+            image.loading = "lazy";
+
+            image.addEventListener("load", () => {
+                placeholder.classList.add("hide");
+            });
+
+            image.addEventListener("error", () => {
+                image.remove();
+            });
+
+            artwork.appendChild(image);
+        }
 
         const details = document.createElement("div");
         details.className = "music-track-details";
