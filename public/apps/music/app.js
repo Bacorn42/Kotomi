@@ -31,6 +31,8 @@ const playlistList = document.getElementById("playlistList");
 const libraryHeading = document.getElementById("libraryHeading");
 
 const bulkToolbar = document.getElementById("bulkToolbar");
+const bulkPlaylistSelect = document.getElementById("bulkPlaylistSelect");
+const addBulkPlaylistButton = document.getElementById("addBulkPlaylistButton");
 const selectedTrackCount = document.getElementById("selectedTrackCount");
 const bulkTagSelect = document.getElementById("bulkTagSelect");
 const applyBulkTagButton = document.getElementById("applyBulkTagButton");
@@ -313,6 +315,7 @@ function renderPlaylists() {
         item.append(selectButton, count, renameButton, deleteButton);
         playlistList.appendChild(item);
     }
+    renderBulkPlaylistOptions();
 }
 
 async function loadPlaylists() {
@@ -625,6 +628,56 @@ async function applyBulkTag(method) {
     await loadTracks();
 }
 
+function renderBulkPlaylistOptions() {
+    bulkPlaylistSelect.replaceChildren();
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Choose a playlist...";
+    bulkPlaylistSelect.appendChild(placeholder);
+
+    for (const playlist of playlists) {
+        const option = document.createElement("option");
+        option.value = playlist.PlaylistID;
+        option.textContent = playlist.Name;
+        bulkPlaylistSelect.appendChild(option);
+    }
+}
+
+async function refreshPlaylistData() {
+    await loadPlaylists();
+
+    if (selectedPlaylistID !== null) {
+        await selectPlaylist(selectedPlaylistID);
+    }
+}
+
+async function addTrackToPlaylist(playlistID, trackID) {
+    const response = await fetch(`/api/music/playlists/${playlistID}/tracks/${trackID}`, {
+        method: "POST",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message || "Failed to add track to playlist.");
+    }
+
+    return result.added;
+}
+
+async function removeTrackFromPlaylist(playlistID, trackID) {
+    const response = await fetch(`/api/music/playlists/${playlistID}/tracks/${trackID}`, {
+        method: "DELETE",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message || "Failed to remove track from playlist.");
+    }
+}
+
 document.getElementById("selectVisibleButton").addEventListener("click", () => {
     const allSelected =
         visibleTrackIDs.length > 0 &&
@@ -655,6 +708,32 @@ clearSelectionButton.addEventListener("click", () => {
 });
 
 bulkTagSelect.addEventListener("change", updateBulkToolbar);
+
+addBulkPlaylistButton.addEventListener("click", async () => {
+    const playlistID = Number(bulkPlaylistSelect.value);
+
+    if (!playlistID || selectedTrackIDs.size === 0) {
+        return;
+    }
+
+    try {
+        let addedCount = 0;
+
+        for (const trackID of selectedTrackIDs) {
+            const added = await addTrackToPlaylist(playlistID, trackID);
+
+            if (added) {
+                addedCount++;
+            }
+        }
+
+        await refreshPlaylistData();
+
+        showPlaylistStatus(`Added ${addedCount} track${addedCount === 1 ? "" : "s"} to playlist.`);
+    } catch (error) {
+        showPlaylistStatus(error.message);
+    }
+});
 
 function createTrackEditor(track) {
     const editor = document.createElement("form");
@@ -925,7 +1004,85 @@ function renderTracks() {
             row.after(editor);
         });
 
-        row.append(selection, artwork, details, album, duration, tagsButton, editButton);
+        let playlistButton;
+
+        if (selectedPlaylistID !== null) {
+            playlistButton = document.createElement("button");
+            playlistButton.type = "button";
+            playlistButton.className = "kotomi-button-secondary music-track-edit";
+            playlistButton.textContent = "Remove";
+
+            playlistButton.addEventListener("click", async () => {
+                try {
+                    await removeTrackFromPlaylist(selectedPlaylistID, track.TrackID);
+                    await refreshPlaylistData();
+                } catch (error) {
+                    showPlaylistStatus(error.message);
+                }
+            });
+        } else {
+            playlistButton = document.createElement("button");
+            playlistButton.type = "button";
+            playlistButton.className = "kotomi-button-secondary music-track-edit";
+            playlistButton.textContent = "Playlist";
+
+            playlistButton.addEventListener("click", () => {
+                const existingMenu = row.nextElementSibling;
+
+                if (existingMenu?.classList.contains("music-track-playlist-menu")) {
+                    existingMenu.remove();
+                    return;
+                }
+
+                const menu = document.createElement("div");
+                menu.className = "music-track-playlist-menu";
+
+                if (playlists.length === 0) {
+                    const empty = document.createElement("span");
+                    empty.textContent = "Create a playlist first.";
+                    menu.appendChild(empty);
+                }
+
+                for (const playlist of playlists) {
+                    const option = document.createElement("button");
+                    option.type = "button";
+                    option.className = "kotomi-button-secondary";
+                    option.textContent = playlist.Name;
+
+                    option.addEventListener("click", async () => {
+                        try {
+                            const added = await addTrackToPlaylist(
+                                playlist.PlaylistID,
+                                track.TrackID,
+                            );
+
+                            if (added) {
+                                await refreshPlaylistData();
+                            } else {
+                                menu.remove();
+                            }
+                        } catch (error) {
+                            showPlaylistStatus(error.message);
+                        }
+                    });
+
+                    menu.appendChild(option);
+                }
+
+                row.after(menu);
+            });
+        }
+
+        row.append(
+            selection,
+            artwork,
+            details,
+            album,
+            duration,
+            playlistButton,
+            tagsButton,
+            editButton,
+        );
         trackList.appendChild(row);
     }
 }
