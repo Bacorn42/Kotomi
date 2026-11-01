@@ -17,6 +17,8 @@
         "cookie-parser": "^1.4.7",
         "dotenv": "^18.0.7",
         "express": "^5.2.1",
+        "multer": "^2.5.0",
+        "music-metadata": "^12.3.3",
         "socket.io": "^4.8.3",
         "socket.io-client": "^4.8.3",
         "ws": "^8.21.1"
