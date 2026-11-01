@@ -311,12 +311,37 @@ export function initializeTrackList({
         playButton.textContent = "Play";
 
         playButton.addEventListener("click", () => {
-            musicPlayer.playTrack(track, filteredTracks);
+            musicPlayer.playTrack(track);
+        });
+
+        const addToQueueButton = document.createElement("button");
+        addToQueueButton.type = "button";
+        addToQueueButton.className = "kotomi-button-secondary music-track-edit";
+        addToQueueButton.textContent = "Queue";
+
+        addToQueueButton.addEventListener("click", () => {
+            musicPlayer.addToQueue([track]);
+        });
+
+        const playNextButton = document.createElement("button");
+        playNextButton.type = "button";
+        playNextButton.className = "kotomi-button-secondary music-track-edit";
+        playNextButton.textContent = "Play Next";
+
+        playNextButton.addEventListener("click", () => {
+            musicPlayer.playNext([track]);
         });
 
         const actions = document.createElement("div");
         actions.className = "music-track-actions";
-        actions.append(playButton, playlistButton, tagsButton, editButton);
+        actions.append(
+            playButton,
+            addToQueueButton,
+            playNextButton,
+            playlistButton,
+            tagsButton,
+            editButton,
+        );
 
         row.append(selection, artwork, details, album, duration, actions);
 

@@ -31,7 +31,9 @@ const playlists = initializePlaylists({
 bulkActions = initializeBulkActions({
     tags,
     playlists,
+    musicPlayer,
     getVisibleTrackIDs: () => library.getVisibleTrackIDs(),
+    getTracks: () => library.getTracks(),
     renderLibrary: () => library.render(),
 });
 
