@@ -18,6 +18,28 @@
                 </div>
 
                 <aside class="music-sidebar kotomi-card">
+                    <form id="playlistForm" class="music-tag-form">
+                        <input
+                            type="text"
+                            id="playlistNameInput"
+                            class="kotomi-control"
+                            placeholder="New playlist..."
+                            maxlength="100"
+                        />
+
+                        <button type="submit" class="kotomi-button">+</button>
+                    </form>
+
+                    <div id="playlistStatus" class="music-tag-status hide"></div>
+
+                    <div id="playlistList" class="music-playlist-list"></div>
+                </aside>
+
+                <div class="music-sidebar-heading music-sidebar-subheading">
+                    <h2>Tags</h2>
+                </div>
+
+                <aside class="music-sidebar kotomi-card">
                     <form id="tagForm" class="music-tag-form">
                         <input
                             type="text"
@@ -38,7 +60,7 @@
 
             <section class="music-library">
                 <div class="music-library-header">
-                    <h2>Music Library</h2>
+                    <h2 id="libraryHeading">Music Library</h2>
 
                     <button id="uploadButton" class="kotomi-button">+ Add Music</button>
 

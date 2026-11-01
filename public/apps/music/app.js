@@ -24,6 +24,12 @@ const tagNameInput = document.getElementById("tagNameInput");
 const tagStatus = document.getElementById("tagStatus");
 const tagList = document.getElementById("tagList");
 
+const playlistForm = document.getElementById("playlistForm");
+const playlistNameInput = document.getElementById("playlistNameInput");
+const playlistStatus = document.getElementById("playlistStatus");
+const playlistList = document.getElementById("playlistList");
+const libraryHeading = document.getElementById("libraryHeading");
+
 const bulkToolbar = document.getElementById("bulkToolbar");
 const selectedTrackCount = document.getElementById("selectedTrackCount");
 const bulkTagSelect = document.getElementById("bulkTagSelect");
@@ -38,6 +44,9 @@ let tags = [];
 let selectedTagID = null;
 let selectedTrackIDs = new Set();
 let visibleTrackIDs = [];
+let playlists = [];
+let selectedPlaylistID = null;
+let playlistTrackIDs = [];
 
 uploadButton.addEventListener("click", () => {
     if (!isUploading) {
@@ -178,6 +187,216 @@ function showTagStatus(message) {
     tagStatus.textContent = message;
     tagStatus.classList.remove("hide");
 }
+
+function showPlaylistStatus(message) {
+    playlistStatus.textContent = message;
+    playlistStatus.classList.remove("hide");
+}
+
+function renderPlaylists() {
+    playlistList.replaceChildren();
+
+    const allTracksItem = document.createElement("div");
+    allTracksItem.className = "music-playlist-item";
+
+    if (selectedPlaylistID === null) {
+        allTracksItem.classList.add("active");
+    }
+
+    const allTracksButton = document.createElement("button");
+    allTracksButton.type = "button";
+    allTracksButton.className = "music-playlist-filter";
+    allTracksButton.textContent = "All tracks";
+
+    allTracksButton.addEventListener("click", () => {
+        selectedPlaylistID = null;
+        playlistTrackIDs = [];
+        renderPlaylists();
+        renderTracks();
+    });
+
+    allTracksItem.appendChild(allTracksButton);
+    playlistList.appendChild(allTracksItem);
+
+    for (const playlist of playlists) {
+        const item = document.createElement("div");
+        item.className = "music-playlist-item";
+
+        if (selectedPlaylistID === playlist.PlaylistID) {
+            item.classList.add("active");
+        }
+
+        const selectButton = document.createElement("button");
+        selectButton.type = "button";
+        selectButton.className = "music-playlist-filter";
+        selectButton.textContent = playlist.Name;
+
+        selectButton.addEventListener("click", () => {
+            selectPlaylist(playlist.PlaylistID);
+        });
+
+        const count = document.createElement("span");
+        count.className = "music-tag-count";
+        count.textContent = playlist.TrackCount;
+
+        const renameButton = document.createElement("button");
+        renameButton.type = "button";
+        renameButton.className = "music-tag-delete";
+        renameButton.textContent = "✎";
+        renameButton.title = `Rename ${playlist.Name}`;
+
+        renameButton.addEventListener("click", async () => {
+            const name = prompt("Enter a new playlist name:", playlist.Name);
+
+            if (name === null || !name.trim()) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/music/playlists/${playlist.PlaylistID}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        Name: name.trim(),
+                        Description: playlist.Description,
+                    }),
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Failed to rename playlist.");
+                }
+
+                await loadPlaylists();
+            } catch (error) {
+                showPlaylistStatus(error.message);
+            }
+        });
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "music-tag-delete";
+        deleteButton.textContent = "×";
+        deleteButton.title = `Delete ${playlist.Name}`;
+
+        deleteButton.addEventListener("click", async () => {
+            if (!confirm(`Delete the playlist "${playlist.Name}"?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/music/playlists/${playlist.PlaylistID}`, {
+                    method: "DELETE",
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Failed to delete playlist.");
+                }
+
+                if (selectedPlaylistID === playlist.PlaylistID) {
+                    selectedPlaylistID = null;
+                    playlistTrackIDs = [];
+                }
+
+                await loadPlaylists();
+                renderTracks();
+            } catch (error) {
+                showPlaylistStatus(error.message);
+            }
+        });
+
+        item.append(selectButton, count, renameButton, deleteButton);
+        playlistList.appendChild(item);
+    }
+}
+
+async function loadPlaylists() {
+    try {
+        const response = await fetch("/api/music/playlists");
+
+        if (!response.ok) {
+            throw new Error("Failed to load playlists.");
+        }
+
+        const data = await response.json();
+        playlists = data.playlists;
+
+        if (
+            selectedPlaylistID !== null &&
+            !playlists.some((playlist) => playlist.PlaylistID === selectedPlaylistID)
+        ) {
+            selectedPlaylistID = null;
+            playlistTrackIDs = [];
+        }
+
+        renderPlaylists();
+        renderTracks();
+    } catch (error) {
+        showPlaylistStatus(error.message);
+    }
+}
+
+async function selectPlaylist(playlistID) {
+    selectedPlaylistID = playlistID;
+    playlistTrackIDs = [];
+
+    renderPlaylists();
+
+    try {
+        const response = await fetch(`/api/music/playlists/${playlistID}/tracks`);
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Failed to load playlist.");
+        }
+
+        playlistTrackIDs = data.tracks.map((track) => track.TrackID);
+
+        renderTracks();
+    } catch (error) {
+        showPlaylistStatus(error.message);
+    }
+}
+
+playlistForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const name = playlistNameInput.value.trim();
+
+    if (!name) {
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/music/playlists", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ Name: name }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Failed to create playlist.");
+        }
+
+        playlistNameInput.value = "";
+        playlistStatus.classList.add("hide");
+
+        await loadPlaylists();
+        await selectPlaylist(result.PlaylistID);
+    } catch (error) {
+        showPlaylistStatus(error.message);
+    }
+});
 
 async function loadTags() {
     try {
@@ -329,7 +548,10 @@ function updateBulkToolbar() {
         visibleTrackIDs.length > 0 &&
         visibleTrackIDs.every((trackID) => selectedTrackIDs.has(trackID));
 
-    bulkToolbar.classList.toggle("hide", tracks.length === 0);
+    bulkToolbar.classList.toggle(
+        "hide",
+        visibleTrackIDs.length === 0 && selectedTrackIDs.size === 0,
+    );
 
     selectedTrackCount.textContent = `${selectedCount} selected`;
 
@@ -523,10 +745,23 @@ function createTrackEditor(track) {
 function renderTracks() {
     trackList.replaceChildren();
 
+    const sourceTracks =
+        selectedPlaylistID === null
+            ? tracks
+            : playlistTrackIDs
+                  .map((trackID) => tracks.find((track) => track.TrackID === trackID))
+                  .filter(Boolean);
+
+    const selectedPlaylist = playlists.find(
+        (playlist) => playlist.PlaylistID === selectedPlaylistID,
+    );
+
+    libraryHeading.textContent = selectedPlaylist ? selectedPlaylist.Name : "Music Library";
+
     const search = searchInput.value.trim().toLowerCase();
     const sortBy = sortSelect.value;
 
-    const filteredTracks = tracks.filter((track) => {
+    const filteredTracks = sourceTracks.filter((track) => {
         const searchableText = [track.Title, track.Artist, track.Album]
             .filter(Boolean)
             .join(" ")
@@ -562,12 +797,18 @@ function renderTracks() {
     visibleTrackIDs = filteredTracks.map((track) => track.TrackID);
     updateBulkToolbar();
 
-    libraryEmpty.classList.toggle("hide", tracks.length > 0);
+    libraryEmpty.classList.toggle("hide", tracks.length > 0 || selectedPlaylistID !== null);
 
-    if (tracks.length > 0 && filteredTracks.length === 0) {
+    if (filteredTracks.length === 0 && (tracks.length > 0 || selectedPlaylistID !== null)) {
         const empty = document.createElement("div");
         empty.className = "music-search-empty";
-        empty.textContent = "No tracks match your search.";
+
+        if (selectedPlaylistID !== null && playlistTrackIDs.length === 0) {
+            empty.textContent = "This playlist is empty. Add some tracks to get started.";
+        } else {
+            empty.textContent = "No tracks match your search.";
+        }
+
         trackList.appendChild(empty);
     }
 
@@ -837,5 +1078,6 @@ sortDirectionButton.addEventListener("click", () => {
     renderTracks();
 });
 
+loadPlaylists();
 loadTags();
 loadTracks();

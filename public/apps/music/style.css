@@ -620,3 +620,55 @@
         display: none;
     }
 }
+
+.music-playlist-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.music-playlist-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--text);
+}
+
+.music-playlist-item.active {
+    border-color: var(--border-strong);
+    background: var(--surface-selected);
+}
+
+.music-playlist-filter {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.music-playlist-filter:hover {
+    color: var(--accent);
+}
+
+.music-playlist-item .music-tag-delete {
+    flex-shrink: 0;
+}
+
+.music-sidebar-subheading {
+    margin-top: 24px;
+}
+
+@media (max-width: 700px) {
+    .music-sidebar-subheading {
+        margin-top: 18px;
+    }
+}
