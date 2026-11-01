@@ -59,9 +59,30 @@ function getTags(userID) {
     }));
 }
 
+function updateTrackMetadata(trackID, userID, metadata) {
+    const track = tracksRepository.getById(trackID, userID);
+
+    if (!track) {
+        return false;
+    }
+
+    return tracksRepository.updateMetadata({
+        TrackID: trackID,
+        UserID: userID,
+        Title: metadata.Title,
+        Artist: metadata.Artist,
+        Album: metadata.Album,
+        AlbumArtist: metadata.AlbumArtist,
+        Genre: metadata.Genre,
+        TrackNumber: metadata.TrackNumber,
+        DiscNumber: metadata.DiscNumber,
+    });
+}
+
 module.exports = {
     getTracks,
     getPlaylists,
     getPlaylistTracks,
     getTags,
+    updateTrackMetadata,
 };

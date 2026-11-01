@@ -49,6 +49,73 @@ router.get("/tracks", (req, res) => {
     res.json({ tracks });
 });
 
+router.put("/tracks/:trackID", (req, res) => {
+    const trackID = Number(req.params.trackID);
+
+    if (!Number.isSafeInteger(trackID) || trackID <= 0) {
+        return res.status(400).json({
+            message: "Invalid track ID.",
+        });
+    }
+
+    const body = req.body;
+
+    if (!body || typeof body.Title !== "string" || !body.Title.trim()) {
+        return res.status(400).json({
+            message: "Track title is required.",
+        });
+    }
+
+    const stringFields = ["Artist", "Album", "AlbumArtist", "Genre"];
+
+    for (const field of stringFields) {
+        if (body[field] !== undefined && body[field] !== null && typeof body[field] !== "string") {
+            return res.status(400).json({
+                message: `Invalid ${field} value.`,
+            });
+        }
+    }
+
+    const numberFields = ["TrackNumber", "DiscNumber"];
+
+    for (const field of numberFields) {
+        const value = body[field];
+
+        if (
+            value !== undefined &&
+            value !== null &&
+            value !== "" &&
+            (!Number.isSafeInteger(value) || value <= 0)
+        ) {
+            return res.status(400).json({
+                message: `Invalid ${field} value.`,
+            });
+        }
+    }
+
+    const metadata = {
+        Title: body.Title.trim(),
+        Artist: body.Artist?.trim() || null,
+        Album: body.Album?.trim() || null,
+        AlbumArtist: body.AlbumArtist?.trim() || null,
+        Genre: body.Genre?.trim() || null,
+        TrackNumber: body.TrackNumber ? body.TrackNumber : null,
+        DiscNumber: body.DiscNumber ? body.DiscNumber : null,
+    };
+
+    const updated = libraryService.updateTrackMetadata(trackID, req.user.UserID, metadata);
+
+    if (!updated) {
+        return res.status(404).json({
+            message: "Track not found.",
+        });
+    }
+
+    res.json({
+        message: "Track metadata updated.",
+    });
+});
+
 router.get("/tracks/:trackID/artwork", (req, res) => {
     const trackID = Number(req.params.trackID);
 

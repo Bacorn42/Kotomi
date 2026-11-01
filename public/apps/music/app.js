@@ -76,6 +76,114 @@ function formatFileSize(bytes) {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function createEditorField(labelText, name, value, type = "text") {
+    const field = document.createElement("label");
+    field.className = "music-editor-field";
+
+    const label = document.createElement("span");
+    label.textContent = labelText;
+
+    const input = document.createElement("input");
+    input.className = "kotomi-control";
+    input.name = name;
+    input.type = type;
+    input.value = value ?? "";
+
+    if (type === "number") {
+        input.min = "1";
+        input.step = "1";
+    }
+
+    field.append(label, input);
+
+    return field;
+}
+
+function createTrackEditor(track) {
+    const editor = document.createElement("form");
+    editor.className = "music-track-editor";
+
+    const heading = document.createElement("h3");
+    heading.textContent = "Edit track";
+
+    const fields = [
+        createEditorField("Title", "Title", track.Title),
+        createEditorField("Artist", "Artist", track.Artist),
+        createEditorField("Album", "Album", track.Album),
+        createEditorField("Album artist", "AlbumArtist", track.AlbumArtist),
+        createEditorField("Genre", "Genre", track.Genre),
+        createEditorField("Track number", "TrackNumber", track.TrackNumber, "number"),
+        createEditorField("Disc number", "DiscNumber", track.DiscNumber, "number"),
+    ];
+
+    const actions = document.createElement("div");
+    actions.className = "music-editor-actions";
+
+    const saveButton = document.createElement("button");
+    saveButton.type = "submit";
+    saveButton.className = "kotomi-button";
+    saveButton.textContent = "Save";
+
+    const cancelButton = document.createElement("button");
+    cancelButton.type = "button";
+    cancelButton.className = "kotomi-button-secondary";
+    cancelButton.textContent = "Cancel";
+
+    const status = document.createElement("p");
+    status.className = "music-editor-status hide";
+
+    actions.append(saveButton, cancelButton);
+    editor.append(heading, ...fields, actions, status);
+
+    cancelButton.addEventListener("click", () => {
+        editor.remove();
+    });
+
+    editor.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(editor);
+
+        const metadata = {
+            Title: formData.get("Title"),
+            Artist: formData.get("Artist"),
+            Album: formData.get("Album"),
+            AlbumArtist: formData.get("AlbumArtist"),
+            Genre: formData.get("Genre"),
+            TrackNumber: formData.get("TrackNumber") ? Number(formData.get("TrackNumber")) : null,
+            DiscNumber: formData.get("DiscNumber") ? Number(formData.get("DiscNumber")) : null,
+        };
+
+        saveButton.disabled = true;
+        saveButton.textContent = "Saving...";
+
+        try {
+            const response = await fetch(`/api/music/tracks/${track.TrackID}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(metadata),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || "Failed to update track.");
+            }
+
+            await loadTracks();
+        } catch (error) {
+            status.textContent = error.message;
+            status.classList.remove("hide");
+            saveButton.disabled = false;
+            saveButton.textContent = "Save";
+        }
+    });
+
+    return editor;
+}
+
 function renderTracks() {
     trackList.replaceChildren();
 
@@ -169,7 +277,24 @@ function renderTracks() {
         duration.className = "music-track-duration";
         duration.textContent = formatDuration(track.Duration);
 
-        row.append(artwork, details, album, duration);
+        const editButton = document.createElement("button");
+        editButton.type = "button";
+        editButton.className = "kotomi-button-secondary music-track-edit";
+        editButton.textContent = "Edit";
+
+        editButton.addEventListener("click", () => {
+            const existingEditor = row.nextElementSibling;
+
+            if (existingEditor?.classList.contains("music-track-editor")) {
+                existingEditor.remove();
+                return;
+            }
+
+            const editor = createTrackEditor(track);
+            row.after(editor);
+        });
+
+        row.append(artwork, details, album, duration, editButton);
         trackList.appendChild(row);
     }
 }
