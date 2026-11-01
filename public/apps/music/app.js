@@ -6,10 +6,15 @@ import { initializeTrackList } from "./components/track-list.js";
 import { initializeUpload } from "./components/upload.js";
 import { initializeLibrary } from "./components/library.js";
 import { initializeBulkActions } from "./components/bulk-actions.js";
+import { initializeQueue } from "./components/queue.js";
+import { initializeQueuePanel } from "./components/queue-panel.js";
 
 initializeKotomiApp("music");
 
-const musicPlayer = initializeMusicPlayer();
+const musicQueue = initializeQueue();
+const musicPlayer = initializeMusicPlayer({ queue: musicQueue });
+
+initializeQueuePanel({ queue: musicQueue });
 
 let library;
 let bulkActions;

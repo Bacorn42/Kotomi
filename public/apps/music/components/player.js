@@ -1,6 +1,6 @@
 import { formatDuration } from "../utils/formatting.js";
 
-export function initializeMusicPlayer() {
+export function initializeMusicPlayer({ queue }) {
     const musicPlayer = document.getElementById("musicPlayer");
     const audioPlayer = document.getElementById("audioPlayer");
 
@@ -20,33 +20,26 @@ export function initializeMusicPlayer() {
     const muteButton = document.getElementById("muteButton");
     const volumeSlider = document.getElementById("volumeSlider");
 
-    let playbackTracks = [];
-    let playbackIndex = -1;
     let currentTrack = null;
+    let playbackHistory = [];
 
-    async function playTrack(track, sequence) {
-        const nextSequence = [...sequence];
-        const nextIndex = nextSequence.findIndex((item) => item.TrackID === track.TrackID);
-
+    async function startTrack(track, { addToHistory = true } = {}) {
         if (currentTrack?.TrackID === track.TrackID) {
-            playbackTracks = nextSequence;
-            playbackIndex = nextIndex;
-
             if (audioPlayer.paused) {
                 try {
                     await audioPlayer.play();
                 } catch (error) {
                     console.error("Playback failed:", error);
                 }
-            } else {
-                audioPlayer.pause();
             }
 
             return;
         }
 
-        playbackTracks = nextSequence;
-        playbackIndex = nextIndex;
+        if (addToHistory && currentTrack) {
+            playbackHistory.push(currentTrack);
+        }
+
         currentTrack = track;
 
         musicPlayer.classList.remove("hide");
@@ -82,6 +75,43 @@ export function initializeMusicPlayer() {
         }
     }
 
+    async function playTrack(track) {
+        queue.clear();
+
+        if (currentTrack?.TrackID === track.TrackID) {
+            if (audioPlayer.paused) {
+                try {
+                    await audioPlayer.play();
+                } catch (error) {
+                    console.error("Playback failed:", error);
+                }
+            } else {
+                audioPlayer.pause();
+            }
+
+            return;
+        }
+
+        await startTrack(track);
+    }
+
+    async function playSelection(tracks) {
+        if (tracks.length === 0) {
+            return;
+        }
+
+        queue.replace(tracks.slice(1));
+        await startTrack(tracks[0]);
+    }
+
+    function addToQueue(tracks) {
+        queue.append(tracks);
+    }
+
+    function playNext(tracks) {
+        queue.prepend(tracks);
+    }
+
     function updatePlayerControls() {
         const isPlaying = !audioPlayer.paused;
 
@@ -100,17 +130,19 @@ export function initializeMusicPlayer() {
         playerDuration.textContent = formatDuration(duration);
     }
 
-    function playNextTrack() {
-        if (playbackIndex < 0 || playbackIndex >= playbackTracks.length - 1) {
+    async function playNextTrack() {
+        const nextEntry = queue.takeNext();
+
+        if (!nextEntry) {
             audioPlayer.pause();
             return;
         }
 
-        playTrack(playbackTracks[playbackIndex + 1], playbackTracks);
+        await startTrack(nextEntry.track);
     }
 
-    function playPreviousTrack() {
-        if (playbackIndex < 0) {
+    async function playPreviousTrack() {
+        if (!currentTrack) {
             return;
         }
 
@@ -119,11 +151,15 @@ export function initializeMusicPlayer() {
             return;
         }
 
-        if (playbackIndex > 0) {
-            playTrack(playbackTracks[playbackIndex - 1], playbackTracks);
-        } else {
+        const previousTrack = playbackHistory.pop();
+
+        if (!previousTrack) {
             audioPlayer.currentTime = 0;
+            return;
         }
+
+        queue.prepend([currentTrack]);
+        await startTrack(previousTrack, { addToHistory: false });
     }
 
     playPauseButton.addEventListener("click", async () => {
@@ -177,5 +213,8 @@ export function initializeMusicPlayer() {
 
     return {
         playTrack,
+        playSelection,
+        addToQueue,
+        playNext,
     };
 }

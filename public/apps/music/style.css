@@ -983,3 +983,143 @@
         gap: 6px;
     }
 }
+
+.music-queue-panel {
+    position: absolute;
+    right: 28px;
+    bottom: calc(100% + 10px);
+    display: flex;
+    flex-direction: column;
+    width: min(380px, calc(100vw - 28px));
+    max-height: min(65vh, 520px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.music-queue-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.music-queue-header h2 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.music-queue-count {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 0.8rem;
+}
+
+.music-queue-header-actions,
+.music-queue-entry-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.music-queue-panel button,
+.music-queue-toggle {
+    color: var(--text);
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.music-queue-panel button {
+    min-width: 30px;
+    min-height: 30px;
+}
+
+.music-queue-panel button:hover:not(:disabled),
+.music-queue-toggle:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-strong);
+}
+
+.music-queue-panel button:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.music-queue-clear {
+    padding: 0 10px;
+    font-size: 0.8rem;
+}
+
+.music-queue-close {
+    font-size: 1.2rem;
+}
+
+.music-queue-list {
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.music-queue-entry {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.music-queue-entry:last-child {
+    border-bottom: none;
+}
+
+.music-queue-entry-details {
+    min-width: 0;
+    flex: 1;
+}
+
+.music-queue-entry-title,
+.music-queue-entry-artist {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.music-queue-entry-title {
+    font-size: 0.9rem;
+}
+
+.music-queue-entry-artist {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 0.8rem;
+}
+
+.music-queue-entry-actions button {
+    font-size: 1rem;
+}
+
+.music-queue-empty {
+    padding: 28px 16px;
+    color: var(--muted);
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.music-queue-toggle {
+    padding: 7px 10px;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 700px) {
+    .music-queue-panel {
+        right: 14px;
+        width: min(380px, calc(100vw - 28px));
+    }
+}
