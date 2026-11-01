@@ -28,9 +28,40 @@
             <section class="music-library">
                 <div class="music-library-header">
                     <h2>Music Library</h2>
+
+                    <button id="uploadButton" class="kotomi-button">+ Add Music</button>
+
+                    <input type="file" id="fileInput" accept=".mp3,audio/mpeg" multiple hidden />
                 </div>
 
-                <div class="music-library-empty kotomi-card">
+                <div id="dropZone" class="music-drop-zone">
+                    <div class="music-drop-icon">♫</div>
+                    <h3>Drop your music here</h3>
+                    <p>Or use the Add Music button to select MP3 files.</p>
+                    <p class="music-drop-hint">
+                        MP3 files · Up to 100 MB each · 20 files per upload
+                    </p>
+                </div>
+
+                <div id="uploadProgress" class="music-upload-progress hide">
+                    <div class="music-upload-progress-header">
+                        <span id="uploadStatus">Uploading...</span>
+                        <span id="uploadPercentage">0%</span>
+                    </div>
+
+                    <progress
+                        id="uploadProgressBar"
+                        class="kotomi-progress"
+                        value="0"
+                        max="100"
+                    ></progress>
+                </div>
+
+                <div id="uploadResults" class="music-upload-results hide"></div>
+
+                <div id="trackList" class="music-track-list"></div>
+
+                <div id="libraryEmpty" class="music-library-empty kotomi-card">
                     <div class="music-empty-icon">♫</div>
                     <h2>Your library is empty</h2>
                     <p>Your music collection will appear here once you add some tracks.</p>

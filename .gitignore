@@ -24,3 +24,6 @@ Thumbs.db
 # Database
 data/kotomi.db
 data/kotomi.db-journal
+
+# Music
+data/music
