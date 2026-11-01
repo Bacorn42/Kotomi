@@ -223,3 +223,115 @@ CREATE INDEX IF NOT EXISTS IX_ChatConversations_UserID_UpdatedDate
 
 CREATE INDEX IF NOT EXISTS IX_ChatMessages_ConversationID_MessageID
     ON ChatMessages(ConversationID, MessageID);
+
+
+CREATE TABLE IF NOT EXISTS MusicTracks (
+    TrackID INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserID INTEGER NOT NULL,
+    StorageKey TEXT NOT NULL UNIQUE,
+    OriginalFilename TEXT,
+    Title TEXT NOT NULL CHECK(length(trim(Title)) > 0),
+    Artist TEXT,
+    Album TEXT,
+    AlbumArtist TEXT,
+    Genre TEXT,
+    Duration REAL CHECK(Duration IS NULL OR Duration >= 0),
+    FileSize INTEGER NOT NULL CHECK(FileSize >= 0),
+    Format TEXT NOT NULL,
+    MimeType TEXT NOT NULL,
+    TrackNumber INTEGER CHECK(TrackNumber IS NULL OR TrackNumber > 0),
+    DiscNumber INTEGER CHECK(DiscNumber IS NULL OR DiscNumber > 0),
+    FileHash TEXT,
+    ArtworkStorageKey TEXT,
+    AddedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UpdatedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(UserID, TrackID),
+
+    FOREIGN KEY(UserID)
+        REFERENCES Users(UserID)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS MusicPlaylists (
+    PlaylistID INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserID INTEGER NOT NULL,
+    Name TEXT NOT NULL CHECK(length(trim(Name)) > 0),
+    Description TEXT,
+    ArtworkStorageKey TEXT,
+    CreatedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UpdatedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(UserID, PlaylistID),
+
+    FOREIGN KEY(UserID)
+        REFERENCES Users(UserID)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS MusicPlaylistTracks (
+    UserID INTEGER NOT NULL,
+    PlaylistID INTEGER NOT NULL,
+    TrackID INTEGER NOT NULL,
+    Position INTEGER NOT NULL CHECK(Position >= 0),
+
+    PRIMARY KEY(PlaylistID, TrackID),
+    UNIQUE(PlaylistID, Position),
+
+    FOREIGN KEY(UserID, PlaylistID)
+        REFERENCES MusicPlaylists(UserID, PlaylistID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY(UserID, TrackID)
+        REFERENCES MusicTracks(UserID, TrackID)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS MusicTags (
+    TagID INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserID INTEGER NOT NULL,
+    Name TEXT NOT NULL COLLATE NOCASE
+        CHECK(length(trim(Name)) > 0),
+    CreatedDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(UserID, TagID),
+    UNIQUE(UserID, Name),
+
+    FOREIGN KEY(UserID)
+        REFERENCES Users(UserID)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS MusicTrackTags (
+    UserID INTEGER NOT NULL,
+    TrackID INTEGER NOT NULL,
+    TagID INTEGER NOT NULL,
+
+    PRIMARY KEY(TrackID, TagID),
+
+    FOREIGN KEY(UserID, TrackID)
+        REFERENCES MusicTracks(UserID, TrackID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY(UserID, TagID)
+        REFERENCES MusicTags(UserID, TagID)
+        ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_MusicTracks_UserID
+    ON MusicTracks(UserID);
+
+CREATE INDEX IF NOT EXISTS idx_MusicTracks_UserID_Title
+    ON MusicTracks(UserID, Title COLLATE NOCASE);
+
+CREATE INDEX IF NOT EXISTS idx_MusicTracks_UserID_Artist
+    ON MusicTracks(UserID, Artist COLLATE NOCASE);
+
+CREATE INDEX IF NOT EXISTS idx_MusicPlaylistTracks_UserID_PlaylistID
+    ON MusicPlaylistTracks(UserID, PlaylistID);
+
+CREATE INDEX IF NOT EXISTS idx_MusicPlaylistTracks_UserID_TrackID
+    ON MusicPlaylistTracks(UserID, TrackID);
+
+CREATE INDEX IF NOT EXISTS idx_MusicTrackTags_UserID_TagID
+    ON MusicTrackTags(UserID, TagID);
