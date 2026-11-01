@@ -93,33 +93,53 @@
                 </div>
 
                 <div id="bulkToolbar" class="music-bulk-toolbar hide">
-                    <span id="selectedTrackCount">0 selected</span>
+                    <div class="music-bulk-group music-bulk-selection">
+                        <div class="music-bulk-group-heading">
+                            <span id="selectedTrackCount">0 selected</span>
+                        </div>
 
-                    <button id="selectVisibleButton" class="kotomi-button-secondary">
-                        Select visible
-                    </button>
+                        <div class="music-bulk-group-controls">
+                            <button id="selectVisibleButton" class="kotomi-button-secondary">
+                                Select visible
+                            </button>
 
-                    <select id="bulkTagSelect" class="kotomi-control">
-                        <option value="">Choose a tag...</option>
-                    </select>
+                            <button id="clearSelectionButton" class="kotomi-button-secondary">
+                                Clear selection
+                            </button>
+                        </div>
+                    </div>
 
-                    <button id="applyBulkTagButton" class="kotomi-button-secondary">Add tag</button>
+                    <div class="music-bulk-group">
+                        <div class="music-bulk-group-heading">Tags</div>
 
-                    <button id="removeBulkTagButton" class="kotomi-button-secondary">
-                        Remove tag
-                    </button>
+                        <div class="music-bulk-group-controls">
+                            <select id="bulkTagSelect" class="kotomi-control">
+                                <option value="">Choose a tag...</option>
+                            </select>
 
-                    <select id="bulkPlaylistSelect" class="kotomi-control">
-                        <option value="">Choose a playlist...</option>
-                    </select>
+                            <button id="applyBulkTagButton" class="kotomi-button-secondary">
+                                Add tag
+                            </button>
 
-                    <button id="addBulkPlaylistButton" class="kotomi-button-secondary">
-                        Add to playlist
-                    </button>
+                            <button id="removeBulkTagButton" class="kotomi-button-secondary">
+                                Remove tag
+                            </button>
+                        </div>
+                    </div>
 
-                    <button id="clearSelectionButton" class="kotomi-button-secondary">
-                        Clear selection
-                    </button>
+                    <div class="music-bulk-group">
+                        <div class="music-bulk-group-heading">Playlists</div>
+
+                        <div class="music-bulk-group-controls">
+                            <select id="bulkPlaylistSelect" class="kotomi-control">
+                                <option value="">Choose a playlist...</option>
+                            </select>
+
+                            <button id="addBulkPlaylistButton" class="kotomi-button-secondary">
+                                Add to playlist
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="dropZone" class="music-drop-zone">

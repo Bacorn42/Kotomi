@@ -1073,16 +1073,11 @@ function renderTracks() {
             });
         }
 
-        row.append(
-            selection,
-            artwork,
-            details,
-            album,
-            duration,
-            playlistButton,
-            tagsButton,
-            editButton,
-        );
+        const actions = document.createElement("div");
+        actions.className = "music-track-actions";
+        actions.append(playlistButton, tagsButton, editButton);
+
+        row.append(selection, artwork, details, album, duration, actions);
         trackList.appendChild(row);
     }
 }

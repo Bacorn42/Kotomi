@@ -158,14 +158,28 @@
 
 .music-track {
     display: grid;
-    grid-template-columns: 48px minmax(0, 2fr) minmax(0, 1fr) 55px;
+    grid-template-columns: 18px 48px minmax(0, 2fr) minmax(0, 1fr) 55px auto;
     align-items: center;
-    gap: 16px;
-    padding: 12px 16px;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    background: var(--surface);
-    transition: background 0.2s ease;
+    gap: 12px;
+}
+
+.music-track-details {
+    min-width: 0;
+}
+
+.music-track-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    min-width: 0;
+}
+
+.music-track-edit {
+    flex-shrink: 0;
+    padding: 6px 12px;
+    font-size: 13px;
+    white-space: nowrap;
 }
 
 .music-track:hover {
@@ -490,13 +504,55 @@
 .music-bulk-toolbar {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
+    align-items: stretch;
+    gap: 16px;
     padding: 14px 16px;
     margin-bottom: 16px;
     border: 1px solid var(--border);
     border-radius: 14px;
     background: var(--surface);
+}
+
+.music-bulk-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    padding-right: 16px;
+    border-right: 1px solid var(--border);
+}
+
+.music-bulk-group:last-child {
+    padding-right: 0;
+    border-right: none;
+}
+
+.music-bulk-group-heading {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.music-bulk-group-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.music-bulk-group-controls select {
+    width: auto;
+    min-width: 150px;
+}
+
+.music-bulk-group-controls button {
+    white-space: nowrap;
+}
+
+.music-bulk-toolbar button:disabled,
+.music-bulk-toolbar select:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
 }
 
 .music-bulk-toolbar > span {
@@ -693,5 +749,54 @@
 @media (max-width: 700px) {
     .music-track-playlist-menu {
         padding: 10px;
+    }
+}
+
+@media (max-width: 700px) {
+    .music-bulk-toolbar {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .music-bulk-group {
+        padding-right: 0;
+        padding-bottom: 12px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .music-bulk-group:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .music-bulk-group-controls {
+        width: 100%;
+    }
+
+    .music-bulk-group-controls select {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    .music-track {
+        grid-template-columns: 18px 42px minmax(0, 1fr) 50px;
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .music-track-artwork {
+        width: 42px;
+        height: 42px;
+    }
+
+    .music-track-album {
+        display: none;
+    }
+
+    .music-track-actions {
+        grid-column: 3 / -1;
+        justify-content: flex-end;
+        flex-wrap: wrap;
     }
 }
