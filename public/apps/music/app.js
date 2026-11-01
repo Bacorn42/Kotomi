@@ -1,6 +1,7 @@
 import { initializeKotomiApp } from "/js/kotomi.js";
 import { initializeMusicPlayer } from "./components/player.js";
 import { formatDuration } from "./utils/formatting.js";
+import { initializeTags } from "./components/tags.js";
 
 initializeKotomiApp("music");
 
@@ -23,11 +24,6 @@ const searchInput = document.getElementById("searchInput");
 const sortSelect = document.getElementById("sortSelect");
 const sortDirectionButton = document.getElementById("sortDirectionButton");
 
-const tagForm = document.getElementById("tagForm");
-const tagNameInput = document.getElementById("tagNameInput");
-const tagStatus = document.getElementById("tagStatus");
-const tagList = document.getElementById("tagList");
-
 const playlistForm = document.getElementById("playlistForm");
 const playlistNameInput = document.getElementById("playlistNameInput");
 const playlistStatus = document.getElementById("playlistStatus");
@@ -38,7 +34,6 @@ const bulkToolbar = document.getElementById("bulkToolbar");
 const bulkPlaylistSelect = document.getElementById("bulkPlaylistSelect");
 const addBulkPlaylistButton = document.getElementById("addBulkPlaylistButton");
 const selectedTrackCount = document.getElementById("selectedTrackCount");
-const bulkTagSelect = document.getElementById("bulkTagSelect");
 const applyBulkTagButton = document.getElementById("applyBulkTagButton");
 const removeBulkTagButton = document.getElementById("removeBulkTagButton");
 const clearSelectionButton = document.getElementById("clearSelectionButton");
@@ -48,15 +43,17 @@ let isUploading = false;
 let tracks = [];
 let sortDescending = true;
 
-let tags = [];
-let selectedTagID = null;
-
 let selectedTrackIDs = new Set();
 let visibleTrackIDs = [];
 
 let playlists = [];
 let selectedPlaylistID = null;
 let playlistTrackIDs = [];
+
+const tags = initializeTags({
+    onTracksChanged: renderTracks,
+    onBulkOptionsChanged: updateBulkToolbar,
+});
 
 uploadButton.addEventListener("click", () => {
     if (!isUploading) {
@@ -91,93 +88,6 @@ dropZone.addEventListener("drop", (event) => {
         uploadFiles(Array.from(event.dataTransfer.files));
     }
 });
-
-function renderTags() {
-    tagList.replaceChildren();
-
-    const allButton = document.createElement("button");
-    allButton.type = "button";
-    allButton.className = "music-tag-item";
-    allButton.textContent = "All tracks";
-
-    if (selectedTagID === null) {
-        allButton.classList.add("active");
-    }
-
-    allButton.addEventListener("click", () => {
-        selectedTagID = null;
-        renderTags();
-        renderTracks();
-    });
-
-    tagList.appendChild(allButton);
-
-    for (const tag of tags) {
-        const item = document.createElement("div");
-        item.className = "music-tag-item";
-
-        if (selectedTagID === tag.TagID) {
-            item.classList.add("active");
-        }
-
-        const filterButton = document.createElement("button");
-        filterButton.type = "button";
-        filterButton.className = "music-tag-filter";
-        filterButton.textContent = tag.Name;
-
-        filterButton.addEventListener("click", () => {
-            selectedTagID = selectedTagID === tag.TagID ? null : tag.TagID;
-
-            renderTags();
-            renderTracks();
-        });
-
-        const count = document.createElement("span");
-        count.className = "music-tag-count";
-        count.textContent = tag.TrackCount;
-
-        const deleteButton = document.createElement("button");
-        deleteButton.type = "button";
-        deleteButton.className = "music-tag-delete";
-        deleteButton.textContent = "×";
-        deleteButton.title = `Delete ${tag.Name}`;
-
-        deleteButton.addEventListener("click", async () => {
-            if (!confirm(`Delete the tag "${tag.Name}"?`)) {
-                return;
-            }
-
-            try {
-                const response = await fetch(`/api/music/tags/${tag.TagID}`, {
-                    method: "DELETE",
-                });
-
-                if (!response.ok) {
-                    throw new Error("Failed to delete tag.");
-                }
-
-                if (selectedTagID === tag.TagID) {
-                    selectedTagID = null;
-                }
-
-                await loadTags();
-                await loadTracks();
-            } catch (error) {
-                showTagStatus(error.message);
-            }
-        });
-
-        item.append(filterButton, count, deleteButton);
-        tagList.appendChild(item);
-    }
-
-    renderBulkTagOptions();
-}
-
-function showTagStatus(message) {
-    tagStatus.textContent = message;
-    tagStatus.classList.remove("hide");
-}
 
 function showPlaylistStatus(message) {
     playlistStatus.textContent = message;
@@ -390,127 +300,6 @@ playlistForm.addEventListener("submit", async (event) => {
     }
 });
 
-async function loadTags() {
-    try {
-        const response = await fetch("/api/music/tags");
-
-        if (!response.ok) {
-            throw new Error("Failed to load tags.");
-        }
-
-        const data = await response.json();
-        tags = data.tags;
-
-        renderTags();
-    } catch (error) {
-        showTagStatus(error.message);
-    }
-}
-
-tagForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const name = tagNameInput.value.trim();
-
-    if (!name) {
-        return;
-    }
-
-    try {
-        const response = await fetch("/api/music/tags", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ Name: name }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || "Failed to create tag.");
-        }
-
-        tagNameInput.value = "";
-        tagStatus.classList.add("hide");
-
-        await loadTags();
-    } catch (error) {
-        showTagStatus(error.message);
-    }
-});
-
-function createTrackTagEditor(track) {
-    const editor = document.createElement("div");
-    editor.className = "music-track-tags-editor";
-
-    const heading = document.createElement("h3");
-    heading.textContent = "Track tags";
-
-    editor.appendChild(heading);
-
-    if (tags.length === 0) {
-        const empty = document.createElement("p");
-        empty.textContent = "Create a tag in the sidebar first.";
-        editor.appendChild(empty);
-        return editor;
-    }
-
-    for (const tag of tags) {
-        const label = document.createElement("label");
-        label.className = "music-track-tag-option";
-
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.checked = track.Tags.some((assignedTag) => assignedTag.TagID === tag.TagID);
-
-        const name = document.createElement("span");
-        name.textContent = tag.Name;
-
-        checkbox.addEventListener("change", async () => {
-            checkbox.disabled = true;
-
-            const method = checkbox.checked ? "POST" : "DELETE";
-
-            try {
-                const response = await fetch(
-                    `/api/music/tracks/${track.TrackID}/tags/${tag.TagID}`,
-                    { method },
-                );
-
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.message || "Failed to update tag.");
-                }
-
-                if (checkbox.checked) {
-                    track.Tags.push({
-                        TagID: tag.TagID,
-                        Name: tag.Name,
-                    });
-                } else {
-                    track.Tags = track.Tags.filter(
-                        (assignedTag) => assignedTag.TagID !== tag.TagID,
-                    );
-                }
-
-                await loadTags();
-                renderTracks();
-            } catch (error) {
-                checkbox.checked = !checkbox.checked;
-                showTagStatus(error.message);
-                checkbox.disabled = false;
-            }
-        });
-
-        label.append(checkbox, name);
-        editor.appendChild(label);
-    }
-
-    return editor;
-}
-
 function createEditorField(labelText, name, value, type = "text") {
     const field = document.createElement("label");
     field.className = "music-editor-field";
@@ -547,7 +336,7 @@ function updateBulkToolbar() {
 
     selectedTrackCount.textContent = `${selectedCount} selected`;
 
-    bulkTagSelect.disabled = selectedCount === 0 || tags.length === 0;
+    bulkTagSelect.disabled = selectedCount === 0 || tags.getTags().length === 0;
     applyBulkTagButton.disabled = selectedCount === 0 || !bulkTagSelect.value;
     removeBulkTagButton.disabled = selectedCount === 0 || !bulkTagSelect.value;
     clearSelectionButton.disabled = selectedCount === 0;
@@ -559,25 +348,6 @@ function updateBulkToolbar() {
             ? "Deselect visible"
             : "Select visible";
     }
-}
-
-function renderBulkTagOptions() {
-    bulkTagSelect.replaceChildren();
-
-    const placeholder = document.createElement("option");
-    placeholder.value = "";
-    placeholder.textContent = "Choose a tag...";
-
-    bulkTagSelect.appendChild(placeholder);
-
-    for (const tag of tags) {
-        const option = document.createElement("option");
-        option.value = tag.TagID;
-        option.textContent = tag.Name;
-        bulkTagSelect.appendChild(option);
-    }
-
-    updateBulkToolbar();
 }
 
 async function applyBulkTag(method) {
@@ -606,14 +376,14 @@ async function applyBulkTag(method) {
     }
 
     if (failed.length > 0) {
-        showTagStatus(`Could not update ${failed.length} of ${selectedIDs.length} track(s).`);
+        tags.showStatus(`Could not update ${failed.length} of ${selectedIDs.length} track(s).`);
     } else {
-        tagStatus.classList.add("hide");
+        tags.clearStatus();
     }
 
     selectedTrackIDs.clear();
 
-    await loadTags();
+    await tags.loadTags();
     await loadTracks();
 }
 
@@ -798,7 +568,7 @@ function createTrackEditor(track) {
             }
 
             await loadTracks();
-            await loadTags();
+            await tags.loadTags();
         } catch (error) {
             status.textContent = error.message;
             status.classList.remove("hide");
@@ -838,7 +608,8 @@ function renderTracks() {
         const matchesSearch = searchableText.includes(search);
 
         const matchesTag =
-            selectedTagID === null || track.Tags.some((tag) => tag.TagID === selectedTagID);
+            tags.getSelectedTagID() === null ||
+            track.Tags.some((tag) => tag.TagID === tags.getSelectedTagID());
 
         return matchesSearch && matchesTag;
     });
@@ -989,7 +760,7 @@ function renderTracks() {
                 return;
             }
 
-            const editor = createTrackTagEditor(track);
+            const editor = tags.createTrackTagEditor(track);
             row.after(editor);
         });
 
@@ -1229,5 +1000,5 @@ sortDirectionButton.addEventListener("click", () => {
 });
 
 loadPlaylists();
-loadTags();
+tags.loadTags();
 loadTracks();
