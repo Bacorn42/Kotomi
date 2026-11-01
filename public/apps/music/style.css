@@ -1175,3 +1175,13 @@
     border-color: var(--accent);
     opacity: 1;
 }
+
+.music-history-time {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 0.75rem;
+}
+
+.music-history-entry > button {
+    flex-shrink: 0;
+}

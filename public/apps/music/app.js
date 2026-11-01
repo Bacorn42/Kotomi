@@ -8,13 +8,27 @@ import { initializeLibrary } from "./components/library.js";
 import { initializeBulkActions } from "./components/bulk-actions.js";
 import { initializeQueue } from "./components/queue.js";
 import { initializeQueuePanel } from "./components/queue-panel.js";
+import { initializePlaybackHistory } from "./components/history.js";
+import { initializeHistoryPanel } from "./components/history-panel.js";
 
 initializeKotomiApp("music");
 
 const musicQueue = initializeQueue();
-const musicPlayer = initializeMusicPlayer({ queue: musicQueue });
+const playbackHistory = initializePlaybackHistory();
 
-initializeQueuePanel({ queue: musicQueue });
+const musicPlayer = initializeMusicPlayer({
+    queue: musicQueue,
+    history: playbackHistory,
+});
+
+initializeQueuePanel({
+    queue: musicQueue,
+});
+
+initializeHistoryPanel({
+    history: playbackHistory,
+    musicPlayer,
+});
 
 let library;
 let bulkActions;

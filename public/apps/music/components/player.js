@@ -1,6 +1,6 @@
 import { formatDuration } from "../utils/formatting.js";
 
-export function initializeMusicPlayer({ queue }) {
+export function initializeMusicPlayer({ queue, history }) {
     const musicPlayer = document.getElementById("musicPlayer");
     const audioPlayer = document.getElementById("audioPlayer");
 
@@ -63,6 +63,7 @@ export function initializeMusicPlayer({ queue }) {
         }
 
         currentTrack = track;
+        history.add(track);
 
         musicPlayer.classList.remove("hide");
 

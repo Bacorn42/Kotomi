@@ -124,7 +124,13 @@ export function initializeQueuePanel({ queue }) {
     }
 
     toggleButton.addEventListener("click", () => {
-        setOpen(panel.classList.contains("hide"));
+        const isOpening = panel.classList.contains("hide");
+
+        if (isOpening) {
+            document.dispatchEvent(new CustomEvent("music-panel-open", { detail: "queue" }));
+        }
+
+        setOpen(isOpening);
     });
 
     closeButton.addEventListener("click", () => {
@@ -133,6 +139,12 @@ export function initializeQueuePanel({ queue }) {
 
     clearButton.addEventListener("click", () => {
         queue.clear();
+    });
+
+    document.addEventListener("music-panel-open", (event) => {
+        if (event.detail !== "queue") {
+            setOpen(false);
+        }
     });
 
     queue.subscribe(render);
