@@ -195,6 +195,185 @@ router.get("/playlists/:playlistID/tracks", (req, res) => {
     res.json({ tracks });
 });
 
+router.post("/playlists", (req, res) => {
+    const name = req.body?.Name;
+    const description = req.body?.Description;
+
+    if (typeof name !== "string" || !name.trim()) {
+        return res.status(400).json({
+            message: "Playlist name is required.",
+        });
+    }
+
+    if (name.trim().length > 100) {
+        return res.status(400).json({
+            message: "Playlist names cannot exceed 100 characters.",
+        });
+    }
+
+    if (description !== undefined && description !== null && typeof description !== "string") {
+        return res.status(400).json({
+            message: "Invalid playlist description.",
+        });
+    }
+
+    if (description && description.length > 500) {
+        return res.status(400).json({
+            message: "Playlist descriptions cannot exceed 500 characters.",
+        });
+    }
+
+    const playlistID = libraryService.createPlaylist(
+        req.user.UserID,
+        name.trim(),
+        description?.trim() || null,
+    );
+
+    res.status(201).json({
+        PlaylistID: playlistID,
+        Name: name.trim(),
+        Description: description?.trim() || null,
+    });
+});
+
+router.put("/playlists/:playlistID", (req, res) => {
+    const playlistID = Number(req.params.playlistID);
+    const name = req.body?.Name;
+    const description = req.body?.Description;
+
+    if (!Number.isSafeInteger(playlistID) || playlistID <= 0) {
+        return res.status(400).json({
+            message: "Invalid playlist ID.",
+        });
+    }
+
+    if (typeof name !== "string" || !name.trim()) {
+        return res.status(400).json({
+            message: "Playlist name is required.",
+        });
+    }
+
+    if (name.trim().length > 100) {
+        return res.status(400).json({
+            message: "Playlist names cannot exceed 100 characters.",
+        });
+    }
+
+    if (description !== undefined && description !== null && typeof description !== "string") {
+        return res.status(400).json({
+            message: "Invalid playlist description.",
+        });
+    }
+
+    if (description && description.length > 500) {
+        return res.status(400).json({
+            message: "Playlist descriptions cannot exceed 500 characters.",
+        });
+    }
+
+    const updated = libraryService.updatePlaylist(
+        playlistID,
+        req.user.UserID,
+        name.trim(),
+        description?.trim() || null,
+    );
+
+    if (!updated) {
+        return res.status(404).json({
+            message: "Playlist not found.",
+        });
+    }
+
+    res.json({
+        message: "Playlist updated.",
+    });
+});
+
+router.delete("/playlists/:playlistID", (req, res) => {
+    const playlistID = Number(req.params.playlistID);
+
+    if (!Number.isSafeInteger(playlistID) || playlistID <= 0) {
+        return res.status(400).json({
+            message: "Invalid playlist ID.",
+        });
+    }
+
+    const removed = libraryService.removePlaylist(playlistID, req.user.UserID);
+
+    if (!removed) {
+        return res.status(404).json({
+            message: "Playlist not found.",
+        });
+    }
+
+    res.json({
+        message: "Playlist deleted.",
+    });
+});
+
+router.post("/playlists/:playlistID/tracks/:trackID", (req, res) => {
+    const playlistID = Number(req.params.playlistID);
+    const trackID = Number(req.params.trackID);
+
+    if (
+        !Number.isSafeInteger(playlistID) ||
+        playlistID <= 0 ||
+        !Number.isSafeInteger(trackID) ||
+        trackID <= 0
+    ) {
+        return res.status(400).json({
+            message: "Invalid playlist or track ID.",
+        });
+    }
+
+    const added = libraryService.addTrackToPlaylist(playlistID, trackID, req.user.UserID);
+
+    if (added === null) {
+        return res.status(404).json({
+            message: "Playlist or track not found.",
+        });
+    }
+
+    res.json({
+        message: added ? "Track added to playlist." : "Track is already in playlist.",
+        added,
+    });
+});
+
+router.delete("/playlists/:playlistID/tracks/:trackID", (req, res) => {
+    const playlistID = Number(req.params.playlistID);
+    const trackID = Number(req.params.trackID);
+
+    if (
+        !Number.isSafeInteger(playlistID) ||
+        playlistID <= 0 ||
+        !Number.isSafeInteger(trackID) ||
+        trackID <= 0
+    ) {
+        return res.status(400).json({
+            message: "Invalid playlist or track ID.",
+        });
+    }
+
+    const removed = libraryService.removeTrackFromPlaylist(playlistID, trackID, req.user.UserID);
+
+    if (removed === null) {
+        return res.status(404).json({
+            message: "Playlist not found.",
+        });
+    }
+
+    if (!removed) {
+        return res.status(404).json({
+            message: "Track is not in this playlist.",
+        });
+    }
+
+    res.json({
+        message: "Track removed from playlist.",
+    });
+});
+
 router.get("/tags", (req, res) => {
     const tags = libraryService.getTags(req.user.UserID);
 

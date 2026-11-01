@@ -55,6 +55,50 @@ function getPlaylistTracks(playlistID, userID) {
     }));
 }
 
+function createPlaylist(userID, name, description = null) {
+    return playlistsRepository.create(userID, name, description);
+}
+
+function updatePlaylist(playlistID, userID, name, description = null) {
+    const playlist = playlistsRepository.getById(playlistID, userID);
+
+    if (!playlist) {
+        return false;
+    }
+
+    return playlistsRepository.update({
+        PlaylistID: playlistID,
+        UserID: userID,
+        Name: name,
+        Description: description,
+    });
+}
+
+function removePlaylist(playlistID, userID) {
+    return playlistsRepository.remove(playlistID, userID);
+}
+
+function addTrackToPlaylist(playlistID, trackID, userID) {
+    const playlist = playlistsRepository.getById(playlistID, userID);
+    const track = tracksRepository.getById(trackID, userID);
+
+    if (!playlist || !track) {
+        return null;
+    }
+
+    return playlistsRepository.addTrack(userID, playlistID, trackID);
+}
+
+function removeTrackFromPlaylist(playlistID, trackID, userID) {
+    const playlist = playlistsRepository.getById(playlistID, userID);
+
+    if (!playlist) {
+        return null;
+    }
+
+    return playlistsRepository.removeTrack(userID, playlistID, trackID);
+}
+
 function getTags(userID) {
     return tagsRepository.getAll(userID).map((tag) => ({
         TagID: tag.TagID,
@@ -122,6 +166,11 @@ module.exports = {
     getTracks,
     getPlaylists,
     getPlaylistTracks,
+    createPlaylist,
+    updatePlaylist,
+    removePlaylist,
+    addTrackToPlaylist,
+    removeTrackFromPlaylist,
     getTags,
     updateTrackMetadata,
     getTrackTags,
