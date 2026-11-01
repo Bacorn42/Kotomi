@@ -17,6 +17,10 @@ function getTracks(userID) {
         DiscNumber: track.DiscNumber,
         AddedDate: track.AddedDate,
         ArtworkURL: track.ArtworkStorageKey ? `/api/music/tracks/${track.TrackID}/artwork` : null,
+        Tags: tagsRepository.getForTrack(track.TrackID, userID).map((tag) => ({
+            TagID: tag.TagID,
+            Name: tag.Name,
+        })),
     }));
 }
 
@@ -79,10 +83,50 @@ function updateTrackMetadata(trackID, userID, metadata) {
     });
 }
 
+function getTrackTags(trackID, userID) {
+    const track = tracksRepository.getById(trackID, userID);
+
+    if (!track) {
+        return null;
+    }
+
+    return tagsRepository.getForTrack(trackID, userID);
+}
+
+function createTag(userID, name) {
+    return tagsRepository.create(userID, name);
+}
+
+function removeTag(tagID, userID) {
+    return tagsRepository.remove(tagID, userID);
+}
+
+function addTagToTrack(trackID, tagID, userID) {
+    const track = tracksRepository.getById(trackID, userID);
+    const tag = tagsRepository.getById(tagID, userID);
+
+    if (!track || !tag) {
+        return false;
+    }
+
+    tagsRepository.addToTrack(userID, trackID, tagID);
+
+    return true;
+}
+
+function removeTagFromTrack(trackID, tagID, userID) {
+    return tagsRepository.removeFromTrack(userID, trackID, tagID);
+}
+
 module.exports = {
     getTracks,
     getPlaylists,
     getPlaylistTracks,
     getTags,
     updateTrackMetadata,
+    getTrackTags,
+    createTag,
+    removeTag,
+    addTagToTrack,
+    removeTagFromTrack,
 };

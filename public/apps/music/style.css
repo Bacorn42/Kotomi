@@ -356,6 +356,143 @@
     font-size: 13px;
 }
 
+.music-tag-form {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.music-tag-form input {
+    min-width: 0;
+    flex: 1;
+}
+
+.music-tag-form button {
+    min-width: 40px;
+    padding: 8px;
+}
+
+.music-tag-status {
+    margin-bottom: 12px;
+    color: #e58d83;
+    font-size: 13px;
+}
+
+.music-tag-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.music-tag-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--text);
+}
+
+.music-tag-item.active {
+    border-color: var(--border-strong);
+    background: var(--surface-selected);
+}
+
+.music-tag-filter {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.music-tag-count {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.music-tag-delete {
+    padding: 0 4px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.music-tag-delete:hover {
+    color: #e58d83;
+}
+
+.music-track-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 6px;
+}
+
+.music-track-tags span {
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: var(--surface-selected);
+    color: var(--accent);
+    font-size: 11px;
+}
+
+.music-track-tags-editor {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    margin-top: -4px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-light);
+}
+
+.music-track-tags-editor h3 {
+    width: 100%;
+    margin: 0;
+    font-size: 15px;
+}
+
+.music-track-tags-editor p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.music-track-tag-option {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--text);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.music-track-tag-option input {
+    accent-color: var(--accent);
+}
+
+.music-track {
+    grid-template-columns: 48px minmax(0, 2fr) minmax(0, 1fr) 55px auto auto;
+}
+
+@media (max-width: 700px) {
+    .music-track {
+        grid-template-columns: 42px minmax(0, 1fr) 50px auto auto;
+    }
+}
+
 @media (max-width: 700px) {
     .music-track {
         grid-template-columns: 42px minmax(0, 1fr) 50px auto;

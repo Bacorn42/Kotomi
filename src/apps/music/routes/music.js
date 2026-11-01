@@ -201,6 +201,137 @@ router.get("/tags", (req, res) => {
     res.json({ tags });
 });
 
+router.get("/tracks/:trackID/tags", (req, res) => {
+    const trackID = Number(req.params.trackID);
+
+    if (!Number.isSafeInteger(trackID) || trackID <= 0) {
+        return res.status(400).json({
+            message: "Invalid track ID.",
+        });
+    }
+
+    const tags = libraryService.getTrackTags(trackID, req.user.UserID);
+
+    if (tags === null) {
+        return res.status(404).json({
+            message: "Track not found.",
+        });
+    }
+
+    res.json({ tags });
+});
+
+router.post("/tags", (req, res) => {
+    const name = req.body?.Name;
+
+    if (typeof name !== "string" || !name.trim()) {
+        return res.status(400).json({
+            message: "Tag name is required.",
+        });
+    }
+
+    if (name.trim().length > 50) {
+        return res.status(400).json({
+            message: "Tag names cannot exceed 50 characters.",
+        });
+    }
+
+    try {
+        const tagID = libraryService.createTag(req.user.UserID, name.trim());
+
+        res.status(201).json({
+            TagID: tagID,
+            Name: name.trim(),
+        });
+    } catch (error) {
+        if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+            return res.status(409).json({
+                message: "You already have a tag with that name.",
+            });
+        }
+
+        throw error;
+    }
+});
+
+router.delete("/tags/:tagID", (req, res) => {
+    const tagID = Number(req.params.tagID);
+
+    if (!Number.isSafeInteger(tagID) || tagID <= 0) {
+        return res.status(400).json({
+            message: "Invalid tag ID.",
+        });
+    }
+
+    const removed = libraryService.removeTag(tagID, req.user.UserID);
+
+    if (!removed) {
+        return res.status(404).json({
+            message: "Tag not found.",
+        });
+    }
+
+    res.json({
+        message: "Tag deleted.",
+    });
+});
+
+router.post("/tracks/:trackID/tags/:tagID", (req, res) => {
+    const trackID = Number(req.params.trackID);
+    const tagID = Number(req.params.tagID);
+
+    if (
+        !Number.isSafeInteger(trackID) ||
+        trackID <= 0 ||
+        !Number.isSafeInteger(tagID) ||
+        tagID <= 0
+    ) {
+        return res.status(400).json({
+            message: "Invalid track or tag ID.",
+        });
+    }
+
+    const added = libraryService.addTagToTrack(trackID, tagID, req.user.UserID);
+
+    if (!added) {
+        return res.status(404).json({
+            message: "Track or tag not found.",
+        });
+    }
+
+    res.json({
+        message: "Tag assigned.",
+    });
+});
+
+router.delete("/tracks/:trackID/tags/:tagID", (req, res) => {
+    const trackID = Number(req.params.trackID);
+    const tagID = Number(req.params.tagID);
+
+    if (
+        !Number.isSafeInteger(trackID) ||
+        trackID <= 0 ||
+        !Number.isSafeInteger(tagID) ||
+        tagID <= 0
+    ) {
+        return res.status(400).json({
+            message: "Invalid track or tag ID.",
+        });
+    }
+
+    const removed = libraryService.removeTagFromTrack(trackID, tagID, req.user.UserID);
+
+    if (!removed) {
+        return res.status(404).json({
+            message: "Tag assignment not found.",
+        });
+    }
+
+    res.json({
+        message: "Tag removed.",
+    });
+});
+
 router.post(
     "/tracks/upload",
     (req, res, next) => {

@@ -18,10 +18,21 @@
                 </div>
 
                 <aside class="music-sidebar kotomi-card">
-                    <div class="music-playlist-empty">
-                        <span>♫</span>
-                        <p>No playlists yet</p>
-                    </div>
+                    <form id="tagForm" class="music-tag-form">
+                        <input
+                            type="text"
+                            id="tagNameInput"
+                            class="kotomi-control"
+                            placeholder="New tag..."
+                            maxlength="50"
+                        />
+
+                        <button type="submit" class="kotomi-button">+</button>
+                    </form>
+
+                    <div id="tagStatus" class="music-tag-status hide"></div>
+
+                    <div id="tagList" class="music-tag-list"></div>
                 </aside>
             </section>
 
