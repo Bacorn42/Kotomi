@@ -30,18 +30,23 @@ export function initializeLibrary({
 
         libraryHeading.textContent = selectedPlaylist ? selectedPlaylist.Name : "Music Library";
 
-        const search = searchInput.value.trim().toLowerCase();
+        const searchTerms = searchInput.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+
         const sortBy = sortSelect.value;
+        const selectedTagID = tags.getSelectedTagID();
 
         const filteredTracks = sourceTracks.filter((track) => {
-            const searchableText = [track.Title, track.Artist, track.Album]
+            const searchableText = [
+                track.Title,
+                track.Artist,
+                track.Album,
+                ...track.Tags.map((tag) => tag.Name),
+            ]
                 .filter(Boolean)
                 .join(" ")
                 .toLowerCase();
 
-            const matchesSearch = searchableText.includes(search);
-
-            const selectedTagID = tags.getSelectedTagID();
+            const matchesSearch = searchTerms.every((term) => searchableText.includes(term));
 
             const matchesTag =
                 selectedTagID === null || track.Tags.some((tag) => tag.TagID === selectedTagID);
@@ -88,7 +93,7 @@ export function initializeLibrary({
             ) {
                 emptyMessage = "This playlist is empty. Add some tracks to get started.";
             } else {
-                emptyMessage = "No tracks match your search.";
+                emptyMessage = "No tracks match your current filters.";
             }
         }
 
