@@ -24,11 +24,20 @@ const tagNameInput = document.getElementById("tagNameInput");
 const tagStatus = document.getElementById("tagStatus");
 const tagList = document.getElementById("tagList");
 
+const bulkToolbar = document.getElementById("bulkToolbar");
+const selectedTrackCount = document.getElementById("selectedTrackCount");
+const bulkTagSelect = document.getElementById("bulkTagSelect");
+const applyBulkTagButton = document.getElementById("applyBulkTagButton");
+const removeBulkTagButton = document.getElementById("removeBulkTagButton");
+const clearSelectionButton = document.getElementById("clearSelectionButton");
+
 let isUploading = false;
 let tracks = [];
 let sortDescending = true;
 let tags = [];
 let selectedTagID = null;
+let selectedTrackIDs = new Set();
+let visibleTrackIDs = [];
 
 uploadButton.addEventListener("click", () => {
     if (!isUploading) {
@@ -161,6 +170,8 @@ function renderTags() {
         item.append(filterButton, count, deleteButton);
         tagList.appendChild(item);
     }
+
+    renderBulkTagOptions();
 }
 
 function showTagStatus(message) {
@@ -312,6 +323,117 @@ function createEditorField(labelText, name, value, type = "text") {
     return field;
 }
 
+function updateBulkToolbar() {
+    const selectedCount = selectedTrackIDs.size;
+    const allVisibleSelected =
+        visibleTrackIDs.length > 0 &&
+        visibleTrackIDs.every((trackID) => selectedTrackIDs.has(trackID));
+
+    bulkToolbar.classList.toggle("hide", tracks.length === 0);
+
+    selectedTrackCount.textContent = `${selectedCount} selected`;
+
+    bulkTagSelect.disabled = selectedCount === 0 || tags.length === 0;
+    applyBulkTagButton.disabled = selectedCount === 0 || !bulkTagSelect.value;
+    removeBulkTagButton.disabled = selectedCount === 0 || !bulkTagSelect.value;
+    clearSelectionButton.disabled = selectedCount === 0;
+
+    const selectVisibleButton = document.getElementById("selectVisibleButton");
+
+    if (selectVisibleButton) {
+        selectVisibleButton.textContent = allVisibleSelected
+            ? "Deselect visible"
+            : "Select visible";
+    }
+}
+
+function renderBulkTagOptions() {
+    bulkTagSelect.replaceChildren();
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Choose a tag...";
+
+    bulkTagSelect.appendChild(placeholder);
+
+    for (const tag of tags) {
+        const option = document.createElement("option");
+        option.value = tag.TagID;
+        option.textContent = tag.Name;
+        bulkTagSelect.appendChild(option);
+    }
+
+    updateBulkToolbar();
+}
+
+async function applyBulkTag(method) {
+    const tagID = Number(bulkTagSelect.value);
+
+    if (!tagID || selectedTrackIDs.size === 0) {
+        return;
+    }
+
+    applyBulkTagButton.disabled = true;
+    removeBulkTagButton.disabled = true;
+
+    const selectedIDs = [...selectedTrackIDs];
+    const failed = [];
+
+    for (const trackID of selectedIDs) {
+        try {
+            const response = await fetch(`/api/music/tracks/${trackID}/tags/${tagID}`, { method });
+
+            if (!response.ok) {
+                throw new Error("Request failed.");
+            }
+        } catch {
+            failed.push(trackID);
+        }
+    }
+
+    if (failed.length > 0) {
+        showTagStatus(`Could not update ${failed.length} of ${selectedIDs.length} track(s).`);
+    } else {
+        tagStatus.classList.add("hide");
+    }
+
+    selectedTrackIDs.clear();
+
+    await loadTags();
+    await loadTracks();
+}
+
+document.getElementById("selectVisibleButton").addEventListener("click", () => {
+    const allSelected =
+        visibleTrackIDs.length > 0 &&
+        visibleTrackIDs.every((trackID) => selectedTrackIDs.has(trackID));
+
+    for (const trackID of visibleTrackIDs) {
+        if (allSelected) {
+            selectedTrackIDs.delete(trackID);
+        } else {
+            selectedTrackIDs.add(trackID);
+        }
+    }
+
+    renderTracks();
+});
+
+applyBulkTagButton.addEventListener("click", () => {
+    applyBulkTag("POST");
+});
+
+removeBulkTagButton.addEventListener("click", () => {
+    applyBulkTag("DELETE");
+});
+
+clearSelectionButton.addEventListener("click", () => {
+    selectedTrackIDs.clear();
+    renderTracks();
+});
+
+bulkTagSelect.addEventListener("change", updateBulkToolbar);
+
 function createTrackEditor(track) {
     const editor = document.createElement("form");
     editor.className = "music-track-editor";
@@ -437,6 +559,9 @@ function renderTracks() {
         return sortDescending ? -comparison : comparison;
     });
 
+    visibleTrackIDs = filteredTracks.map((track) => track.TrackID);
+    updateBulkToolbar();
+
     libraryEmpty.classList.toggle("hide", tracks.length > 0);
 
     if (tracks.length > 0 && filteredTracks.length === 0) {
@@ -449,6 +574,22 @@ function renderTracks() {
     for (const track of filteredTracks) {
         const row = document.createElement("div");
         row.className = "music-track";
+
+        const selection = document.createElement("input");
+        selection.type = "checkbox";
+        selection.className = "music-track-selection";
+        selection.checked = selectedTrackIDs.has(track.TrackID);
+        selection.title = "Select track";
+
+        selection.addEventListener("change", () => {
+            if (selection.checked) {
+                selectedTrackIDs.add(track.TrackID);
+            } else {
+                selectedTrackIDs.delete(track.TrackID);
+            }
+
+            updateBulkToolbar();
+        });
 
         const artwork = document.createElement("div");
         artwork.className = "music-track-artwork";
@@ -543,7 +684,7 @@ function renderTracks() {
             row.after(editor);
         });
 
-        row.append(artwork, details, album, duration, tagsButton, editButton);
+        row.append(selection, artwork, details, album, duration, tagsButton, editButton);
         trackList.appendChild(row);
     }
 }
